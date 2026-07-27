@@ -74,6 +74,12 @@
         }
       ]
     },
+    "groups": [
+    {
+      "group": "Home",
+      "pages": ["index"]
+    }
+  ],
     "tabs": [
       {
         "tab": "Ramp",
