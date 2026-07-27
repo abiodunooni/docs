@@ -74,12 +74,7 @@
         }
       ]
     },
-    "groups": [
-    {
-      "group": "Home",
-      "pages": ["index"]
-    }
-  ],
+      "pages": ["index"],
     "tabs": [
       {
         "tab": "Get Started",
@@ -94,7 +89,7 @@
         ]
       },
       {
-        "tab": "Rampy",
+        "tab": "Ramp",
         "icon": "ramp-loading",
         "groups": [
           {
