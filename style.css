@@ -58,3 +58,40 @@
   background-color: #36343a;
   border-color: #4a484d;
 }
+
+.solution-card {
+  background-color: #ffffff;
+  border: 1px solid #e6e6e7;
+}
+
+.solution-card:hover {
+  border-color: var(--primary);
+}
+
+.solution-icon {
+  background-color: #f4f4f4;
+}
+
+.solution-cta {
+  margin-top: auto;
+  border: 1px solid #e6e6e7;
+  background-color: #ffffff;
+}
+
+.solution-card:hover .solution-cta {
+  border-color: var(--primary);
+}
+
+.dark .solution-card {
+  background-color: #232126;
+  border-color: #36343a;
+}
+
+.dark .solution-icon {
+  background-color: #36343a;
+}
+
+.dark .solution-cta {
+  background-color: #232126;
+  border-color: #36343a;
+}
