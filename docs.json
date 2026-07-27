@@ -76,19 +76,6 @@
     },
     "tabs": [
       {
-        "tab": "Overview",
-        "hidden": true,
-        "groups": [
-          {
-            "group": "Getting Started",
-            "pages": [
-              "index",
-              "quickstart"
-            ]
-          }
-        ]
-      },
-      {
         "tab": "Ramp",
         "icon": "ramp-loading",
         "groups": [
