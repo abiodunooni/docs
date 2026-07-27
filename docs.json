@@ -82,6 +82,18 @@
   ],
     "tabs": [
       {
+        "tab": "Get Started",
+        "icon": "ramp-loading",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "ramp"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Rampy",
         "icon": "ramp-loading",
         "groups": [
