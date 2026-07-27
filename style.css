@@ -1,3 +1,5 @@
+/* Text colours */
+
 .quidax-text-primary {
   color: #232126;
 }
@@ -14,6 +16,9 @@
   color: #acabae;
 }
 
+
+/* Product cards */
+
 .product-card {
   background-color: #ffffff;
   border: 1px solid #e6e6e7;
@@ -28,22 +33,40 @@
   border-color: #36343a;
 }
 
+
+/* Product icon backgrounds */
+
 .ramp-icon-background {
   background-color: #eafca6;
 }
+
+.basqet-icon-background {
+  background-color: #eee7ff;
+}
+
+.wallet-icon-background {
+  background-color: #dff7ed;
+}
+
+.orderbook-icon-background {
+  background-color: #fff1d6;
+}
+
+
+/* Use case cards */
 
 .usecase-card {
   min-height: 154px;
   background-color: #f4f4f4;
 }
 
+.usecase-card:hover {
+  background-color: #eeeeef;
+}
+
 .usecase-icon {
   background-color: #ffffff;
   border: 1px solid #e6e6e7;
-}
-
-.usecase-card:hover {
-  background-color: #eeeeef;
 }
 
 .dark .usecase-card {
@@ -55,9 +78,12 @@
 }
 
 .dark .usecase-icon {
-  background-color: #36343a;
-  border-color: #4a484d;
+  background-color: #17151b;
+  border-color: #36343a;
 }
+
+
+/* Solution cards */
 
 .solution-card {
   background-color: #ffffff;
@@ -72,26 +98,11 @@
   background-color: #f4f4f4;
 }
 
-.solution-cta {
-  margin-top: auto;
-  border: 1px solid #e6e6e7;
-  background-color: #ffffff;
-}
-
-.solution-card:hover .solution-cta {
-  border-color: var(--primary);
-}
-
 .dark .solution-card {
-  background-color: #232126;
+  background-color: #17151b;
   border-color: #36343a;
 }
 
 .dark .solution-icon {
-  background-color: #36343a;
-}
-
-.dark .solution-cta {
   background-color: #232126;
-  border-color: #36343a;
 }
