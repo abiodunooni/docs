@@ -131,7 +131,15 @@
         ]
       },
       {
-        "tab": "Developer Tools"
+        "tab": "Developer Tools",
+        "groups": [
+          {
+            "group": "Developer",
+            "pages": [
+              "orderbook"
+            ]
+          }
+        ]
       }
     ]
   }
