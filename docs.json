@@ -1,5 +1,4 @@
 {
-  "$schema": "https://mintlify.com/docs.json",
   "theme": "palm",
   "name": "Quidax Documentation",
   "colors": {
@@ -7,77 +6,60 @@
     "light": "#07C983",
     "dark": "#15803D"
   },
+  "logo": {
+    "light": "/images/light-log.svg",
+    "dark": "/images/dark-logo.svg"
+  },
   "favicon": "/favicon.svg",
-  "navigation": {
-    "tabs": [
+  "appearance": {
+    "strict": false
+  },
+  "background": {
+    "color": {
+      "light": "#ffffff",
+      "dark": "#17151B"
+    }
+  },
+  "navbar": {
+    "links": [
       {
-        "tab": "Overview",
-        "hidden": true,
-        "groups": [
-          {
-            "group": "Overview",
-            "pages": [
-              "index",
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Get Started",
-        "groups": [
-          {
-            "group": "Getting Started",
-            "pages": [
-              "quickstart"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Ramp",
-        "groups": [
-          {
-            "group": "Ramp",
-            "pages": [
-              "ramp"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Payment",
-        "groups": [
-          {
-            "group": "Basqet",
-            "pages": [
-              "basqet"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Wallets",
-        "groups": [
-          {
-            "group": "Wallets",
-            "pages": [
-              "wallets"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Orderbook",
-        "groups": [
-          {
-            "group": "Orderbook",
-            "pages": [
-              "orderbook"
-            ]
-          }
-        ]
+        "href": "mailto:hi@mintlify.com",
+        "label": "Support"
       }
     ],
+    "primary": {
+      "type": "button",
+      "label": "Dashboard",
+      "href": "https://app.mintlify.com"
+    }
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/mintlify",
+      "github": "https://github.com/mintlify",
+      "linkedin": "https://www.linkedin.com/company/quidax"
+    }
+  },
+  "fonts": {
+    "family": "Open Sans"
+  },
+  "styling": {
+    "eyebrows": "breadcrumbs"
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ],
+    "display": "header"
+  },
+  "navigation": {
     "global": {
       "anchors": [
         {
@@ -91,57 +73,73 @@
           "href": "https://mintlify.com/blog"
         }
       ]
-    }
-  },
-  "logo": {
-    "light": "/images/light-log.svg",
-    "dark": "/images/dark-logo.svg"
-  },
-  "navbar": {
-    "links": [
+    },
+    "tabs": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "tab": "Overview",
+        "hidden": true,
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "index",
+              "quickstart"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Ramp",
+        "icon": "ramp-loading",
+        "groups": [
+          {
+            "group": "Ramp",
+            "pages": [
+              "ramp"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Payment",
+        "icon": "cc-mastercard",
+        "groups": [
+          {
+            "group": "Basqet",
+            "pages": [
+              "basqet"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Wallets",
+        "icon": "wallet",
+        "groups": [
+          {
+            "group": "Wallets",
+            "pages": [
+              "wallets"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Orderbook",
+        "icon": "book-alt",
+        "groups": [
+          {
+            "group": "Orderbook",
+            "pages": [
+              "orderbook"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Developer Tools",
+        "icon": "toolbox"
       }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://app.mintlify.com"
-    }
-  },
-  "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude",
-      "perplexity",
-      "mcp",
-      "cursor",
-      "vscode"
     ]
-  },
-  "footer": {
-    "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://www.linkedin.com/company/quidax"
-    }
-  },
-  "styling": {
-    "eyebrows": "breadcrumbs"
-  },
-  "background": {
-    "color": {
-      "light": "#ffffff",
-      "dark": "#17151B"
-    }
-  },
-  "fonts": {
-    "family": "Open Sans"
-  },
-  "appearance": {
-    "strict": false
   }
 }
