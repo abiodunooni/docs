@@ -76,17 +76,6 @@
             ]
           }
         ]
-      },
-      {
-        "tab": "Developer Tools",
-        "groups": [
-          {
-            "group": "Developer Tools",
-            "pages": [
-              "orderbook"
-            ]
-          }
-        ]
       }
     ],
     "global": {
