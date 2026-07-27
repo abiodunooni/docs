@@ -9,12 +9,61 @@
   },
   "favicon": "/favicon.svg",
   "navigation": {
-    "pages": [
+    "tabs": [
       {
-        "group": "Getting Started",
-        "pages": [
-          "index",
-          "quickstart"
+        "tab": "Overview",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "index",
+              "quickstart"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Ramp",
+        "groups": [
+          {
+            "group": "Ramp",
+            "pages": [
+              "ramp"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Basqet",
+        "groups": [
+          {
+            "group": "Basqet",
+            "pages": [
+              "basqet"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Wallets",
+        "groups": [
+          {
+            "group": "Wallets",
+            "pages": [
+              "wallets"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Orderbook",
+        "groups": [
+          {
+            "group": "Orderbook",
+            "pages": [
+              "orderbook"
+            ]
+          }
         ]
       }
     ],
@@ -31,16 +80,7 @@
           "href": "https://mintlify.com/blog"
         }
       ]
-    },
-    "groups": [
-      {
-        "group": "Getting Started",
-        "pages": [
-          "index",
-          "quickstart"
-        ]
-      }
-    ]
+    }
   },
   "logo": {
     "light": "/images/light-log.svg",
