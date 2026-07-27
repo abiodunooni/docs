@@ -1,0 +1,60 @@
+.quidax-text-primary {
+  color: #232126;
+}
+
+.quidax-text-secondary {
+  color: #6a696c;
+}
+
+.dark .quidax-text-primary {
+  color: #ffffff;
+}
+
+.dark .quidax-text-secondary {
+  color: #acabae;
+}
+
+.product-card {
+  background-color: #ffffff;
+  border: 1px solid #e6e6e7;
+}
+
+.product-card:hover {
+  border-color: var(--primary);
+}
+
+.dark .product-card {
+  background-color: #232126;
+  border-color: #36343a;
+}
+
+.ramp-icon-background {
+  background-color: #eafca6;
+}
+
+.usecase-card {
+  min-height: 154px;
+  background-color: #f4f4f4;
+}
+
+.usecase-icon {
+  background-color: #ffffff;
+  border: 1px solid #e6e6e7;
+}
+
+.usecase-card:hover {
+  background-color: #eeeeef;
+}
+
+.dark .usecase-card {
+  background-color: #232126;
+}
+
+.dark .usecase-card:hover {
+  background-color: #2b292e;
+}
+
+.dark .usecase-icon {
+  background-color: #36343a;
+  border-color: #4a484d;
+}
