@@ -106,3 +106,7 @@
 .dark .solution-icon {
   background-color: #232126;
 }
+
+html[data-current-path="/"] .nav-tabs-item[data-active] > div {
+  display: none !important;
+}
