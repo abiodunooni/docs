@@ -1,0 +1,153 @@
+---
+title: "Widget"
+description: "Embed Ramp in your product with a script tag."
+icon: "window"
+---
+
+The Ramp widget is a hosted pop-up that runs the whole conversion inside your product. Quidax verifies each user, generates the account or address, converts and settles. You supply a public key and the transaction parameters.
+
+<Card title="Try the demo" icon="play" href="https://ramp-demo.quidax.io/" horizontal>
+  See the full flow before you integrate.
+</Card>
+
+## What you get
+
+<Columns cols={2}>
+  <Card title="No compliance stack" icon="shield-check">
+    Quidax handles identity verification, banking relationships and liquidity end to end.
+  </Card>
+
+  <Card title="Fastest path to market" icon="gauge-high">
+    A script tag and a function call. Typically 3 to 10 business days including testing.
+  </Card>
+</Columns>
+
+Two things to plan around. The widget carries Quidax branding, and users are verified as Quidax users even where they already completed verification with you. It is also not customisable per merchant, though requests to remove or restrict specific features can be considered.
+
+## Add the widget
+
+<Steps>
+  <Step title="Get your public key">
+    Copy it from the merchant dashboard. It starts with `pub_`, and unlike your secret key it is safe in client-side code.
+  </Step>
+
+  <Step title="Load the script">
+    The widget is framework-agnostic and works with React, Vue, Angular or plain JavaScript. There is no package to install.
+
+    ```html
+    <script src="https://d309lcjd52k0i0.cloudfront.net/ramp.js"></script>
+    ```
+  </Step>
+
+  <Step title="Initialise it">
+    Call `window.ramp.initialize()` from your own trigger, passing the transaction parameters and your callbacks.
+  </Step>
+</Steps>
+
+## Buy
+
+The customer pays local currency and receives stablecoin at the address you pass.
+
+```html
+<script src="https://d309lcjd52k0i0.cloudfront.net/ramp.js"></script>
+<button type="button" onclick="payWithRamp()">Buy USDT</button>
+
+<script>
+  function payWithRamp() {
+    window.ramp.initialize({
+      public_key: "pub_xxxxxxxxxxxx",
+      reference: "order-93979999999",
+      from_currency: "ngn",
+      to_currency: "usdt",
+      from_amount: "3000",
+      mode: "buy",
+      address: "0x2c8cb922aede1464ec575c",
+      network: "BEP20",
+      onClose: function (ref) {
+        // The customer dismissed the modal, completed or not.
+      },
+      onSuccess: function (transaction) {
+        // The transaction completed. Update your own record.
+      },
+    });
+  }
+</script>
+```
+
+## Sell
+
+The customer sends stablecoin and receives local currency. There is no `address` parameter — Ramp generates the deposit address and hands it to you through `onReceiveWalletDetails`.
+
+```html
+<script>
+  function sellWithRamp() {
+    window.ramp.initialize({
+      public_key: "pub_xxxxxxxxxxxx",
+      reference: "order-93979999998",
+      from_currency: "usdt",
+      to_currency: "ngn",
+      from_amount: "5",
+      mode: "sell",
+      network: "BEP20",
+      onClose: function (ref) {},
+      onReceiveWalletDetails: function (walletDetails) {
+        console.log(walletDetails.walletAddress);
+        console.log(walletDetails.network);
+        console.log(walletDetails.amount);
+      },
+      onSuccess: function (transaction) {},
+    });
+  }
+</script>
+```
+
+## Parameters
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `public_key` | String | Your public key from the merchant dashboard. Required. |
+| `reference` | String | Your own identifier for the transaction. Must be unique for every transaction. |
+| `from_currency` | String | Currency being converted from, for example `ngn` on buy or `usdt` on sell. |
+| `to_currency` | String | Currency the customer receives, for example `usdt` on buy or `ngn` on sell. |
+| `from_amount` | String | Amount of `from_currency` being converted, as a string. |
+| `mode` | String | `buy` to purchase with fiat, `sell` to convert to fiat. |
+| `network` | String | Blockchain network for the transaction, for example `BEP20`. |
+| `address` | String | Destination wallet address. Buy only. |
+
+### Callbacks
+
+| Callback | When it fires |
+| --- | --- |
+| `onClose(ref)` | The customer closes the modal, whether the transaction completed or was abandoned. |
+| `onReceiveWalletDetails(walletDetails)` | A deposit address has been generated. Returns `walletAddress`, `network` and `amount`. |
+| `onSuccess(transaction)` | The transaction completed. Returns the transaction details. |
+
+## Verify before you credit
+
+`onSuccess` runs in the browser, so treat it as a prompt to refresh rather than proof of payment. Confirm server-side before you credit a customer, using the [webhook](/ramp/webhooks) or by fetching the transaction with your secret key.
+
+<Warning>
+  Never put your secret key in client-side code. Only `pub_` keys belong in a browser or mobile app.
+</Warning>
+
+## Starter kit
+
+The Ramp team provides a starter kit when you onboard:
+
+- A React component, npm-ready, with state handling, loading animations and asset-load safety checks.
+- An HTML and JavaScript template — a copy-pasteable static script with a centred container layout.
+- A developer README covering local setup, public key configuration and parameter management.
+
+Ask your Quidax representative for it.
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Webhooks" icon="webhook" href="/ramp/webhooks" horizontal />
+
+  <Card title="Coverage and limits" icon="globe" href="/ramp/coverage" horizontal />
+
+  <Card title="Testing" icon="flask" href="/ramp/testing" horizontal />
+
+  <Card title="Move to the API" icon="code" href="/ramp/on-ramp" horizontal />
+</CardGroup>

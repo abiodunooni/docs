@@ -1,0 +1,167 @@
+---
+title: "Errors and statuses"
+description: "Response format, status values and every error message Ramp returns."
+icon: "triangle-alert"
+---
+
+Every Ramp response uses the same envelope, whether it succeeded or failed.
+
+```json
+{
+  "status": "ok",
+  "message": "Human-readable response message",
+  "data": {}
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `status` | string | Result of the request. |
+| `message` | string | Human-readable explanation. |
+| `data` | object, array or null | Response payload on success, usually `null` on errors. |
+
+## Response statuses
+
+| `status` | HTTP | Meaning |
+| --- | --- | --- |
+| `ok` | 200 | The request succeeded. |
+| `bad_request` | 400 | The request was invalid, incomplete, duplicated or could not be processed. |
+| `forbidden` | 403 | Authentication failed, usually an invalid private key. |
+| `not_found` | 404 | The transaction or refund does not exist. |
+
+<Tip>
+  Branch on `status` rather than parsing `message`. Messages are written for humans and may be reworded; the status values are stable.
+</Tip>
+
+## Error messages
+
+<AccordionGroup>
+  <Accordion title="Authentication" icon="key">
+    | Message | Status | What to do |
+    | --- | --- | --- |
+    | `Invalid private key` | `forbidden` | Check you are sending `x-private-key`, that the key is correct, and that your account is activated. |
+  </Accordion>
+
+  <Accordion title="Creating a transaction" icon="plus">
+    | Message | Status | What to do |
+    | --- | --- | --- |
+    | `Invalid amount` | `bad_request` | The amount is below the minimum or above the maximum. Check [Get on-ramp limits](/api-reference/ramp/rates-and-limits/get-on-ramp-limits) and validate before submitting. |
+    | `Transaction with reference already exists` | `bad_request` | The `merchant_reference` has been used. Generate a new one — do not retry with the same value. |
+    | `Invalid address format` | `bad_request` | The wallet address is malformed. Validate client-side. |
+    | `Invalid network` | `bad_request` | The network is not supported for that asset. See [Assets and networks](/ramp/coverage#assets-and-networks). |
+    | `customer first name is missing` | `bad_request` | `customer.first_name` is required. |
+    | `customer last name is missing` | `bad_request` | `customer.last_name` is required. |
+    | `Invalid customer` | `bad_request` | The customer object failed validation. Check the email is well formed and unique. |
+  </Accordion>
+
+  <Accordion title="Refreshing a transaction" icon="arrows-rotate">
+    | Message | Status | What to do |
+    | --- | --- | --- |
+    | `Currency swap not allowed: ngn -> usdtg` | `bad_request` | The currency pair is not supported. The message names the pair it rejected. |
+    | `Failed to refresh on-ramp transaction` | `bad_request` | The transaction cannot be refreshed, usually because it is already confirmed. Create a new one. |
+    | `Failed to refresh off-ramp transaction` | `bad_request` | As above, for off-ramp. |
+  </Accordion>
+
+  <Accordion title="Confirming and payout accounts" icon="building-columns">
+    | Message | Status | What to do |
+    | --- | --- | --- |
+    | `Transaction does not exist` | `not_found` | Check the `merchant_reference` in the path. |
+    | `Failed to create account` | `bad_request` | The payout account could not be created. Check the `bank_code` came from the institutions endpoint and the account number is valid. |
+    | `Name does not match` | `bad_request` | The resolved account name does not match the customer on the transaction. Surface this to your customer as a name problem. |
+  </Accordion>
+
+  <Accordion title="Mobile money" icon="mobile">
+    | Message | Status | What to do |
+    | --- | --- | --- |
+    | `Mobile money deposit failed` | `bad_request` | The provider rejected the debit. Ask the customer to retry, or try another provider. |
+    | `Transaction not found` | `bad_request` | Check the `merchant_reference`. |
+    | `Fiat deposit already exists` | `bad_request` | The deposit has already been made. Fetch the transaction rather than retrying. |
+    | `Failed to verify the OTP for your mobile money deposit. Please try again.` | `bad_request` | Wrong or expired code. Initiate the deposit again to send a new one. |
+    | `Missing OTP token` | `bad_request` | The `otp` field was empty. |
+    | `Deposit not found` | `bad_request` | No mobile money deposit has been initiated for this transaction. |
+  </Accordion>
+
+  <Accordion title="Fetching and filtering" icon="magnifying-glass">
+    | Message | Status | What to do |
+    | --- | --- | --- |
+    | `Transaction not found` | `not_found` | Pass the Quidax `reference` (`TRX-...`), not your `merchant_reference`. This is the most common cause. |
+    | `Refund not found` | `not_found` | No refund exists for that transaction. |
+    | `Invalid fiat currency` | `bad_request` | The currency is not supported for that operation. |
+    | `Invalid crypto currency` | `bad_request` | The asset is not supported for that operation. |
+    | `Invalid side` | `bad_request` | `side` must be `on_ramp` or `off_ramp`. |
+  </Accordion>
+</AccordionGroup>
+
+## Transaction statuses
+
+`status` on the transaction itself, distinct from the response status above.
+
+| Status | Terminal | Meaning |
+| --- | --- | --- |
+| `pending` | No | Created but not yet funded. |
+| `processing` | No | Funds received. Conversion or payout under way. |
+| `completed` | Yes | Both legs finished successfully. |
+| `failed` | Yes | The transaction could not be completed. |
+| `needs_attention` | No | One leg succeeded, the other did not. Under manual review. |
+| `refunded` | Yes | Funds returned to the customer. |
+| `abandoned` | Yes | Created but never funded. |
+| `cancelled` | Yes | Cancelled before completion. |
+| `swap_reversed` | Yes | A conversion was reversed. |
+
+Credit your customer only on `completed`. `needs_attention` means Quidax is working on it, so hold rather than failing the order.
+
+Leg statuses sit on the nested objects: `fiat_deposit.status`, `crypto_payout.status`, `crypto_deposit.status` and `fiat_payout.status`. A transaction can be `needs_attention` with `fiat_deposit.status` of `success` and `crypto_payout.status` of `failed`.
+
+`error_message` on a fetched transaction carries the reason where one is available, and is `null` otherwise.
+
+## Failure modes worth handling
+
+<AccordionGroup>
+  <Accordion title="The customer paid the wrong amount" icon="equals">
+    The provider rejects overpayment and underpayment on the virtual account and reverses the transfer. Nothing reaches Ramp. Show `amount_expected` prominently and discourage rounding.
+  </Accordion>
+
+  <Accordion title="Someone else paid" icon="user-xmark">
+    Third-party deposits are not supported. A name mismatch means the deposit is rejected and refunded to the customer, which starts the [refund flow](/ramp/refunds).
+  </Accordion>
+
+  <Accordion title="A duplicate deposit was made" icon="copy">
+    The provider rejects the second deposit to the same virtual account and reverses it.
+  </Accordion>
+
+  <Accordion title="The wrong asset or network was sent" icon="link-slash">
+    On off-ramp, sending a different asset, a different amount, or using the wrong network can push the transaction into `needs_attention` for manual review. Contact support with the references.
+  </Accordion>
+
+  <Accordion title="A payout was reversed after acceptance" icon="rotate-left">
+    A bank or mobile money provider can accept a payout and reverse it later. Quidax handles these manually and sends the fiat to an alternative account you provide.
+  </Accordion>
+
+  <Accordion title="A limit was breached" icon="gauge-high">
+    The transaction is rejected before any money moves. Ramp never partially fills. Surface the message and offer a smaller amount where you can. See [Transaction tiers](/ramp/coverage#transaction-tiers).
+  </Accordion>
+</AccordionGroup>
+
+## Retrying safely
+
+Ramp keys transactions on your `merchant_reference`, which makes safe retries straightforward:
+
+- **A request timed out and you do not know if it landed.** Retry with the same `merchant_reference`. A duplicate error tells you the original succeeded.
+- **A request failed validation.** Fix the input and retry with the same reference — nothing was created.
+- **You want to start over.** Generate a new reference. Never reuse one across different transactions.
+
+<Warning>
+  Never retry a confirmed transaction with a new reference before checking the state of the original. You could generate a second bank account for a customer who has already paid into the first.
+</Warning>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Webhooks" icon="webhook" href="/ramp/webhooks" horizontal />
+
+  <Card title="Testing" icon="flask" href="/ramp/testing" horizontal />
+
+  <Card title="API reference" icon="code" href="/api-reference/ramp/introduction" horizontal />
+
+  <Card title="Contact support" icon="life-ring" href="/support" horizontal />
+</CardGroup>

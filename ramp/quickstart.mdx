@@ -1,0 +1,249 @@
+---
+title: "Quickstart"
+description: "Run your first Ramp transaction from creation to completion."
+icon: "rocket"
+---
+
+This walks you through one on-ramp transaction against the live API, using the smallest amount Ramp accepts. Budget about 20 minutes.
+
+<Note>
+  Ramp has no sandbox yet, so first transactions run in production with real money. Use the minimum — ₦3,000 for NGN — and you can complete the whole flow for a trivial amount. See [Testing](/ramp/testing).
+</Note>
+
+## Before you start
+
+<Steps>
+  <Step title="Get your keys">
+    From the merchant dashboard, copy your secret key (`sk_...`) for API calls and your public key (`pub_...`) for the widget.
+  </Step>
+
+  <Step title="Store them as environment variables">
+    ```bash .env
+    RAMP_SECRET_KEY=sk_live_xxxxxxxxxxxx
+    RAMP_PUBLIC_KEY=pub_xxxxxxxxxxxx
+    ```
+
+    <Warning>
+      The secret key authenticates every API call. Keep it server-side, never commit it, and never expose it in browser or mobile code. Only the public key belongs in a client.
+    </Warning>
+  </Step>
+
+  <Step title="Set your webhook URL">
+    Set it in the merchant dashboard. It must be reachable over HTTPS and return `2xx`. If you do not have an endpoint yet, use a request-inspection service to watch events while you build.
+  </Step>
+
+  <Step title="Have a wallet address ready">
+    You need a destination address on a [supported network](/ramp/coverage#assets-and-networks). Use one you control so you can confirm the funds arrive.
+  </Step>
+</Steps>
+
+## 1. Check the rate
+
+Quotes are indicative until a transaction exists, but this confirms your key works.
+
+```bash
+curl 'https://ramp-be.quidax.io/api/v1/merchants/purchase_quotes/buy?currency=ngn&token=usdt&fiat_amount=3000&token_network=bep20' \
+  -H 'accept: application/json' \
+  -H "x-private-key: $RAMP_SECRET_KEY"
+```
+
+```json
+{
+  "status": "ok",
+  "message": "Crypto currency amount retrieved",
+  "data": { "fee": "80.63", "to_amount": "2.05" }
+}
+```
+
+A `403` with `Invalid private key` means the key is wrong or not yet active.
+
+## 2. Create the transaction
+
+Generate a unique `merchant_reference` and store it against your order before you call.
+
+<CodeGroup>
+```bash cURL
+curl -X POST 'https://ramp-be.quidax.io/api/v1/merchants/custodial/on_ramp_transactions/initiate' \
+  -H 'accept: application/json' \
+  -H 'content-type: application/json' \
+  -H "x-private-key: $RAMP_SECRET_KEY" \
+  -d '{
+    "from_currency": "ngn",
+    "to_currency": "usdt",
+    "from_amount": "3000",
+    "merchant_reference": "quickstart-001",
+    "customer": {
+      "email": "ada@example.com",
+      "first_name": "Ada",
+      "last_name": "Lovelace"
+    },
+    "wallet_address": {
+      "address": "0x2c8cb922aede1464ec575c",
+      "network": "bep20"
+    }
+  }'
+```
+
+```js Node.js
+const res = await fetch(
+  "https://ramp-be.quidax.io/api/v1/merchants/custodial/on_ramp_transactions/initiate",
+  {
+    method: "POST",
+    headers: {
+      accept: "application/json",
+      "content-type": "application/json",
+      "x-private-key": process.env.RAMP_SECRET_KEY,
+    },
+    body: JSON.stringify({
+      from_currency: "ngn",
+      to_currency: "usdt",
+      from_amount: "3000",
+      merchant_reference: "quickstart-001",
+      customer: {
+        email: "ada@example.com",
+        first_name: "Ada",
+        last_name: "Lovelace",
+      },
+      wallet_address: {
+        address: "0x2c8cb922aede1464ec575c",
+        network: "bep20",
+      },
+    }),
+  },
+);
+
+const { data } = await res.json();
+console.log(data.reference);
+```
+</CodeGroup>
+
+```json Response
+{
+  "status": "ok",
+  "message": "Transaction successfully initiated",
+  "data": {
+    "public_id": "6a089a1a-7633-4e4c-b6e6-39da723dd4fa",
+    "reference": "TRX-29U3YLYGC8",
+    "merchant_reference": "quickstart-001",
+    "from_currency": "ngn",
+    "to_currency": "usdt",
+    "from_amount": "3000.0",
+    "to_amount": "2.05",
+    "status": "pending",
+    "blockchain_fee": "1.0"
+  }
+}
+```
+
+Save `reference` alongside your `merchant_reference`. You need `reference` to fetch the transaction later.
+
+<Warning>
+  The customer name must match the name on the bank account that will pay. Ramp rejects third-party deposits.
+</Warning>
+
+## 3. Confirm to get the bank account
+
+Confirming locks the quote and generates a single-use account. Only do this when your customer is ready to pay.
+
+```bash
+curl -X POST 'https://ramp-be.quidax.io/api/v1/merchants/custodial/on_ramp_transactions/quickstart-001/confirm' \
+  -H 'accept: application/json' \
+  -H "x-private-key: $RAMP_SECRET_KEY"
+```
+
+```json Response
+{
+  "status": "ok",
+  "message": "Transaction successfully confirmed",
+  "data": {
+    "account_name": "Quidax / Ada Lovelace",
+    "account_number": "0565084270",
+    "bank_name": "Test Bank",
+    "amount": "3000.0",
+    "amount_expected": "3083.75",
+    "processor_fee": "80.63",
+    "vat": "3.12"
+  }
+}
+```
+
+<Warning>
+  Show `amount_expected`, not `amount`. It includes the processor fee and VAT, and it is the figure the customer must transfer. Paying more or less causes the deposit to be rejected.
+</Warning>
+
+## 4. Pay it
+
+Transfer exactly `amount_expected` to the account returned, from an account in the customer's name.
+
+## 5. Watch the webhooks
+
+Three events arrive in sequence. Full payloads are in [Webhooks](/ramp/webhooks).
+
+| Order | Event | What it means |
+| --- | --- | --- |
+| 1 | `buy_transaction.processing` | Fiat received. `fiat_deposit` populated, `crypto_payout` still `null`. |
+| 2 | `buy_transaction.processing` | Payout started. Both objects populated. |
+| 3 | `buy_transaction.successful` | Done, with the transaction hash on `crypto_payout`. |
+
+Verify the signature before you trust an event:
+
+```js
+import crypto from "crypto";
+
+export function verifyRampSignature(rawBody, signature, secretKey) {
+  const expected = crypto
+    .createHmac("sha256", secretKey)
+    .update(rawBody)
+    .digest("hex");
+
+  if (expected.length !== signature.length) return false;
+
+  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+}
+```
+
+Use the raw request body. Do not parse and re-serialise the JSON before verifying.
+
+## 6. Confirm the final state
+
+Webhooks are the source of truth, but fetch the transaction whenever you need to reconcile. Pass the Quidax `reference`, not your own.
+
+```bash
+curl 'https://ramp-be.quidax.io/api/v1/merchants/on_ramp_transaction/TRX-29U3YLYGC8' \
+  -H 'accept: application/json' \
+  -H "x-private-key: $RAMP_SECRET_KEY"
+```
+
+Check that `status` is `completed`, that `crypto_payout.transaction_hash` is set, and that the funds landed at your address.
+
+## What to build next
+
+<Steps>
+  <Step title="Handle the unhappy paths">
+    Underpayment, name mismatch, expired quotes and failed payouts all have defined behaviour.
+
+    <Card title="Errors and statuses" icon="triangle-alert" href="/ramp/errors" horizontal />
+  </Step>
+
+  <Step title="Add off-ramp">
+    The sell flow adds a payout account step before confirmation.
+
+    <Card title="Off-ramp guide" icon="arrow-up" href="/ramp/off-ramp" horizontal />
+  </Step>
+
+  <Step title="Handle refunds">
+    Ramp asks you for destination account details by webhook when an on-ramp deposit has to be returned.
+
+    <Card title="Refunds" icon="rotate-left" href="/ramp/refunds" horizontal />
+  </Step>
+
+  <Step title="Work through testing, then launch">
+    <Card title="Testing" icon="flask" href="/ramp/testing" horizontal />
+  </Step>
+</Steps>
+
+## Prefer not to build the interface?
+
+The widget covers the same flows with a script tag, and Quidax verifies each user inside it.
+
+<Card title="Widget integration" icon="window" href="/ramp/widget" horizontal />

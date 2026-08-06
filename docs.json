@@ -113,9 +113,30 @@
         "tab": "Ramp",
         "groups": [
           {
-            "group": "Ramp",
+            "group": "Overview",
             "pages": [
-              "ramp"
+              "ramp",
+              "ramp/how-it-works",
+              "ramp/coverage"
+            ]
+          },
+          {
+            "group": "Integrate",
+            "pages": [
+              "ramp/quickstart",
+              "ramp/widget",
+              "ramp/on-ramp",
+              "ramp/off-ramp",
+              "ramp/rates-and-markup",
+              "ramp/refunds",
+              "ramp/webhooks"
+            ]
+          },
+          {
+            "group": "Launch",
+            "pages": [
+              "ramp/testing",
+              "ramp/errors"
             ]
           }
         ]
@@ -149,6 +170,77 @@
             "group": "Orderbook",
             "pages": [
               "orderbook"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api-reference"
+            ]
+          },
+          {
+            "group": "Ramp",
+            "openapi": "/openapi/ramp.json",
+            "pages": [
+              "api-reference/ramp/introduction",
+              {
+                "group": "Rates and limits",
+                "pages": [
+                  "api-reference/ramp/rates-and-limits/list-payment-methods",
+                  "api-reference/ramp/rates-and-limits/get-an-on-ramp-quote",
+                  "api-reference/ramp/rates-and-limits/get-an-off-ramp-quote",
+                  "api-reference/ramp/rates-and-limits/get-on-ramp-limits",
+                  "api-reference/ramp/rates-and-limits/get-off-ramp-limits"
+                ]
+              },
+              {
+                "group": "On-ramp",
+                "pages": [
+                  "api-reference/ramp/on-ramp/create-an-on-ramp-transaction",
+                  "api-reference/ramp/on-ramp/refresh-an-on-ramp-transaction",
+                  "api-reference/ramp/on-ramp/confirm-an-on-ramp-transaction",
+                  "api-reference/ramp/on-ramp/initiate-a-mobile-money-deposit",
+                  "api-reference/ramp/on-ramp/verify-a-mobile-money-otp",
+                  "api-reference/ramp/on-ramp/create-an-auto-swap-account"
+                ]
+              },
+              {
+                "group": "Off-ramp",
+                "pages": [
+                  "api-reference/ramp/off-ramp/create-an-off-ramp-transaction",
+                  "api-reference/ramp/off-ramp/refresh-an-off-ramp-transaction",
+                  "api-reference/ramp/off-ramp/add-a-payout-account",
+                  "api-reference/ramp/off-ramp/confirm-an-off-ramp-transaction"
+                ]
+              },
+              {
+                "group": "Transactions",
+                "pages": [
+                  "api-reference/ramp/transactions/fetch-an-on-ramp-transaction",
+                  "api-reference/ramp/transactions/fetch-an-off-ramp-transaction",
+                  "api-reference/ramp/transactions/list-on-ramp-transactions",
+                  "api-reference/ramp/transactions/list-off-ramp-transactions"
+                ]
+              },
+              {
+                "group": "Refunds",
+                "pages": [
+                  "api-reference/ramp/refunds/get-a-refund",
+                  "api-reference/ramp/refunds/submit-refund-bank-details",
+                  "api-reference/ramp/refunds/verify-a-bank-account"
+                ]
+              },
+              {
+                "group": "Banks",
+                "pages": [
+                  "api-reference/ramp/banks/list-supported-institutions"
+                ]
+              }
             ]
           }
         ]

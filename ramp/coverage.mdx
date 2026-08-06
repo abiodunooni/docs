@@ -1,0 +1,154 @@
+---
+title: "Coverage and limits"
+description: "Markets, assets, networks, minimums and transaction tiers for Ramp."
+icon: "globe"
+---
+
+Retrieve currencies, assets and limits from the API rather than hard-coding them. New markets and assets then reach your integration without a release.
+
+## Markets
+
+| Country | Currency | Code | Status |
+| --- | --- | --- | --- |
+| Nigeria | Nigerian Naira | NGN | Live |
+| Ghana | Ghanaian Cedi | GHS | Live |
+| South Africa | South African Rand | ZAR | Coming soon |
+| Cameroon | Central African Franc | XAF | Coming soon |
+| Côte d'Ivoire | West African Franc | XOF | Coming soon |
+
+NGN and GHS are live on both the widget and the API. ZAR, XAF and XOF are in progress — talk to your Quidax representative about timelines and early access.
+
+<Note>
+  Need a market that is not listed? New corridor requests go through a feasibility review covering regulatory access, provider availability, expected volume and treasury cost. Corridors have been added in as little as four weeks where volume justifies it. Raise it with your Quidax representative.
+</Note>
+
+## Payment methods
+
+Methods differ by currency and by channel. Call [List payment methods](/api-reference/ramp/rates-and-limits/list-payment-methods) for the live set rather than assuming.
+
+| Currency | On-ramp | Off-ramp |
+| --- | --- | --- |
+| NGN | Virtual bank account, dynamic by default, static on request | Bank transfer |
+| GHS | Mobile money | Mobile money and bank transfer |
+
+In Ghana, mobile money reaches most consumer endpoints and settles in under five minutes. Bank rails reach formal account holders, settle more slowly and carry higher per-transaction caps. Consumer products usually lead with mobile money; higher-ticket and B2B flows often need bank rails.
+
+## Assets and networks
+
+| Asset | Code | Networks |
+| --- | --- | --- |
+| Tether | `usdt` | `bep20`, `erc20`, `solana`, `trc20`, `celo` |
+| USD Coin | `usdc` | `bep20`, `erc20`, `solana` |
+| Compliant Naira | `cngn` | `bep20` |
+
+Additional assets, including XAUT and USAT, are available on some flows by arrangement. Confirm what is enabled on your account during onboarding.
+
+<Tip>
+  For predictable settlement timing, default to Tron or Polygon and use Ethereum only when the destination wallet requires it. Gas spikes on Ethereum mainnet delay sends by minutes, and Ramp queues rather than overpaying gas.
+</Tip>
+
+## Minimums
+
+| Currency | Minimum |
+| --- | --- |
+| NGN | 3,000 |
+| GHS | 50 |
+| USDT | 5 |
+| USDC | 5 |
+
+Call [Get on-ramp limits](/api-reference/ramp/rates-and-limits/get-on-ramp-limits) and [Get off-ramp limits](/api-reference/ramp/rates-and-limits/get-off-ramp-limits) to validate against the live figures for your account, which include the maximum and the interval the limit is measured over.
+
+```bash
+curl 'https://ramp-be.quidax.io/api/v1/merchants/purchase_limits/buy?currency_symbol=ngn' \
+  -H 'accept: application/json' \
+  -H "x-private-key: $RAMP_SECRET_KEY"
+```
+
+```json
+{
+  "status": "ok",
+  "message": "Fiat currency limit retrieved",
+  "data": {
+    "code": "ngn",
+    "min_value": "2000.0",
+    "max_value": "2000000.0",
+    "interval": "daily"
+  }
+}
+```
+
+## Transaction tiers
+
+Limits are set per user and determined by how much verification has been completed. Caps are enforced per corridor, so reaching a daily cap in one market does not affect another.
+
+<Tabs>
+  <Tab title="Widget">
+    Tiers apply to your end users, and Quidax handles the upgrade path inside the flow.
+
+    **NGN**
+
+    | Tier | Daily limit | Requirement |
+    | --- | --- | --- |
+    | Basic | ₦5,000,000 | BVN or NIN verification and a selfie |
+    | Advanced | ₦75,000,000 | Proof of address |
+    | Enhanced | $1,000,000 | Enhanced due diligence form, subject to manual review |
+
+    **GHS mobile money**
+
+    | Tier | Daily limit | Requirement |
+    | --- | --- | --- |
+    | Basic | GHS 3,000 | Ghana Card verification and a selfie |
+    | Advanced | GHS 15,000 | Proof of address |
+    | Enhanced | GHS 25,000 | Enhanced due diligence form, subject to manual review |
+  </Tab>
+
+  <Tab title="API, enterprise">
+    For businesses transacting on their own account or for their own customers.
+
+    | Tier | Single | Daily | Monthly | Requirement |
+    | --- | --- | --- | --- | --- |
+    | Basic | $10,000 | $50,000 | $500,000 | Basic business verification |
+    | Advanced | $25,000 | $300,000 | $5,000,000 | Basic verification, proven activity, website review, source-of-funds evidence and licences |
+    | Enhanced | $100,000 | $1,000,000 | $20,000,000 | Full verification, source-of-funds verification, ongoing monitoring and licences |
+  </Tab>
+
+  <Tab title="API, aggregator">
+    For platforms serving sub-merchants. Limits are enforced per user, so sub-merchants are subject to the same limits as the aggregator.
+
+    | Tier | Single | Daily | Monthly | Requirement |
+    | --- | --- | --- | --- | --- |
+    | Basic | $25,000 | $50,000 | $1,000,000 | Full verification and a merchant list with basic details |
+    | Advanced | $50,000 | $500,000 | $10,000,000 | Full verification, source-of-funds evidence, merchant onboarding policy, full merchant list with verification status and website reviews |
+    | Enhanced | $1,000,000 | $10,000,000 | $30,000,000 | Full verification, source-of-funds verification, merchant onboarding policy, prohibited merchant policy and full merchant list with verification status |
+  </Tab>
+</Tabs>
+
+<Note>
+  Limit increases are reviewed against your processed volume. Moving to a new tier involves a compliance refresh, including updated source-of-funds documentation. Ask your merchant success manager to start the review.
+</Note>
+
+### Handling a limit breach
+
+A transaction that would exceed a limit is rejected before any money moves. Ramp never partially fills. Surface the message to your customer and, where you can, offer a smaller amount.
+
+## Settlement times
+
+| Direction | Rail | Typical time |
+| --- | --- | --- |
+| On-ramp | Bank transfer or virtual account | Under 5 minutes |
+| Off-ramp | NGN bank payout | Under 2 minutes |
+| Off-ramp | GHS mobile money | Under 5 minutes |
+
+Times assume the local rail is available. Nigeria's instant rail runs continuously; some bank rails have processing hours, and transactions submitted outside them are queued.
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="How it works" icon="route" href="/ramp/how-it-works" horizontal />
+
+  <Card title="Quickstart" icon="rocket" href="/ramp/quickstart" horizontal />
+
+  <Card title="API reference" icon="code" href="/api-reference/ramp/introduction" horizontal />
+
+  <Card title="Quidax coverage" icon="map" href="/get-started/coverage" horizontal />
+</CardGroup>

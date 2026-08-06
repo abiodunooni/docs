@@ -1,0 +1,224 @@
+---
+title: "How it works"
+description: "Transaction lifecycles, statuses and the rules that govern each step."
+icon: "route"
+---
+
+Every Ramp transaction has two legs: a fiat leg and a crypto leg. Ramp converts between them and settles both. The direction determines which leg comes first.
+
+| Direction | Also called | Customer sends | Customer receives |
+| --- | --- | --- | --- |
+| On-ramp | Buy | Local currency | Stablecoin |
+| Off-ramp | Sell | Stablecoin | Local currency |
+
+## On-ramp lifecycle
+
+<Tabs>
+  <Tab title="API">
+    <Steps>
+      <Step title="Create the transaction">
+        Send the amount, currency pair, customer details and the destination wallet address. You get back a quote and a Quidax `reference`.
+      </Step>
+
+      <Step title="Refresh if the quote goes stale">
+        Quotes are held for roughly 10 seconds. If your customer takes longer to decide, refresh to recalculate.
+      </Step>
+
+      <Step title="Confirm the transaction">
+        This generates a single-use bank account and returns `amount_expected`, the exact total to pay. Confirm only when the customer is ready.
+      </Step>
+
+      <Step title="The customer pays">
+        They transfer `amount_expected` from an account in their own name.
+      </Step>
+
+      <Step title="Ramp converts and pays out">
+        You receive `buy_transaction.processing` when the deposit lands, and again when the payout starts.
+      </Step>
+
+      <Step title="The transaction completes">
+        `buy_transaction.successful` arrives with the transaction hash. Requery if you need to confirm.
+      </Step>
+    </Steps>
+
+    <Card title="On-ramp guide" icon="arrow-down" href="/ramp/on-ramp" horizontal>
+      Full request and response detail, including mobile money.
+    </Card>
+  </Tab>
+
+  <Tab title="Widget">
+    <Steps>
+      <Step title="Your customer opens the widget">
+        They enter the amount they want to buy.
+      </Step>
+
+      <Step title="They verify their identity">
+        New users verify their email by OTP and complete verification inline. Existing Quidax users skip straight through.
+      </Step>
+
+      <Step title="A bank account is generated">
+        The widget shows the account and the exact amount.
+      </Step>
+
+      <Step title="They pay, and receive stablecoin">
+        Your `onSuccess` callback fires with the transaction details.
+      </Step>
+    </Steps>
+
+    <Card title="Widget integration" icon="window" href="/ramp/widget" horizontal />
+  </Tab>
+</Tabs>
+
+## Off-ramp lifecycle
+
+<Tabs>
+  <Tab title="API">
+    <Steps>
+      <Step title="Create the transaction">
+        Send the asset amount, network, target fiat currency and customer details.
+      </Step>
+
+      <Step title="Fetch supported institutions">
+        Pull the live list of banks and mobile money providers for the country.
+      </Step>
+
+      <Step title="Attach the payout account">
+        Ramp resolves the account and checks the name against the customer on the transaction.
+      </Step>
+
+      <Step title="Confirm the transaction">
+        This returns the deposit address. Confirm only after the payout account is attached.
+      </Step>
+
+      <Step title="The customer sends the asset">
+        Exact amount, correct asset, correct network.
+      </Step>
+
+      <Step title="Ramp converts and pays out">
+        `sell_transaction.processing` fires when the deposit is accepted and again when the payout starts, then `sell_transaction.successful` on completion.
+      </Step>
+    </Steps>
+
+    <Card title="Off-ramp guide" icon="arrow-up" href="/ramp/off-ramp" horizontal />
+  </Tab>
+
+  <Tab title="Widget">
+    <Steps>
+      <Step title="Your customer opens the widget">
+        They enter the amount they want to sell.
+      </Step>
+
+      <Step title="They enter their payout account">
+        The bank or mobile money account that will receive the funds.
+      </Step>
+
+      <Step title="A deposit address is generated">
+        Your `onReceiveWalletDetails` callback fires with the address, network and amount.
+      </Step>
+
+      <Step title="They send, and receive local currency">
+        Ramp pays out directly to their account.
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+## Transaction statuses
+
+`status` on a transaction moves through these values.
+
+| Status | Meaning |
+| --- | --- |
+| `pending` | Created, but the customer has not paid or sent funds yet. |
+| `processing` | Funds received. Conversion or payout is under way. |
+| `completed` | Both legs finished. This is the terminal success state. |
+| `failed` | The transaction could not be completed. |
+| `needs_attention` | One leg succeeded and the other did not. Quidax reviews these manually. |
+| `refunded` | Funds were returned to the customer. |
+| `abandoned` | Created but never funded. |
+| `cancelled` | Cancelled before completion. |
+| `swap_reversed` | A conversion was reversed. |
+
+<Note>
+  Treat webhooks as the source of truth for the final state, and requery the transaction when you need to confirm. Both are covered in [Webhooks](/ramp/webhooks).
+</Note>
+
+## Rules that apply to every transaction
+
+<AccordionGroup>
+  <Accordion title="References" icon="hashtag">
+    There are two references and they are not interchangeable.
+
+    - `merchant_reference` is the unique reference **you** generate. Use it to create, refresh, confirm and attach accounts, and to look up refunds.
+    - `reference` is the reference **Quidax** returns, formatted `TRX-...`. Use it to fetch a transaction.
+
+    Store both against your own order record. Reusing a `merchant_reference` returns a duplicate transaction error.
+  </Accordion>
+
+  <Accordion title="Exact amounts" icon="equals">
+    On on-ramp, the customer must transfer exactly `amount_expected`. That figure is the transaction amount plus the processor fee and VAT. Overpayment and underpayment are both rejected by the provider, so show the exact figure and discourage rounding.
+
+    On off-ramp, the customer must send the exact asset amount on the correct network. A different amount can push the transaction into `needs_attention` for manual review.
+  </Accordion>
+
+  <Accordion title="Name matching" icon="user-check">
+    Ramp does not support third-party deposits or payouts. The name on the paying bank account must match the customer name on the transaction, and Ramp runs the same check on off-ramp payout accounts.
+
+    Where a mismatch is found, the fiat deposit is rejected and refunded, or the payout account is not attached.
+
+    For business customers, pass the first word of the business name as `first_name` and the remainder as `last_name`.
+  </Accordion>
+
+  <Accordion title="Quotes and rates" icon="clock">
+    A quote is held for roughly 10 seconds once a transaction is initiated. Refresh the transaction to recalculate if your customer takes longer.
+
+    Quoted rates include the transaction fee and any markup you have configured. Stamp duty, where it applies, is deducted from the converted amount afterwards and is not in the quote.
+  </Accordion>
+
+  <Accordion title="Virtual accounts" icon="building-columns">
+    On-ramp uses a dynamic virtual account by default: a fresh account number per transaction, so no payment reference is needed and your customer does not have to add a narration.
+
+    Duplicate deposits to the same account are rejected and reversed by the provider.
+
+    Static accounts, where one customer keeps the same account number across transactions, are available for NGN on request. See [auto swap](/ramp/on-ramp#recurring-funding-with-auto-swap).
+  </Accordion>
+
+  <Accordion title="Settlement timing" icon="stopwatch">
+    On-ramp fiat is typically confirmed in under 30 seconds, with the stablecoin send bound by the network's block time. Off-ramp payouts are typically under 2 minutes for NGN and under 5 minutes for GHS mobile money.
+
+    Most local rails have processing hours while blockchains run continuously. Transactions submitted outside those hours are queued and processed when the next window opens.
+  </Accordion>
+</AccordionGroup>
+
+## Fees
+
+Fees appear on the transaction so you can reconcile against them.
+
+| Field | Applies to | What it is |
+| --- | --- | --- |
+| `processor_fee` | Both | The payment or blockchain processor's fee. |
+| `vat` | On-ramp confirm | VAT charged on the processor fee. |
+| `blockchain_fee` | On-ramp | Network fee for the stablecoin send. |
+| `stamp_charge` | Off-ramp | Stamp duty, where the payout meets the local threshold. |
+
+<Note>
+  In Nigeria, stamp duty of ₦50 applies to payouts of ₦10,000 or more. It is deducted from the converted amount after conversion, so it is not included in the quote.
+</Note>
+
+Ramp is priced as a percentage transaction fee on the principal, applied inside the quoted rate. You can add your own markup on top of it and keep the difference.
+
+<Card title="Rates and markup" icon="percent" href="/ramp/rates-and-markup" horizontal>
+  How a rate is built, and how to configure a markup that earns you revenue per transaction.
+</Card>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/ramp/quickstart" horizontal />
+
+  <Card title="Coverage and limits" icon="globe" href="/ramp/coverage" horizontal />
+
+  <Card title="Webhooks" icon="webhook" href="/ramp/webhooks" horizontal />
+
+  <Card title="Errors and statuses" icon="triangle-alert" href="/ramp/errors" horizontal />
+</CardGroup>

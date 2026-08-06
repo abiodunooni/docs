@@ -1,0 +1,375 @@
+---
+title: "Webhooks"
+description: "Receive, verify and process Ramp transaction events."
+icon: "webhook"
+---
+
+Webhooks are how Ramp tells you a transaction moved. Treat them as the source of truth for the final state of a transaction, and requery the API when you need to confirm.
+
+## Set up your endpoint
+
+<Steps>
+  <Step title="Register your URL">
+    Set your webhook URL in the merchant dashboard. It must be reachable over HTTPS. All events for your app, including refunds, are delivered to this one URL.
+  </Step>
+
+  <Step title="Capture the raw body">
+    Signature verification runs against the exact bytes Ramp sent. Configure your framework to expose the raw request body before any JSON parsing middleware touches it.
+  </Step>
+
+  <Step title="Verify, store, respond">
+    Verify the signature, persist the event, return `2xx`, and do your business logic asynchronously.
+  </Step>
+</Steps>
+
+## Request format
+
+Ramp sends a `POST` with these headers:
+
+```http
+Content-Type: application/json
+User-Agent: Quidax-Ramp
+X-Ramp-Signature: <hmac_sha256_signature>
+```
+
+Every payload has the same shape: an `event` name and a `data` object.
+
+```json
+{
+  "event": "buy_transaction.successful",
+  "data": {
+    "mode": "buy",
+    "status": "completed",
+    "merchant_reference": "order_12345"
+  }
+}
+```
+
+## Verify the signature
+
+Ramp signs the webhook body with HMAC-SHA256 using your app's latest active secret key. Compute the digest over the raw body and compare it with `X-Ramp-Signature`.
+
+<CodeGroup>
+```js Node.js
+import crypto from "crypto";
+
+export function verifyRampSignature(rawBody, signature, secretKey) {
+  const expected = crypto
+    .createHmac("sha256", secretKey)
+    .update(rawBody)
+    .digest("hex");
+
+  if (expected.length !== signature.length) return false;
+
+  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+}
+```
+
+```js Express
+import express from "express";
+
+const app = express();
+
+app.post(
+  "/webhooks/ramp",
+  express.raw({ type: "application/json" }),
+  (req, res) => {
+    const signature = req.headers["x-ramp-signature"];
+
+    if (!verifyRampSignature(req.body, signature, process.env.RAMP_SECRET_KEY)) {
+      return res.sendStatus(401);
+    }
+
+    const event = JSON.parse(req.body.toString());
+
+    // Persist first, process later.
+    enqueue(event);
+
+    res.sendStatus(200);
+  },
+);
+```
+
+```python Python
+import hmac
+import hashlib
+
+def verify_ramp_signature(raw_body: bytes, signature: str, secret_key: str) -> bool:
+    expected = hmac.new(
+        secret_key.encode(),
+        raw_body,
+        hashlib.sha256,
+    ).hexdigest()
+
+    return hmac.compare_digest(expected, signature)
+```
+</CodeGroup>
+
+<Warning>
+  Verify against the raw body. Parsing and re-serialising the JSON changes key order and whitespace, which changes the digest and makes every signature fail.
+</Warning>
+
+## Respond and retry
+
+| Behaviour | Detail |
+| --- | --- |
+| Expected response | Any `2xx`. Ramp reads only the status code. |
+| Timeout | 10 seconds by default. |
+| Treated as failed | A timeout, an unreachable endpoint, or a non-`2xx` response. |
+| On failure | Ramp retries the delivery. |
+
+Because deliveries retry, your handler must be idempotent. Key on the combination of `event`, `merchant_reference` and, for refunds, `refund_reference`.
+
+<Tip>
+  Acknowledge before you process. Verify the signature, write the event to a queue or table, then return `2xx`. Doing settlement work inline is what pushes handlers past the timeout and triggers duplicate deliveries.
+</Tip>
+
+## Events
+
+<AccordionGroup>
+  <Accordion title="buy_transaction.processing" icon="arrow-down">
+    Sent twice on a typical on-ramp: once when the fiat deposit is confirmed, and again when the crypto payout starts.
+
+    On the first, `crypto_payout` is `null`. On the second, both objects are present.
+
+    ```json
+    {
+      "event": "buy_transaction.processing",
+      "data": {
+        "mode": "buy",
+        "status": "processing",
+        "network": "trc20",
+        "public_id": "a0f80737-f542-49f2-81dc-303be971839e",
+        "from_amount": "3000.0",
+        "to_amount": "1.85",
+        "from_currency": "ngn",
+        "to_currency": "usdt",
+        "blockchain_fee": "1.0",
+        "merchant_reference": "order_12345",
+        "fiat_deposit": {
+          "fee": "80.63",
+          "amount": "3000.0",
+          "status": "success",
+          "currency": "ngn",
+          "public_id": "ffbd4fc9-ed12-4df4-91b9-869c097990fc",
+          "created_at": "2026-04-15T17:35:58.120Z",
+          "updated_at": "2026-04-15T17:35:58.120Z"
+        },
+        "crypto_payout": null,
+        "created_at": "2026-04-14T08:41:12.696Z",
+        "updated_at": "2026-04-15T17:39:59.837Z"
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="buy_transaction.successful" icon="circle-check">
+    The fiat deposit was received and the crypto payout completed. `status` is `completed` and `crypto_payout.transaction_hash` is set.
+
+    ```json
+    {
+      "event": "buy_transaction.successful",
+      "data": {
+        "mode": "buy",
+        "status": "completed",
+        "merchant_reference": "order_12345",
+        "fiat_deposit": {
+          "amount": "3000.0",
+          "status": "success",
+          "currency": "ngn"
+        },
+        "crypto_payout": {
+          "amount": "1.85",
+          "status": "completed",
+          "address": "0x2c8cb922aede1464ec575c",
+          "network": "trc20",
+          "currency": "usdt",
+          "processor_fee": 1,
+          "transaction_hash": "0x9f2c8cb922aede1464ec575c"
+        }
+      }
+    }
+    ```
+
+    This is the event to credit your customer on.
+  </Accordion>
+
+  <Accordion title="buy_transaction.failed" icon="circle-x">
+    The transaction failed or needs attention. Usually the fiat deposit landed but the crypto payout did not, so `status` is `needs_attention` and `crypto_payout.status` is `failed`. It can also fire when the fiat deposit itself fails.
+
+    Do not credit the customer. Where funds need returning, Ramp starts the [refund flow](/ramp/refunds).
+  </Accordion>
+
+  <Accordion title="sell_transaction.processing" icon="arrow-up">
+    Sent when the crypto deposit is accepted, and again when the fiat payout starts. On the first, `fiat_payout` is `null`.
+
+    ```json
+    {
+      "event": "sell_transaction.processing",
+      "data": {
+        "mode": "sell",
+        "status": "processing",
+        "network": "bep20",
+        "from_amount": "2.0",
+        "to_amount": "3211.04",
+        "from_currency": "usdt",
+        "to_currency": "ghs",
+        "merchant_reference": "order_67890",
+        "fiat_payout": null,
+        "crypto_deposit": {
+          "txid": "0x9f2c8cb922aede1464ec575c",
+          "amount": "2.0",
+          "status": "accepted",
+          "network": "bep20",
+          "currency": "usdt",
+          "public_id": "b607455c-428b-4637-ba72-baeec2cc65fa"
+        }
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="sell_transaction.successful" icon="circle-check">
+    The crypto deposit was accepted and the fiat payout completed. `status` is `completed`.
+  </Accordion>
+
+  <Accordion title="sell_transaction.failed" icon="circle-x">
+    The transaction failed or needs manual review. This happens when the crypto deposit arrives but the payout cannot complete, and also when the deposited amount is higher or lower than expected.
+
+    Contact support with the references to resolve it.
+  </Accordion>
+
+  <Accordion title="buy_transaction.refund.details_requested" icon="rotate-left">
+    Ramp needs a destination account to return an on-ramp deposit.
+
+    ```json
+    {
+      "event": "buy_transaction.refund.details_requested",
+      "data": {
+        "refund_reference": "RFN9K4D2M8Q1",
+        "merchant_reference": "order_12345",
+        "amount": "1000.0",
+        "currency": "NGN",
+        "completed_at": null
+      }
+    }
+    ```
+
+    <Card title="Refunds" icon="rotate-left" href="/ramp/refunds" horizontal />
+  </Accordion>
+
+  <Accordion title="buy_transaction.refund.completed" icon="circle-check">
+    The refund is done. `completed_at` carries an ISO 8601 timestamp.
+
+    ```json
+    {
+      "event": "buy_transaction.refund.completed",
+      "data": {
+        "refund_reference": "RFN9K4D2M8Q1",
+        "merchant_reference": "order_12345",
+        "amount": "1000.0",
+        "currency": "NGN",
+        "completed_at": "2026-07-17T10:30:00Z"
+      }
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Payload fields
+
+<Tabs>
+  <Tab title="Common">
+    | Field | Type | Description |
+    | --- | --- | --- |
+    | `event` | string | The event name. |
+    | `data.mode` | string | `buy` on on-ramp, `sell` on off-ramp. |
+    | `data.status` | string | Current transaction status. |
+    | `data.network` | string | Network for the crypto leg. |
+    | `data.public_id` | string | Quidax identifier for the transaction. |
+    | `data.from_amount` | string | Amount being converted from. |
+    | `data.to_amount` | string | Amount the customer receives. |
+    | `data.from_currency` | string | Currency being converted from. |
+    | `data.to_currency` | string | Currency the customer receives. |
+    | `data.merchant_reference` | string | Your reference for the transaction. |
+    | `data.created_at` | string | When the transaction was created. |
+    | `data.updated_at` | string | When it was last updated. |
+  </Tab>
+
+  <Tab title="On-ramp">
+    | Field | Type | Description |
+    | --- | --- | --- |
+    | `data.blockchain_fee` | string | Network fee for the payout. |
+    | `data.fiat_deposit.amount` | string | Fiat received. |
+    | `data.fiat_deposit.fee` | string | Fee charged on the deposit. |
+    | `data.fiat_deposit.status` | string | Deposit status, for example `success`. |
+    | `data.fiat_deposit.currency` | string | Deposit currency. |
+    | `data.fiat_deposit.public_id` | string | Identifier for the deposit. |
+    | `data.crypto_payout` | object or null | `null` until the payout starts. |
+    | `data.crypto_payout.amount` | string | Amount sent. |
+    | `data.crypto_payout.status` | string | `processing`, `completed` or `failed`. |
+    | `data.crypto_payout.address` | string | Destination wallet address. |
+    | `data.crypto_payout.processor_fee` | number or string | Fee charged on the payout. |
+    | `data.crypto_payout.transaction_hash` | string | On-chain hash. |
+  </Tab>
+
+  <Tab title="Off-ramp">
+    | Field | Type | Description |
+    | --- | --- | --- |
+    | `data.crypto_deposit.txid` | string | Hash of the customer's deposit. |
+    | `data.crypto_deposit.amount` | string | Amount received. |
+    | `data.crypto_deposit.status` | string | Deposit status, for example `accepted`. |
+    | `data.crypto_deposit.currency` | string | Asset received. |
+    | `data.crypto_deposit.network` | string | Network used. |
+    | `data.fiat_payout` | object or null | `null` until the payout starts. |
+    | `data.fiat_payout.amount` | string | Fiat paid out. |
+    | `data.fiat_payout.status` | string | Payout status. |
+    | `data.fiat_payout.currency` | string | Payout currency. |
+    | `data.fiat_payout.processor_fee` | string | Fee charged on the payout. |
+    | `data.fiat_payout.completed_at` | string or null | `null` until completion. |
+  </Tab>
+
+  <Tab title="Refunds">
+    | Field | Type | Description |
+    | --- | --- | --- |
+    | `data.refund_reference` | string | Ramp's identifier for the refund. |
+    | `data.merchant_reference` | string | Reference of the original transaction. |
+    | `data.amount` | string | Amount being refunded. |
+    | `data.currency` | string | Refund currency. |
+    | `data.completed_at` | string or null | `null` on `details_requested`, a timestamp on `completed`. |
+  </Tab>
+</Tabs>
+
+## Handling patterns
+
+<AccordionGroup>
+  <Accordion title="Out-of-order and duplicate delivery" icon="shuffle">
+    Retries and network conditions mean an event can arrive twice, or a `processing` event can land after `successful`. Store the status you receive, but never move a transaction backwards from a terminal state. If your record already says `completed`, ignore a later `processing`.
+  </Accordion>
+
+  <Accordion title="Webhook before your own record exists" icon="clock">
+    A webhook can arrive before your database has committed the transaction you just created. Look the transaction up by `merchant_reference`, and if you do not find it, retry after a short delay rather than discarding the event.
+  </Accordion>
+
+  <Accordion title="Missed events" icon="wifi">
+    If your endpoint was down, reconcile by fetching each open transaction, or by listing transactions with `start_date` and `end_date`. Do not depend on webhook delivery alone for financial state.
+
+    <Card title="List on-ramp transactions" icon="code" href="/api-reference/ramp/transactions/list-on-ramp-transactions" horizontal />
+  </Accordion>
+
+  <Accordion title="Secret key rotation" icon="key">
+    Signatures use your app's latest active secret key. When you rotate, accept signatures from both the old and new key for a short window so events in flight still verify.
+  </Accordion>
+</AccordionGroup>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Refunds" icon="rotate-left" href="/ramp/refunds" horizontal />
+
+  <Card title="Errors and statuses" icon="triangle-alert" href="/ramp/errors" horizontal />
+
+  <Card title="Testing" icon="flask" href="/ramp/testing" horizontal />
+
+  <Card title="API reference" icon="code" href="/api-reference/ramp/introduction" horizontal />
+</CardGroup>

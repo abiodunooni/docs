@@ -1,3 +1,94 @@
 ---
-title: "api-reference"
+title: "API reference"
+description: "Endpoint documentation for every Quidax product."
+icon: "code"
 ---
+
+Every Quidax product exposes its own API. They share a set of conventions, but each has its own host, credentials and webhook configuration, so pick the product you are building against and start from its introduction.
+
+## APIs
+
+<CardGroup cols={2}>
+  <Card title="Ramp" icon="arrow-right-arrow-left" href="/api-reference/ramp/introduction">
+    Convert between local currency and stablecoins, on-ramp and off-ramp.
+  </Card>
+
+  <Card title="Payments" icon="credit-card" href="/basqet">
+    Accept crypto payments and settle in fiat or digital assets. Powered by Basqet.
+  </Card>
+
+  <Card title="Wallets" icon="wallet" href="/wallets">
+    Create subaccounts, generate deposit addresses, and send and receive assets.
+  </Card>
+
+  <Card title="Orderbook" icon="chart-candlestick" href="/orderbook">
+    Retrieve market data, place and manage orders, and access liquidity.
+  </Card>
+</CardGroup>
+
+<Note>
+  Ramp is documented here in full. The Payments, Wallets and Orderbook references are being added — until then, their product pages carry the current integration detail.
+</Note>
+
+## What is shared
+
+<Columns cols={2}>
+  <Card title="Credentials per platform" icon="key">
+    Products sit on three platforms, each with its own dashboard, API keys and webhook configuration. Keys are never interchangeable between them.
+  </Card>
+
+  <Card title="Server-side secrets" icon="shield-check">
+    Secret keys authenticate API calls and sign webhooks. They belong on your server only. Public keys, where a product has one, are the only credentials safe in a client.
+  </Card>
+
+  <Card title="Webhooks as source of truth" icon="webhook">
+    Treat the webhook as the authority on final state, verify its signature, respond `2xx` quickly, and process idempotently.
+  </Card>
+
+  <Card title="Your own references" icon="hashtag">
+    Send a unique reference of your own on every transaction, and store the Quidax identifier that comes back. Reconciliation and support both depend on having the pair.
+  </Card>
+</Columns>
+
+<Warning>
+  Because each platform issues its own credentials, name your environment variables by platform — `RAMP_SECRET_KEY` rather than `API_KEY`. Mixing keys between platforms is the most common cause of a `403` that looks inexplicable.
+</Warning>
+
+## What differs
+
+| | Host | Authentication | Sandbox |
+| --- | --- | --- | --- |
+| Ramp | `ramp-be.quidax.io` | `x-private-key` header | No, test in production |
+| Payments | Basqet platform | Per-platform credentials | Yes, full sandbox |
+| Wallets | Quidax business platform | Per-platform credentials | No, test in production |
+| Orderbook | Quidax business platform | Per-platform credentials | No, test in production |
+
+Wallets and Orderbook share one business account, so one set of keys covers both.
+
+<Card title="Testing" icon="flask" href="/testing" horizontal>
+  How to test each product, and the scenarios to cover before launch.
+</Card>
+
+## Before you build
+
+<Steps>
+  <Step title="Complete onboarding">
+    Each platform has its own sign-up and review. Your account has to be activated before production credentials work.
+
+    <Card title="Onboarding" icon="clipboard-check" href="/get-started/onboarding" horizontal />
+  </Step>
+
+  <Step title="Create your keys">
+    Issue credentials from the relevant dashboard and set your webhook URL.
+
+    <Card title="Create an account" icon="user-plus" href="/get-started/create-an-account" horizontal />
+  </Step>
+
+  <Step title="Run one transaction end to end">
+    <Card title="Quickstart" icon="rocket" href="/get-started/quickstart" horizontal />
+  </Step>
+</Steps>
+
+<Tip>
+  Building on more than one product? Plan for separate credentials and a separate webhook endpoint per platform from the start. Retrofitting that split later is more work than it looks.
+</Tip>

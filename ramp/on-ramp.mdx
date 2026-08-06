@@ -1,0 +1,298 @@
+---
+title: "On-ramp"
+description: "Convert local currency to stablecoin with the Ramp API."
+icon: "arrow-down"
+---
+
+An on-ramp transaction, also called a buy, takes fiat from your customer and delivers stablecoin to a wallet address you specify.
+
+```
+create → refresh (optional) → confirm → customer pays → webhooks → complete
+```
+
+<Note>
+  All requests go to `https://ramp-be.quidax.io/api/v1/merchants` and carry your secret key in the `x-private-key` header.
+</Note>
+
+## 1. Create the transaction
+
+Generate a unique `merchant_reference` and store it against your order before calling.
+
+```bash
+curl -X POST 'https://ramp-be.quidax.io/api/v1/merchants/custodial/on_ramp_transactions/initiate' \
+  -H 'accept: application/json' \
+  -H 'content-type: application/json' \
+  -H "x-private-key: $RAMP_SECRET_KEY" \
+  -d '{
+    "from_currency": "ngn",
+    "to_currency": "usdt",
+    "from_amount": "3000",
+    "merchant_reference": "order_12345",
+    "customer": {
+      "email": "ada@example.com",
+      "first_name": "Ada",
+      "last_name": "Lovelace"
+    },
+    "wallet_address": {
+      "address": "0x2c8cb922aede1464ec575c",
+      "network": "bep20"
+    }
+  }'
+```
+
+```json Response
+{
+  "status": "ok",
+  "message": "Transaction successfully initiated",
+  "data": {
+    "public_id": "6a089a1a-7633-4e4c-b6e6-39da723dd4fa",
+    "reference": "TRX-29U3YLYGC8",
+    "merchant_reference": "order_12345",
+    "from_currency": "ngn",
+    "to_currency": "usdt",
+    "from_amount": "3000.0",
+    "to_amount": "2.05",
+    "status": "pending",
+    "blockchain_fee": "1.0"
+  }
+}
+```
+
+Store `reference` as well as your `merchant_reference`. You need `reference` to fetch the transaction.
+
+<AccordionGroup>
+  <Accordion title="Customer names must match their bank account" icon="user-check">
+    Ramp compares the customer name against the name on the paying account. Third-party deposits are not supported: a mismatch means the deposit is rejected and refunded.
+
+    For a business customer, pass the first word of the business name as `first_name` and the remainder as `last_name`.
+  </Accordion>
+
+  <Accordion title="Emails must be unique per customer" icon="at">
+    Each customer needs a unique email address. If yours do not have one, generate a pseudorandom address on your own domain.
+  </Accordion>
+
+  <Accordion title="Validate the address and network first" icon="link">
+    An invalid address returns `Invalid address format`, and an unsupported network returns `Invalid network`. Validate client-side to save your customer a round trip.
+  </Accordion>
+</AccordionGroup>
+
+<Card title="Create an on-ramp transaction" icon="code" href="/api-reference/ramp/on-ramp/create-an-on-ramp-transaction" horizontal />
+
+## 2. Refresh the quote
+
+Quotes are held for roughly 10 seconds. If your customer takes longer, refresh before confirming. Use the same `merchant_reference`.
+
+```bash
+curl -X PUT 'https://ramp-be.quidax.io/api/v1/merchants/custodial/on_ramp_transactions/order_12345/refresh' \
+  -H 'content-type: application/json' \
+  -H "x-private-key: $RAMP_SECRET_KEY" \
+  -d '{ "from_currency": "ngn", "to_currency": "usdt", "from_amount": "3000" }'
+```
+
+This also changes the amount, so you can use it when a customer edits their order.
+
+## 3. Confirm and collect payment
+
+How the customer pays depends on the currency.
+
+<Tabs>
+  <Tab title="NGN bank transfer">
+    Confirming generates a single-use virtual account.
+
+    ```bash
+    curl -X POST 'https://ramp-be.quidax.io/api/v1/merchants/custodial/on_ramp_transactions/order_12345/confirm' \
+      -H 'accept: application/json' \
+      -H "x-private-key: $RAMP_SECRET_KEY"
+    ```
+
+    ```json Response
+    {
+      "status": "ok",
+      "message": "Transaction successfully confirmed",
+      "data": {
+        "account_name": "Quidax / Ada Lovelace",
+        "account_number": "0565084270",
+        "bank_name": "Test Bank",
+        "reference": "BANK_ACCOUNT_8f8102c76be41979",
+        "amount": "2000.0",
+        "amount_expected": "2053.75",
+        "processor_fee": "50.0",
+        "vat": "3.75"
+      }
+    }
+    ```
+
+    <Warning>
+      Display `amount_expected`, not `amount`. It is the transaction amount plus the processor fee and VAT, and it is the exact figure the customer must transfer. The provider rejects overpayment and underpayment alike.
+    </Warning>
+
+    The account is single-use and tied to this transaction, so the customer does not need to add a payment reference or narration. Duplicate deposits to the same account are rejected and reversed by the provider.
+
+    Confirm only when the customer is ready to pay, since confirming locks the quote.
+  </Tab>
+
+  <Tab title="GHS mobile money">
+    Mobile money debits the customer's wallet rather than asking them to push funds, so it uses its own pair of endpoints instead of `confirm`.
+
+    <Steps>
+      <Step title="Initiate the debit">
+        ```bash
+        curl -X POST 'https://ramp-be.quidax.io/api/v1/merchants/custodial/on_ramp_transactions/initiate_mobile_money' \
+          -H 'content-type: application/json' \
+          -H "x-private-key: $RAMP_SECRET_KEY" \
+          -d '{
+            "merchant_reference": "order_12345",
+            "phone_number": "0209546124",
+            "network_provider": "MTN"
+          }'
+        ```
+
+        `network_provider` accepts `MTN`, `AIRTEL` or `VODAFONE`.
+
+        ```json Response
+        {
+          "status": "ok",
+          "message": "Mobile money deposit successfully initiated",
+          "data": {
+            "next_step": "PIN",
+            "fee": "23.0",
+            "amount": "1000.0",
+            "instruction": "You will receive a prompt on your mobile number ******7778 to enter your PIN to authorize your payment request of GHS 1000",
+            "currency": "ghs"
+          }
+        }
+        ```
+      </Step>
+
+      <Step title="Branch on next_step">
+        The provider decides how the customer authorises the debit, and `next_step` tells you which path you are on.
+
+        | `next_step` | What to do |
+        | --- | --- |
+        | `PIN` | The provider pushes a prompt to the customer's handset. Ask them to approve it there. No further API call. |
+        | `OTP` | The provider sends a code. Collect it and verify it. |
+
+        MTN tends to use push prompts, while Telecel and AirtelTigo are commonly OTP-based. Handle both.
+
+        You can show the `instruction` string as-is, or display your own wording. The response shape is the same either way.
+      </Step>
+
+      <Step title="Verify the OTP, if required">
+        ```bash
+        curl -X POST 'https://ramp-be.quidax.io/api/v1/merchants/custodial/on_ramp_transactions/verify_mobile_money_otp/' \
+          -H 'content-type: application/json' \
+          -H "x-private-key: $RAMP_SECRET_KEY" \
+          -d '{ "merchant_reference": "order_12345", "otp": "123456" }'
+        ```
+
+        This endpoint is idempotent, so a customer can submit a code more than once without being charged twice. To resend an expired code, call the initiate endpoint again. There is no cap on resends.
+      </Step>
+    </Steps>
+
+    <Note>
+      OTP length and expiry are set by the mobile money provider, not by Ramp. A customer can also hold more than one mobile money account.
+    </Note>
+  </Tab>
+</Tabs>
+
+## 4. Track it to completion
+
+You get three webhooks. Full payloads are in [Webhooks](/ramp/webhooks).
+
+| Event | State |
+| --- | --- |
+| `buy_transaction.processing` | Fiat received. `fiat_deposit` populated, `crypto_payout` still `null`. |
+| `buy_transaction.processing` | Payout under way. Both objects populated. |
+| `buy_transaction.successful` | Complete, with `crypto_payout.transaction_hash` set. |
+| `buy_transaction.failed` | Status is `needs_attention`. One leg did not complete. |
+
+Fetch the transaction any time you need to confirm state. Pass the Quidax `reference`, not your `merchant_reference`.
+
+```bash
+curl 'https://ramp-be.quidax.io/api/v1/merchants/on_ramp_transaction/TRX-29U3YLYGC8' \
+  -H "x-private-key: $RAMP_SECRET_KEY"
+```
+
+The response nests both legs, so one call tells you what happened on each:
+
+```json
+{
+  "status": "ok",
+  "message": "Transaction found",
+  "data": {
+    "status": "completed",
+    "mode": "buy",
+    "from_amount": "3000.0",
+    "to_amount": "1.927314",
+    "merchant_reference": "order_12345",
+    "error_message": null,
+    "crypto_payout": {
+      "status": "completed",
+      "transaction_hash": "5WCENqT47Qs3aGz2yghSvDMYK2KBCmxEShaPWeyiLgP1",
+      "amount": "1.927314",
+      "processor_fee": "0.025",
+      "address": "FQw1J6qke2JDgjzLmdzeU7mxKgNDePK2Stf81XGpUZog"
+    },
+    "fiat_deposit": {
+      "status": "success",
+      "currency": "ngn",
+      "amount": "3000.0",
+      "fee": "80.63"
+    },
+    "mobile_money_deposit": null
+  }
+}
+```
+
+## Recurring funding with auto swap
+
+The standard flow issues a fresh account per transaction. Where a customer funds repeatedly, auto swap gives them one **static** account instead: anything paid into it is converted and forwarded to the registered wallet automatically, with no per-transaction call.
+
+```bash
+curl 'https://ramp-be.quidax.io/api/v1/merchants/custodial/auto_swap/initiate_onramp' \
+  -H 'content-type: application/json' \
+  -H "x-private-key: $RAMP_SECRET_KEY" \
+  -d '{
+    "customer": {
+      "email": "ada@example.com",
+      "first_name": "Ada",
+      "last_name": "Lovelace"
+    },
+    "coin_deposit": {
+      "address": "0x2c8cb922aede1464ec575c",
+      "network": "bep20",
+      "currency": "usdt"
+    },
+    "bank_account": {
+      "bvn": "22222222222",
+      "bank_code": "035",
+      "currency": "ngn"
+    }
+  }'
+```
+
+Static accounts are available for NGN on request. The customer's BVN is required, and the name on it is what Ramp checks incoming deposits against.
+
+<Card title="Create an auto-swap account" icon="code" href="/api-reference/ramp/on-ramp/create-an-auto-swap-account" horizontal />
+
+## Checklist
+
+1. Generate a unique `merchant_reference` for every transaction and never reuse one.
+2. Store both `merchant_reference` and the Quidax `reference`.
+3. Validate the wallet address and network before creating the transaction.
+4. Confirm only when the customer is ready to pay.
+5. Show `amount_expected` and discourage rounding.
+6. Make sure the paying account is in the customer's own name.
+7. Treat webhooks as the source of truth, and requery to reconcile.
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Off-ramp" icon="arrow-up" href="/ramp/off-ramp" horizontal />
+
+  <Card title="Webhooks" icon="webhook" href="/ramp/webhooks" horizontal />
+
+  <Card title="Refunds" icon="rotate-left" href="/ramp/refunds" horizontal />
+
+  <Card title="Errors and statuses" icon="triangle-alert" href="/ramp/errors" horizontal />
+</CardGroup>

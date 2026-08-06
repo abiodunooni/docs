@@ -1,0 +1,190 @@
+---
+title: "Ramp"
+description: "Fiat-to-stablecoin and stablecoin-to-fiat infrastructure for African corridors."
+icon: "arrow-right-arrow-left"
+---
+
+Ramp moves your customers between local currency and stablecoins. Integrate once, and offer on-ramping (local currency to USDT or USDC) and off-ramping (stablecoin to a local bank account or mobile money) without building your own banking, liquidity or treasury stack.
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/ramp/quickstart">
+    Run your first on-ramp transaction end to end.
+  </Card>
+
+  <Card title="API reference" icon="code" href="/api-reference/ramp/introduction">
+    Every endpoint, with request and response schemas.
+  </Card>
+</CardGroup>
+
+## What you can build
+
+<Columns cols={2}>
+  <Card title="Fiat entry and exit" icon="wallet" horizontal>
+    Let users top up in local currency and cash out to their bank account.
+  </Card>
+
+  <Card title="Stablecoin settlement" icon="money-bill-transfer" horizontal>
+    Use stablecoins as rails and pay recipients in local currency.
+  </Card>
+
+  <Card title="Deposits and payouts" icon="arrows-rotate" horizontal>
+    Fund customer balances on the way in, and pay winnings or withdrawals on the way out.
+  </Card>
+
+  <Card title="Dollar-denominated products" icon="chart-line" horizontal>
+    Let customers fund a stablecoin savings or investment product in local currency.
+  </Card>
+</Columns>
+
+<Card title="Earn on every transaction" icon="percent" href="/ramp/rates-and-markup" horizontal>
+  Add your own percentage markup on the quoted rate. It is collected per transaction and passed back to you on settlement.
+</Card>
+
+## Choose a channel
+
+Ramp is delivered three ways. They share one merchant account and one set of credentials, so you can run more than one at a time.
+
+<Tabs>
+  <Tab title="Widget">
+    A hosted pop-up you embed in your product. Quidax verifies each user inside the flow, then handles conversion and settlement.
+
+    **Best for** consumer apps, wallets and platforms that want the fastest path to market.
+
+    **Effort** low. Embed a script tag and call `window.ramp.initialize()`.
+
+    Quidax owns end-user verification, banking relationships and liquidity. The widget carries Quidax branding, and users are verified as Quidax users even if they already completed verification with you.
+
+    <Card title="Widget integration" icon="window" href="/ramp/widget" horizontal />
+  </Tab>
+
+  <Tab title="API">
+    A headless REST API. You own the entire interface, and Ramp runs conversion and settlement in the background.
+
+    **Best for** exchanges, fintechs, remittance platforms and aggregators.
+
+    **Effort** medium. REST calls plus a webhook handler.
+
+    You verify your own customers under your own licence, and Quidax performs transaction-level monitoring. Evidence of your verification process is reviewed during onboarding.
+
+    <Card title="On-ramp guide" icon="arrow-down" href="/ramp/on-ramp" horizontal />
+  </Tab>
+
+  <Tab title="Telegram">
+    A chat-native channel running on the same compliance and settlement infrastructure, aimed at users in Telegram and the TON ecosystem.
+
+    **Best for** distribution to chat-first audiences.
+
+    **Effort** none. It is user-facing only, with no integration work.
+  </Tab>
+</Tabs>
+
+<Tip>
+  A common pattern is to run both: the API for institutional or high-tier users where you want full control of the experience, and the widget for retail users where Quidax-hosted verification lifts conversion.
+</Tip>
+
+### Widget or API?
+
+| | Widget | API |
+| --- | --- | --- |
+| Who builds the interface | Quidax | You |
+| Who verifies the end user | Quidax, inside the flow | You, under your own licence |
+| Who holds the customer relationship | Shared, users are Quidax users | You |
+| Integration effort | A script tag | REST plus webhooks |
+| Typical time to launch | 3 to 10 business days | 1 to 4 weeks |
+
+You can start on the widget and move to the API later. Your business verification and master services agreement carry over, and only the commercial schedule is re-papered.
+
+## At a glance
+
+| | |
+| --- | --- |
+| **Live markets** | Nigeria (NGN), Ghana (GHS) |
+| **Coming soon** | South Africa (ZAR), Cameroon (XAF), Côte d'Ivoire (XOF) |
+| **Assets** | USDT, USDC, CNGN, and others by arrangement |
+| **Directions** | On-ramp and off-ramp, from one set of credentials |
+| **Base URL** | `https://ramp-be.quidax.io/api/v1/merchants` |
+| **Settlement** | Typically under 5 minutes on both directions |
+
+<Card title="Coverage and limits" icon="globe" href="/ramp/coverage" horizontal>
+  Markets, assets, networks, minimums and transaction tiers.
+</Card>
+
+## How a transaction works
+
+<Columns cols={2}>
+  <Card title="On-ramp" icon="arrow-down">
+    Your customer pays local currency and receives stablecoin.
+
+    1. Create the transaction with the destination wallet address.
+    2. Confirm it to generate a single-use bank account.
+    3. The customer pays the exact amount shown.
+    4. Ramp converts and sends the stablecoin.
+    5. Webhooks track it to completion.
+  </Card>
+
+  <Card title="Off-ramp" icon="arrow-up">
+    Your customer sends stablecoin and receives local currency.
+
+    1. Create the transaction with the customer's details.
+    2. Attach the payout bank or mobile money account.
+    3. Confirm it to generate a deposit address.
+    4. The customer sends the exact amount.
+    5. Ramp converts and pays out, and webhooks track it.
+  </Card>
+</Columns>
+
+<Card title="How it works" icon="route" href="/ramp/how-it-works" horizontal>
+  Full lifecycles, transaction statuses and the rules that govern each step.
+</Card>
+
+## Start building
+
+<Steps>
+  <Step title="Create your merchant account">
+    Sign up at [ramp-merchant.quidax.io/sign-up](https://ramp-merchant.quidax.io/sign-up) and complete onboarding. Your account is activated by the Quidax team.
+
+    <Card title="Onboarding" icon="clipboard-check" href="/get-started/onboarding" horizontal />
+  </Step>
+
+  <Step title="Get your keys">
+    Collect your public key for the widget and your secret key for the API from the merchant dashboard, then set your webhook URL.
+  </Step>
+
+  <Step title="Run one transaction">
+    Follow the quickstart to take a single small transaction from creation to completion.
+
+    <Card title="Quickstart" icon="rocket" href="/ramp/quickstart" horizontal />
+  </Step>
+
+  <Step title="Handle webhooks">
+    Verify signatures, respond `2xx`, and process events idempotently.
+
+    <Card title="Webhooks" icon="webhook" href="/ramp/webhooks" horizontal />
+  </Step>
+
+  <Step title="Test and launch">
+    Work through the test scenarios, then run the go-live checklist.
+
+    <Card title="Testing" icon="flask" href="/ramp/testing" horizontal />
+  </Step>
+</Steps>
+
+## Reference
+
+<CardGroup cols={2}>
+  <Card title="Coverage and limits" icon="globe" href="/ramp/coverage" horizontal />
+
+  <Card title="Rates and markup" icon="percent" href="/ramp/rates-and-markup" horizontal />
+
+  <Card title="Webhooks" icon="webhook" href="/ramp/webhooks" horizontal />
+
+  <Card title="Refunds" icon="rotate-left" href="/ramp/refunds" horizontal />
+
+  <Card title="Errors and statuses" icon="triangle-alert" href="/ramp/errors" horizontal />
+
+  <Card title="API reference" icon="code" href="/api-reference/ramp/introduction" horizontal />
+</CardGroup>
+
+<Note>
+  Want to see it before you build? Try the [demo flow](https://ramp-demo.quidax.io/), or [schedule a demo](/get-started/schedule-a-demo) to map your use case to the right channel.
+</Note>

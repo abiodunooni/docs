@@ -1,0 +1,158 @@
+---
+title: "Testing"
+description: "Verify your Ramp integration before you open it to customers."
+icon: "flask"
+---
+
+Ramp is tested against production, with real balances and real settlement. That means what you verify is exactly what your customers will experience — no sandbox drift, no surprises at launch.
+
+<Note>
+  A sandbox is on the roadmap. Until it lands, test with the minimums below, which keep a full end-to-end run trivially cheap.
+</Note>
+
+## Test amounts
+
+| Direction | Currency | Minimum |
+| --- | --- | --- |
+| On-ramp | NGN | ₦3,000 |
+| On-ramp | GHS | GHS 50 |
+| Off-ramp | USDT | 5 USDT |
+| Off-ramp | USDC | 5 USDC |
+
+A complete on-ramp and off-ramp round trip costs a few dollars in fees and spread.
+
+## Run a controlled pilot
+
+<Steps>
+  <Step title="Fund a small operational balance">
+    Enough to cover the minimums plus network fees, and small enough to be inconsequential.
+  </Step>
+
+  <Step title="Restrict access">
+    Keep the integration behind a feature flag or limited to internal users until every flow is verified.
+  </Step>
+
+  <Step title="Tag every test transaction">
+    Use a recognisable `merchant_reference` prefix, for example `test-`. Reconciliation becomes trivial and test records stay easy to exclude from reporting.
+  </Step>
+
+  <Step title="Run one transaction per flow">
+    Complete a full cycle for each direction and each currency you are approved for.
+
+    - **On-ramp, NGN** — create, confirm, pay the exact amount, confirm the stablecoin arrives.
+    - **On-ramp, GHS** — cover both `next_step` values, `PIN` and `OTP`.
+    - **Off-ramp** — create, fetch institutions, attach the payout account, confirm, send, confirm the payout lands.
+  </Step>
+
+  <Step title="Reconcile each one">
+    Confirm every transaction appears with matching references, amounts and fees in both Ramp and your own system. Check `processor_fee`, `vat`, `blockchain_fee` and `stamp_charge` land where you expect.
+  </Step>
+
+  <Step title="Scale up gradually">
+    Raise volume in steps, watching errors, latency and reconciliation at each level.
+  </Step>
+</Steps>
+
+## Test the failures deliberately
+
+Most launch problems hide in paths nobody exercised. These cost nothing, because the request is rejected before money moves.
+
+<AccordionGroup>
+  <Accordion title="Validation errors" icon="triangle-alert">
+    - An amount below the minimum, and one above the maximum.
+    - A malformed wallet address.
+    - A network the asset does not support.
+    - A reused `merchant_reference`.
+    - A missing customer first or last name.
+    - A request with no `x-private-key` header, and one with a wrong key.
+
+    Confirm your client surfaces each message usefully rather than showing a generic failure.
+  </Accordion>
+
+  <Accordion title="Name mismatch" icon="user-xmark">
+    Attach an off-ramp payout account whose registered name differs from the customer on the transaction, and confirm you get `Name does not match` and present it as a name problem.
+
+    On on-ramp, this path costs a real transaction to reproduce, since the deposit is rejected and refunded. Handle it in code and confirm the refund flow works rather than forcing it repeatedly.
+  </Accordion>
+
+  <Accordion title="Wrong payment amount" icon="equals">
+    Confirm your interface shows `amount_expected` and not `amount`, and that a customer cannot proceed with a rounded figure. This single mistake causes more failed on-ramps than anything else.
+  </Accordion>
+
+  <Accordion title="Expired quotes" icon="clock">
+    Let a transaction sit for more than 10 seconds before confirming, and check your refresh path recalculates correctly and shows the customer the new figure.
+  </Accordion>
+
+  <Accordion title="Mobile money branches" icon="mobile">
+    Test both `PIN` and `OTP`. Submit a wrong OTP, submit an expired one, and re-initiate to trigger a resend. Confirm submitting the same OTP twice does not double-charge.
+  </Accordion>
+</AccordionGroup>
+
+## Test your webhook handler
+
+You do not need a live transaction for most of this. Replay captured payloads against your endpoint.
+
+<AccordionGroup>
+  <Accordion title="Signature verification" icon="key">
+    - A valid signature passes.
+    - A tampered body fails.
+    - A missing `X-Ramp-Signature` header is rejected.
+    - Verification runs against the raw body, not re-serialised JSON. Add a test that would fail if middleware reordered keys.
+  </Accordion>
+
+  <Accordion title="Delivery behaviour" icon="webhook">
+    - The same event delivered twice results in one credit.
+    - A `processing` event arriving after `successful` does not move the transaction backwards.
+    - Your endpoint returns `2xx` within the 10-second timeout while doing real work asynchronously.
+    - An event arriving before your own record exists is retried, not discarded.
+  </Accordion>
+
+  <Accordion title="Recovery" icon="wifi">
+    Take your endpoint down, run a transaction, bring it back, and confirm your reconciliation job picks up the missed event by listing transactions over a date range.
+  </Accordion>
+
+  <Accordion title="Refunds" icon="rotate-left">
+    Replay `buy_transaction.refund.details_requested`, confirm it reaches an operations queue, and verify a repeat of the same event for one `refund_reference` does not submit details twice.
+  </Accordion>
+</AccordionGroup>
+
+## Before you launch
+
+<AccordionGroup>
+  <Accordion title="Credentials" icon="key">
+    - The secret key lives server-side only and is not in any client bundle.
+    - Only the public key appears in browser or mobile code.
+    - Keys are in environment variables, not source control.
+    - You know who rotates keys and how.
+  </Accordion>
+
+  <Accordion title="Operations" icon="gauge-high">
+    - Both references are stored against every order and are searchable by support.
+    - Failed and `needs_attention` transactions raise an alert rather than sitting silently.
+    - Someone owns the refund queue.
+    - Your team knows to contact support with references rather than retrying manually.
+  </Accordion>
+
+  <Accordion title="Customer experience" icon="users">
+    - The exact payment amount is unmissable in your interface.
+    - Customers are told to pay from an account in their own name.
+    - Limit and validation errors are shown in language a customer understands.
+    - Off-ramp customers are told the exact amount, asset, network and tag.
+  </Accordion>
+</AccordionGroup>
+
+<Card title="Go-live checklist" icon="circle-check" href="/get-started/go-live-checklist" horizontal>
+  Business, security, transaction, settlement and operational readiness.
+</Card>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Errors and statuses" icon="triangle-alert" href="/ramp/errors" horizontal />
+
+  <Card title="Webhooks" icon="webhook" href="/ramp/webhooks" horizontal />
+
+  <Card title="Quidax testing" icon="flask" href="/testing" horizontal />
+
+  <Card title="Contact support" icon="life-ring" href="/support" horizontal />
+</CardGroup>

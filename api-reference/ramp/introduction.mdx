@@ -1,0 +1,156 @@
+---
+title: "Introduction"
+description: "Base URL, authentication and conventions for the Ramp API."
+icon: "code"
+---
+
+The Ramp API is a REST API over JSON. It converts fiat to stablecoin and back, and settles both legs.
+
+## Base URL
+
+```
+https://ramp-be.quidax.io/api/v1/merchants
+```
+
+Every path on these pages is relative to that root. There is no separate sandbox host — see [Testing](/ramp/testing).
+
+## Authentication
+
+Send your merchant secret key in the `x-private-key` header on every request.
+
+```bash
+curl 'https://ramp-be.quidax.io/api/v1/merchants/purchase_limits/buy?currency_symbol=ngn' \
+  -H 'accept: application/json' \
+  -H "x-private-key: $RAMP_SECRET_KEY"
+```
+
+A missing or wrong key returns:
+
+```json
+{ "status": "forbidden", "message": "Invalid private key", "data": null }
+```
+
+<Warning>
+  The secret key is server-side only. Never ship it in browser or mobile code. The widget uses a separate public key (`pub_...`), which is safe on a client.
+</Warning>
+
+Get both keys from the merchant dashboard. The same secret key also signs your webhooks.
+
+## Response format
+
+Every response uses the same envelope.
+
+```json
+{
+  "status": "ok",
+  "message": "Transaction found",
+  "data": {}
+}
+```
+
+| `status` | HTTP | Meaning |
+| --- | --- | --- |
+| `ok` | 200 | Succeeded. |
+| `bad_request` | 400 | Invalid, incomplete or duplicated request. |
+| `forbidden` | 403 | Authentication failed. |
+| `not_found` | 404 | The resource does not exist. |
+
+Branch on `status`, not on `message`.
+
+<Card title="Errors and statuses" icon="triangle-alert" href="/ramp/errors" horizontal>
+  Every error message, and the transaction statuses they map to.
+</Card>
+
+## References
+
+Two identifiers travel with each transaction, and mixing them up is the most common integration error.
+
+| Identifier | Who generates it | Format | Used for |
+| --- | --- | --- | --- |
+| `merchant_reference` | You | Your own scheme | Creating, refreshing, confirming, attaching accounts, refunds |
+| `reference` | Quidax | `TRX-...` | Fetching a transaction |
+
+Store both against your order record. A `merchant_reference` must be unique, and reusing one returns a duplicate transaction error.
+
+## Amounts
+
+Amounts are strings, not numbers, in both requests and responses. This preserves precision on assets with many decimal places. Parse them with a decimal type rather than a float.
+
+```json
+{ "from_amount": "3000.0", "to_amount": "1.927314" }
+```
+
+## Pagination
+
+List endpoints accept these query parameters.
+
+| Parameter | Default | Notes |
+| --- | --- | --- |
+| `page` | 1 | Positive integer. |
+| `per_page` | 25 | Positive integer, maximum 50. |
+| `status` | — | Filter by transaction status. |
+| `from_currency` | — | Filter by source currency code. |
+| `to_currency` | — | Filter by destination currency code. |
+| `start_date` | — | `YYYY-MM-DD`. Must be sent with `end_date`. |
+| `end_date` | — | `YYYY-MM-DD`. Must be sent with `start_date`. |
+
+```bash
+curl 'https://ramp-be.quidax.io/api/v1/merchants/on_ramp_transactions?page=1&per_page=50&start_date=2026-08-01&end_date=2026-08-31' \
+  -H "x-private-key: $RAMP_SECRET_KEY"
+```
+
+The date filters are what you want for reconciliation runs.
+
+## Idempotency and retries
+
+Ramp keys transactions on your `merchant_reference`. If a request times out and you do not know whether it landed, retry with the same reference: a duplicate error confirms the original succeeded.
+
+The mobile money OTP endpoint is idempotent, and resubmitting identical refund details in the same cycle is safe.
+
+## Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Rates and limits" icon="calculator" href="/api-reference/ramp/rates-and-limits/list-payment-methods">
+    Quotes, limits and payment methods.
+  </Card>
+
+  <Card title="On-ramp" icon="arrow-down" href="/api-reference/ramp/on-ramp/create-an-on-ramp-transaction">
+    Fiat to stablecoin, including mobile money and auto swap.
+  </Card>
+
+  <Card title="Off-ramp" icon="arrow-up" href="/api-reference/ramp/off-ramp/create-an-off-ramp-transaction">
+    Stablecoin to fiat, including payout accounts.
+  </Card>
+
+  <Card title="Transactions" icon="list" href="/api-reference/ramp/transactions/fetch-an-on-ramp-transaction">
+    Fetch single transactions and paginated lists.
+  </Card>
+
+  <Card title="Refunds" icon="rotate-left" href="/api-reference/ramp/refunds/get-a-refund">
+    Respond to refund requests and track their status.
+  </Card>
+
+  <Card title="Banks" icon="building-columns" href="/api-reference/ramp/banks/list-supported-institutions">
+    Supported institutions and account verification.
+  </Card>
+</CardGroup>
+
+## Webhooks
+
+Transaction state changes arrive at your registered URL, signed with HMAC-SHA256 in the `X-Ramp-Signature` header. Webhooks are the source of truth for final state.
+
+<Card title="Webhooks" icon="webhook" href="/ramp/webhooks" horizontal>
+  Events, payloads, signature verification and retry behaviour.
+</Card>
+
+## Guides
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/ramp/quickstart" horizontal />
+
+  <Card title="On-ramp guide" icon="arrow-down" href="/ramp/on-ramp" horizontal />
+
+  <Card title="Off-ramp guide" icon="arrow-up" href="/ramp/off-ramp" horizontal />
+
+  <Card title="Coverage and limits" icon="globe" href="/ramp/coverage" horizontal />
+</CardGroup>

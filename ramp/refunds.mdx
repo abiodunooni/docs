@@ -1,0 +1,164 @@
+---
+title: "Refunds"
+description: "Return an on-ramp deposit to your customer."
+icon: "rotate-left"
+---
+
+When an on-ramp deposit cannot be converted — a name mismatch, a failed payout, or a transaction that needs unwinding — Ramp returns the fiat to your customer. Ramp does not hold their bank details, so it asks you for them by webhook.
+
+<Note>
+  Refunds are driven by Ramp, not initiated by you. Your job is to respond to `buy_transaction.refund.details_requested` with a destination account.
+</Note>
+
+## The flow
+
+<Steps>
+  <Step title="Ramp requests details">
+    You receive `buy_transaction.refund.details_requested` at your webhook URL.
+
+    ```json
+    {
+      "event": "buy_transaction.refund.details_requested",
+      "data": {
+        "refund_reference": "RFN9K4D2M8Q1",
+        "merchant_reference": "order_12345",
+        "amount": "1000.0",
+        "currency": "NGN",
+        "completed_at": null
+      }
+    }
+    ```
+
+    Match it to the original transaction on `merchant_reference`, and store `refund_reference` as Ramp's identifier for the refund. Then collect the destination account from your customer or your operations team.
+  </Step>
+
+  <Step title="Verify the account">
+    A completed refund is final, so confirm the account resolves to the name your customer expects before you submit it.
+
+    ```bash
+    curl -X POST 'https://ramp-be.quidax.io/api/v1/merchants/refunds/order_12345/verify_account' \
+      -H 'content-type: application/json' \
+      -H "x-private-key: $RAMP_SECRET_KEY" \
+      -d '{
+        "account_number": "0123456789",
+        "bank_code": "058",
+        "currency_code": "NGN"
+      }'
+    ```
+
+    ```json Response
+    {
+      "status": "ok",
+      "message": "Bank account successfully verified",
+      "data": {
+        "account_name": "Ada Lovelace",
+        "account_number": "0123456789",
+        "bank_name": "GTBank",
+        "bank_code": "058"
+      }
+    }
+    ```
+
+    A failed verification returns `400` in real time. Show the returned `account_name` back to your customer for confirmation before moving on.
+
+    Get `bank_code` values from the institutions endpoint:
+
+    ```bash
+    curl 'https://ramp-be.quidax.io/api/v1/merchants/custodial/banks?country=NG' \
+      -H "x-private-key: $RAMP_SECRET_KEY"
+    ```
+  </Step>
+
+  <Step title="Submit the details">
+    Use the original transaction's `merchant_reference` in the path.
+
+    ```bash
+    curl -X POST 'https://ramp-be.quidax.io/api/v1/merchants/refunds/order_12345/details' \
+      -H 'content-type: application/json' \
+      -H "x-private-key: $RAMP_SECRET_KEY" \
+      -d '{
+        "account_number": "0123456789",
+        "bank_code": "058",
+        "account_name": "Ada Lovelace"
+      }'
+    ```
+
+    ```json Response
+    {
+      "status": "ok",
+      "message": "Refund details submitted successfully",
+      "data": {
+        "public_id": "mref_abc123",
+        "refund_reference": "RFN9K4D2M8Q1",
+        "status": "refund_details_received",
+        "amount": "1000.0",
+        "currency": "NGN",
+        "merchant_reference": "order_12345"
+      }
+    }
+    ```
+
+    Submitting identical details more than once in the same refund cycle is safe. Ramp stores one submission and returns the refund.
+  </Step>
+
+  <Step title="Track the status">
+    ```bash
+    curl 'https://ramp-be.quidax.io/api/v1/merchants/refunds/order_12345' \
+      -H "x-private-key: $RAMP_SECRET_KEY"
+    ```
+
+    | Status | Meaning |
+    | --- | --- |
+    | `pending_refund_details` | Ramp is waiting for you to submit an account. |
+    | `refund_details_received` | Details submitted and being processed. |
+    | `completed` | The refund has been paid. |
+  </Step>
+
+  <Step title="Confirm completion">
+    You receive `buy_transaction.refund.completed`, with `completed_at` set. Mark the order refunded in your system.
+
+    If you miss the webhook, fetch the refund and check for `status: "completed"`.
+  </Step>
+</Steps>
+
+## When a refund fails
+
+Roughly 1 in 156 refunds fails, almost always because the destination bank is temporarily unavailable.
+
+There is no `refund_failed` event. Ramp requests details again for the same transaction, so you receive another `buy_transaction.refund.details_requested` and respond through the same flow. Your handler should therefore expect to see the event more than once for one `refund_reference`.
+
+<Note>
+  Quidax does not charge a fee for fiat refunds.
+</Note>
+
+## Building for it
+
+<AccordionGroup>
+  <Accordion title="Make the handler idempotent" icon="copy">
+    Key on `event`, `refund_reference` and `merchant_reference` together. Retried deliveries and repeat requests after a failure both produce the same event more than once.
+  </Accordion>
+
+  <Accordion title="Do not auto-submit unverified accounts" icon="shield-check">
+    Verify first and show the resolved `account_name` to your customer. A refund cannot be reversed once completed, and an unverified account number is the one place a typo becomes permanent.
+  </Accordion>
+
+  <Accordion title="Have an operations path" icon="users">
+    A refund can arrive for a customer who is no longer in session. Route `details_requested` to a queue your support team can action, not only to an in-app prompt.
+  </Accordion>
+</AccordionGroup>
+
+## Refunds on completed transactions
+
+The flow above covers refunds Ramp raises on transactions that could not complete. To reverse a transaction that already succeeded, contact support with the references — those are handled case by case.
+
+<Card title="Contact support" icon="life-ring" href="/support" horizontal />
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Webhooks" icon="webhook" href="/ramp/webhooks" horizontal />
+
+  <Card title="Errors and statuses" icon="triangle-alert" href="/ramp/errors" horizontal />
+
+  <Card title="Refund endpoints" icon="code" href="/api-reference/ramp/refunds/get-a-refund" horizontal />
+</CardGroup>
