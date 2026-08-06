@@ -4,34 +4,44 @@ description: "Countries, currencies, assets and networks supported across Quidax
 icon: "globe"
 ---
 
-Quidax supports businesses operating across multiple African markets and selected global markets.
+Quidax supports businesses operating across African markets and selected global markets. Across our API products and OTC desk, coverage extends to **21 countries**, including markets in West, East, Central and Southern Africa.
 
-Coverage may differ by product, country, fiat currency, digital asset, blockchain network, payment method, settlement method, business model and regulatory approval. Your approved coverage is confirmed during onboarding.
+Coverage differs by product, country, fiat currency, digital asset, blockchain network, payment method, settlement method, business model and regulatory approval. Your approved coverage is confirmed during onboarding.
 
-## Geographic coverage
+## Fiat coverage by product
 
-Quidax's digital asset infrastructure supports businesses across more than 20 countries, including markets in West, East, Central and Southern Africa. Current published coverage includes Nigeria, Ghana, Cameroon, Côte d'Ivoire, Kenya, Rwanda, Tanzania, Uganda and South Africa, among other markets.
+Each product supports the currencies its local collection, payout and settlement rails cover.
 
-## Fiat currencies
-
-Fiat support is based on your approved integration and the available local collection, payout and settlement rails.
-
-Currencies used across Quidax's institutional infrastructure include:
-
-| Currency | Code |
-| --- | --- |
-| Nigerian naira | NGN |
-| Ghanaian cedi | GHS |
-| Kenyan shilling | KES |
-| Central African CFA franc | XAF |
-| West African CFA franc | XOF |
-| Zambian kwacha | ZMW |
-| Tanzanian shilling | TZS |
-| United States dollar | USD |
+| Currency | Ramp | Orderbook | Payments settlement |
+| --- | :---: | :---: | :---: |
+| Nigerian naira (NGN) | ● | ● | ● |
+| Ghanaian cedi (GHS) | ● | ● | ● |
+| South African rand (ZAR) | | ● | ● |
+| Central African CFA franc (XAF) | | ● | ● |
+| West African CFA franc (XOF) | | ● | ● |
+| Kenyan shilling (KES) | | | ● |
+| Ugandan shilling (UGX) | | | ● |
+| Zambian kwacha (ZMW) | | | ● |
+| Tanzanian shilling (TZS) | | | ● |
+| United States dollar (USD) | | | ● |
+| Euro (EUR) | | | ● |
+| Pound sterling (GBP) | | | ● |
 
 <Note>
-  Fiat collections and payouts are made to and from accounts belonging to the transacting party, which keeps every leg of a transaction traceable end to end. Design your beneficiary and account-collection flows around this from the start.
+  Wallets holds and moves digital assets rather than fiat. Fiat legs come from Ramp, Orderbook or Payments, depending on how you combine products.
 </Note>
+
+## OTC and institutional liquidity
+
+Our OTC desk extends coverage beyond the currencies available through the self-serve APIs, and handles large or bulk transactions that need a quoted price rather than order book execution.
+
+<Card title="Talk to the team about OTC" icon="calendar" href="/get-started/schedule-a-demo" horizontal>
+  Bring your corridors, transaction sizes and settlement requirements.
+</Card>
+
+## Fiat account requirements
+
+Fiat collections and payouts are made to and from accounts belonging to the transacting party, which keeps every leg of a transaction traceable from source to destination. Design your beneficiary and account-collection flows around this from the start.
 
 ## Digital assets and networks
 
@@ -51,11 +61,23 @@ Use the API to determine:
 - Current withdrawal fees.
 - Whether buying, selling, deposits or withdrawals are available.
 
+The exact endpoints, response fields and per-asset limits are documented on each product's pages.
+
+<CardGroup cols={2}>
+  <Card title="Ramp" icon="arrow-right-arrow-left" href="/ramp" horizontal />
+
+  <Card title="Payments" icon="credit-card" href="/basqet" horizontal />
+
+  <Card title="Wallets" icon="wallet" href="/wallets" horizontal />
+
+  <Card title="Orderbook" icon="chart-candlestick" href="/orderbook" horizontal />
+</CardGroup>
+
 ## Need something not listed?
 
 <Columns cols={2}>
-  <Card title="Request a coin listing" icon="coins" href="/get-started/coin-listings">
-    Ask us to assess an asset or trading pair your product needs.
+  <Card title="List a coin on Quidax" icon="coins" href="/get-started/coin-listings">
+    For exchanges, issuers and projects that want their asset listed.
   </Card>
 
   <Card title="Discuss a new market" icon="calendar" href="/get-started/schedule-a-demo">

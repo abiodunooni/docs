@@ -4,15 +4,17 @@ description: "Get help with your Quidax account, API integration or live transac
 icon: "life-ring"
 ---
 
-Support is organised per platform. When you get in touch, say which product you are using — Ramp, Payments or the Core API — so your request reaches the right team first time.
+Email [support@quidax.com](mailto:support@quidax.com), or contact your assigned integration representative.
+
+Support is organised per platform, so say which product you are using — Ramp, Payments, Wallets or Orderbook — in the subject line. That gets your request to the right team first time.
 
 <Columns cols={2}>
-  <Card title="Account and onboarding" icon="clipboard-check">
-    Questions about verification, documents, approvals, limits or commercial terms. Contact your Quidax representative.
+  <Card title="Account and onboarding" icon="clipboard-check" href="mailto:support@quidax.com">
+    Verification, documents, approvals, limits and commercial terms.
   </Card>
 
-  <Card title="Integration help" icon="code">
-    Questions about endpoints, credentials, webhooks or errors. Contact Support or your assigned integration representative.
+  <Card title="Integration help" icon="code" href="mailto:support@quidax.com">
+    Endpoints, credentials, webhooks, errors and live transactions.
   </Card>
 </Columns>
 
@@ -50,13 +52,27 @@ For a production incident:
   </Step>
 
   <Step title="Escalate">
-    Contact the designated support or escalation channel, and include all relevant transaction references.
+    Email [support@quidax.com](mailto:support@quidax.com) or your designated escalation channel, and include all relevant transaction references. Mark the subject line as urgent so it is triaged as an incident.
   </Step>
 </Steps>
 
 <Warning>
   Do not manually credit or debit a customer until the transaction state has been confirmed.
 </Warning>
+
+## Check the product pages first
+
+Error codes, response statuses, webhook events, rate limits and transaction limits are documented per product. Most integration questions are answered there faster than by raising a ticket.
+
+<CardGroup cols={2}>
+  <Card title="Ramp" icon="arrow-right-arrow-left" href="/ramp" horizontal />
+
+  <Card title="Payments" icon="credit-card" href="/basqet" horizontal />
+
+  <Card title="Wallets" icon="wallet" href="/wallets" horizontal />
+
+  <Card title="Orderbook" icon="chart-candlestick" href="/orderbook" horizontal />
+</CardGroup>
 
 ## Other ways to get help
 

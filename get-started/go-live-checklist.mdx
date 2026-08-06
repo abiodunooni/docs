@@ -6,6 +6,10 @@ icon: "circle-check"
 
 Use this checklist before enabling your Quidax integration for customers. Work through it per platform if you are launching more than one product.
 
+<Note>
+  Items here apply across Quidax. Check them against the endpoints, statuses, error codes and limits documented on your product's own pages: [Ramp](/ramp), [Payments](/basqet), [Wallets](/wallets) and [Orderbook](/orderbook).
+</Note>
+
 <AccordionGroup>
   <Accordion title="Business and compliance" icon="building">
     - Business verification is complete.
@@ -15,15 +19,17 @@ Use this checklist before enabling your Quidax integration for customers. Work t
     - Transaction limits have been confirmed.
     - Compliance escalation contacts have been assigned.
     - Customer terms and disclosures have been reviewed.
-    - Any required customer verification process has been implemented. On Ramp, this applies where you integrate via the API and verify your own customers.
+    - Any required customer verification process has been implemented. This applies where you integrate Ramp via the API, or issue wallets to your own end users.
+    - The API agreement and any product-specific terms have been executed.
   </Accordion>
 
   <Accordion title="Credentials and security" icon="key">
     - Production credentials are stored in a secrets manager.
-    - Credentials are labelled by platform, so Payments, Ramp and Core API keys cannot be confused.
+    - Credentials are labelled by platform, so Payments, Ramp and business-platform keys cannot be confused.
     - Sandbox credentials are not used in production.
     - Secret keys are not exposed in frontend or mobile code.
     - Two-factor authentication is enabled for dashboard users, and recovery details are stored where more than one person can reach them.
+    - Account ownership on Wallets and Orderbook is agreed, and the person holding the authenticator is documented and reachable.
     - API access is limited to authorised systems.
     - IP restrictions have been configured where supported.
     - Credential-rotation procedures have been documented.
@@ -58,7 +64,7 @@ Use this checklist before enabling your Quidax integration for customers. Work t
     - Blockchain confirmation requirements have been considered.
     - Crypto withdrawal fees are shown or accounted for.
     - Internal and external transfers can be distinguished.
-    - Your withdrawal runbook accounts for the authenticator code required on the Core API.
+    - Your withdrawal runbook accounts for the authenticator code required on Wallets and Orderbook, and names who holds it.
   </Accordion>
 
   <Accordion title="Webhooks" icon="webhook">

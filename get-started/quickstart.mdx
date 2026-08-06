@@ -7,13 +7,13 @@ icon: "rocket"
 This guide shows the general process for setting up credentials, configuring your pricing and making your first request.
 
 <Note>
-  Credentials are issued per platform. Keys created on Payments work on Payments, and keys created on the Core API work across Wallets and Orderbook. If you are integrating more than one product, repeat these steps on each platform.
+  Credentials are issued per platform. Keys created on Payments work on Payments, and keys created on the Quidax business platform work across both Wallets and Orderbook. If you are integrating more than one product, repeat these steps on each platform.
 </Note>
 
 ## Prerequisites
 
 - Access to the dashboard for the product you are integrating with. See [Create an account](/get-started/create-an-account).
-- Two-factor authentication enabled, using Google Authenticator. On the Core API this is required before keys can be created.
+- Two-factor authentication enabled with Google Authenticator. On Wallets and Orderbook this is required before keys can be created.
 - A backend service that can store secrets and receive webhooks over HTTPS.
 
 <Steps>
@@ -29,8 +29,8 @@ This guide shows the general process for setting up credentials, configuring you
         Create your key in the Ramp dashboard. Keys are scoped to your Ramp account and to the integration model you were approved for, widget or API.
       </Tab>
 
-      <Tab title="Core API">
-        Confirm the action with your six-digit authenticator code. The same key pair covers both Wallets and Orderbook.
+      <Tab title="Wallets and Orderbook">
+        Confirm the action with your six-digit authenticator code. The same key pair covers both products.
       </Tab>
     </Tabs>
 
@@ -117,6 +117,8 @@ This guide shows the general process for setting up credentials, configuring you
     - Handle duplicate events safely.
     - Store received event identifiers.
     - Retrieve the latest transaction state before crediting a customer where required.
+
+    The event names, payload shapes and signature verification method are documented on each product's pages.
   </Step>
 
   <Step title="Test the complete flow">
@@ -127,6 +129,20 @@ This guide shows the general process for setting up credentials, configuring you
     </Card>
   </Step>
 </Steps>
+
+## Product reference
+
+This guide covers the setup common to every Quidax product. Endpoints, webhook events, error codes, response statuses, rate limits and transaction limits are specific to each product and documented on its own pages.
+
+<CardGroup cols={2}>
+  <Card title="Ramp" icon="arrow-right-arrow-left" href="/ramp" horizontal />
+
+  <Card title="Payments" icon="credit-card" href="/basqet" horizontal />
+
+  <Card title="Wallets" icon="wallet" href="/wallets" horizontal />
+
+  <Card title="Orderbook" icon="chart-candlestick" href="/orderbook" horizontal />
+</CardGroup>
 
 ## Next steps
 

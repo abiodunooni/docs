@@ -64,25 +64,33 @@ Quidax products can be used independently or combined. For example:
 
 ## How access is organised
 
-Each product has its own platform, with its own dashboard, API keys and webhook configuration:
+Products are grouped across three platforms. Each platform has its own sign-up, dashboard, API keys and webhook configuration.
 
 <Columns cols={3}>
   <Card title="Ramp" icon="arrow-right-arrow-left">
-    Its own dashboard, credentials and webhooks. Onboarding is guided by the Quidax team.
+    **Ramp**
+
+    Its own dashboard, credentials and webhooks. Activation is guided by the Quidax team.
   </Card>
 
-  <Card title="Payments" icon="credit-card">
-    Self-serve sign-up on Basqet, with its own dashboard, credentials, webhooks and sandbox.
+  <Card title="Basqet" icon="credit-card">
+    **Payments**
+
+    Self-serve sign-up, its own dashboard, credentials, webhooks and a full sandbox.
   </Card>
 
-  <Card title="Core API" icon="server">
-    Wallets and Orderbook share one platform, one set of credentials and one webhook configuration.
+  <Card title="Quidax business" icon="server">
+    **Wallets** and **Orderbook**
+
+    One business account serves both, with one set of API keys and one webhook configuration.
   </Card>
 </Columns>
 
 <Note>
-  You only set up the platforms you use. If you integrate more than one product, plan for separate credentials and webhook endpoints per platform, and store them under clearly named environment variables.
+  Wallets and Orderbook share a platform, but they are approved separately. Issuing wallets to your own end users carries additional requirements that trading on your own account does not. See [Onboarding](/get-started/onboarding).
 </Note>
+
+You only set up the platforms you use. If you integrate more than one product, plan for separate credentials and webhook endpoints per platform, and name your environment variables by platform so they cannot be confused.
 
 ## Getting started
 
@@ -117,6 +125,20 @@ Each product has its own platform, with its own dashboard, API keys and webhook 
     <Card title="Go-live checklist" icon="circle-check" href="/get-started/go-live-checklist" horizontal />
   </Step>
 </Steps>
+
+## Where to find the details
+
+These pages cover what is common across Quidax. Anything that varies by product — endpoints, webhook events, error codes, response statuses, rate limits and transaction limits — is documented on that product's own pages.
+
+<CardGroup cols={2}>
+  <Card title="Ramp" icon="arrow-right-arrow-left" href="/ramp" horizontal />
+
+  <Card title="Payments" icon="credit-card" href="/basqet" horizontal />
+
+  <Card title="Wallets" icon="wallet" href="/wallets" horizontal />
+
+  <Card title="Orderbook" icon="chart-candlestick" href="/orderbook" horizontal />
+</CardGroup>
 
 <Tip>
   Not sure which products fit your use case? [Schedule a demo](/get-started/schedule-a-demo) and the team will map your flow to the right combination.

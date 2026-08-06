@@ -6,7 +6,13 @@ icon: "user-plus"
 
 Create a Quidax business account to begin onboarding and access the developer environment.
 
-Because each product runs on its own platform, you create an account on the platform for the product you are building with. Accounts are separate, and so are their credentials and webhook settings.
+Each platform has its own account, credentials and webhook settings. Sign up on the platform for the product you are building with.
+
+| Product | Sign up |
+| --- | --- |
+| Payments | [dashboard.basqet.com/signup](https://dashboard.basqet.com/signup) |
+| Ramp | [ramp-merchant.quidax.io/sign-up](https://ramp-merchant.quidax.io/sign-up) |
+| Wallets and Orderbook | [pro.quidax.io/en_US/register](https://pro.quidax.io/en_US/register) — select the **Business** tab |
 
 ## Before you begin
 
@@ -24,7 +30,7 @@ You should have:
   <Tab title="Payments">
     <Steps>
       <Step title="Sign up on Basqet">
-        Create your account with a business email address.
+        Go to [dashboard.basqet.com/signup](https://dashboard.basqet.com/signup) and create your account with a business email address.
       </Step>
 
       <Step title="Verify your email">
@@ -32,7 +38,7 @@ You should have:
       </Step>
 
       <Step title="Add your business details">
-        Enter your company information and upload your documents from the dashboard.
+        Enter your company information and upload your documents from the dashboard. Our compliance team reviews them and may follow up for clarification.
       </Step>
 
       <Step title="Enable two-factor authentication">
@@ -47,48 +53,48 @@ You should have:
 
   <Tab title="Ramp">
     <Steps>
-      <Step title="Request access">
-        [Schedule a demo](/get-started/schedule-a-demo) so the team can confirm your use case, markets and integration model.
+      <Step title="Register">
+        Create your account at [ramp-merchant.quidax.io/sign-up](https://ramp-merchant.quidax.io/sign-up).
       </Step>
 
       <Step title="Complete onboarding">
-        Submit your business, compliance and commercial information.
+        Submit your business, compliance and commercial information, and confirm whether you are launching with the widget or the API.
 
         <Card title="Onboarding" icon="clipboard-check" href="/get-started/onboarding" horizontal />
       </Step>
 
-      <Step title="Activate your dashboard">
-        Your Ramp dashboard is provisioned once your business is approved. Set your password and enable two-factor authentication on first sign-in.
+      <Step title="Secure your account">
+        Enable two-factor authentication on first sign-in.
       </Step>
 
       <Step title="Create API keys and webhooks">
-        Issue credentials and configure your webhook endpoint from the Ramp dashboard.
+        Once your account is activated for production, issue credentials and configure your webhook endpoint from the Ramp dashboard.
 
         <Card title="Quickstart" icon="rocket" href="/get-started/quickstart" horizontal />
       </Step>
     </Steps>
   </Tab>
 
-  <Tab title="Core API">
-    The Core API covers Wallets and Orderbook.
+  <Tab title="Wallets and Orderbook">
+    Both products are served by one Quidax business account.
 
     <Steps>
-      <Step title="Request access">
-        [Schedule a demo](/get-started/schedule-a-demo) so the team can confirm your use case, assets and markets.
+      <Step title="Register as a business">
+        Go to [pro.quidax.io/en_US/register](https://pro.quidax.io/en_US/register) and select the **Business** tab before filling in your details.
+      </Step>
+
+      <Step title="Decide how the account will be owned">
+        There is no team feature on this platform yet, so choose an ownership model before you go further. See [Account ownership](#account-ownership) below.
       </Step>
 
       <Step title="Complete onboarding">
-        Submit your business, compliance and commercial information.
+        Submit your business, compliance and commercial information. If you plan to issue wallets to your own users, this includes your end-user verification setup and the API agreement.
 
         <Card title="Onboarding" icon="clipboard-check" href="/get-started/onboarding" horizontal />
       </Step>
 
-      <Step title="Designate an account owner">
-        Core API dashboard access sits with one account owner. Use a shared, organisation-controlled email address rather than an individual's.
-      </Step>
-
       <Step title="Set up two-factor authentication">
-        Scan the QR code with Google Authenticator and confirm the six-digit code. Save the recovery details in your team's password manager.
+        Scan the QR code with Google Authenticator and confirm the six-digit code.
 
         <Warning>
           Two-factor authentication is required before you can create API keys or process withdrawals. Set it up as your first action on the dashboard so it never blocks you mid-integration.
@@ -96,13 +102,43 @@ You should have:
       </Step>
 
       <Step title="Create API keys and webhooks">
-        Issue credentials and configure your webhook endpoint.
+        Issue credentials and configure your webhook endpoint. The same key pair covers Wallets and Orderbook.
 
         <Card title="Quickstart" icon="rocket" href="/get-started/quickstart" horizontal />
       </Step>
     </Steps>
   </Tab>
 </Tabs>
+
+## Account ownership
+
+The Wallets and Orderbook platform does not have a team feature yet, so dashboard access sits with one account. Two models work well — pick the one that matches how your team operates.
+
+<Columns cols={2}>
+  <Card title="Single owner" icon="user">
+    One person creates and manages the account, and is the only one who signs in.
+
+    Best where one engineer or operator runs the integration day to day, and dashboard actions are infrequent.
+  </Card>
+
+  <Card title="Shared account" icon="users">
+    The account is registered on a shared, organisation-controlled email address that several people can access.
+
+    Best where more than one person needs to create keys, check balances or process withdrawals.
+  </Card>
+</Columns>
+
+<Note>
+  Whichever model you choose, hold the Google Authenticator second factor with someone senior who is reliably reachable. Dashboard withdrawals and API key creation both need a code, so availability of that person is what keeps your operations moving.
+</Note>
+
+Practical steps that make either model safer:
+
+- Register the account on a mailbox your organisation controls, not an individual's inbox.
+- Store the password and the authenticator recovery details in your team's password manager.
+- Make sure at least two people can restore the second factor if a device is lost.
+- Agree in advance who approves and executes withdrawals, and document it.
+- Review who has access whenever someone joins or leaves the team.
 
 ## Two-factor authentication
 
@@ -127,7 +163,7 @@ Two-factor authentication protects your dashboard and the actions that move fund
 </Steps>
 
 <Note>
-  On the Core API, two-factor authentication is checked when you create API keys and when you process withdrawals. Setting it up early means both are ready when you need them.
+  On the Wallets and Orderbook platform, two-factor authentication is checked when you create API keys and when you process withdrawals. Setting it up early means both are ready when you need them.
 </Note>
 
 ## Account security
@@ -136,12 +172,8 @@ To protect your integration:
 
 - Use an email address controlled by your organisation.
 - Enable two-factor authentication.
-- Do not share account passwords.
+- Do not share account passwords outside your password manager.
 - Create separate API credentials for each environment and platform.
 - Restrict credentials to authorised systems and team members.
 - Never place secret keys in frontend or mobile application code.
 - Rotate credentials when access changes or exposure is suspected.
-
-<Tip>
-  Where a platform's dashboard access sits with a single owner, treat the credentials as shared infrastructure: an organisation-controlled mailbox, a password manager entry, and at least two people who can recover the second factor.
-</Tip>

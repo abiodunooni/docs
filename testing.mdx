@@ -11,10 +11,14 @@ Test environments differ by product. Plan for this early so your release schedul
     Includes a full sandbox. Build and test the complete payment lifecycle with sandbox credentials, then swap to live keys.
   </Card>
 
-  <Card title="Ramp and Core API" icon="server">
+  <Card title="Ramp, Wallets and Orderbook" icon="server">
     Tested directly in production using small live transactions, so what you verify is exactly what your customers will experience.
   </Card>
 </Columns>
+
+<Note>
+  This page covers the approach. Test data, sandbox specifics and per-endpoint behaviour are documented on each product's pages.
+</Note>
 
 ## Testing Payments in the sandbox
 
@@ -38,7 +42,7 @@ Sandbox credentials are issued as soon as you create your Basqet account, so you
   </Step>
 </Steps>
 
-## Testing Ramp and the Core API in production
+## Testing Ramp, Wallets and Orderbook in production
 
 These products are tested against production, with real balances and real settlement. Treat the first phase of testing as a controlled pilot.
 
@@ -52,10 +56,14 @@ These products are tested against production, with real balances and real settle
   </Step>
 
   <Step title="Run one transaction per flow">
-    Complete a full cycle for each flow you support: an on-ramp, an off-ramp, a deposit, a withdrawal, an order, a conversion.
+    Complete a full cycle for each flow you support.
+
+    - **Ramp** — one on-ramp and one off-ramp, in each currency you are approved for.
+    - **Wallets** — create a subaccount, generate an address, receive a deposit, send a withdrawal.
+    - **Orderbook** — place a market order, place and cancel a limit order, run a conversion.
 
     <Note>
-      On the Core API, withdrawals are confirmed with your Google Authenticator code. Have the authenticator to hand for your first withdrawal test.
+      On Wallets and Orderbook, withdrawals are confirmed with your Google Authenticator code. Have the authenticator to hand, and make sure whoever holds it is available for your first withdrawal test.
     </Note>
   </Step>
 
@@ -87,6 +95,8 @@ Do not test only the successful path. Your integration should handle:
     - Failed transactions.
     - Expired transactions.
     - Reversed or refunded transactions.
+
+    The full list of statuses for each flow is on the product's pages.
   </Accordion>
 
   <Accordion title="Webhooks" icon="webhook">
@@ -103,14 +113,29 @@ Do not test only the successful path. Your integration should handle:
     - Unsupported currencies or networks.
     - Transaction-limit errors.
     - Amounts below the minimum or above the maximum.
+
+    Error codes, response statuses and limits are documented per product.
   </Accordion>
 
   <Accordion title="Network conditions" icon="wifi">
     - Network timeouts.
+    - Rate limiting, and how your client backs off.
     - Retries that must not create duplicate transactions.
     - Requests where the response is lost but the transaction succeeded.
   </Accordion>
 </AccordionGroup>
+
+## Product reference
+
+<CardGroup cols={2}>
+  <Card title="Ramp" icon="arrow-right-arrow-left" href="/ramp" horizontal />
+
+  <Card title="Payments" icon="credit-card" href="/basqet" horizontal />
+
+  <Card title="Wallets" icon="wallet" href="/wallets" horizontal />
+
+  <Card title="Orderbook" icon="chart-candlestick" href="/orderbook" horizontal />
+</CardGroup>
 
 ## Before you launch
 

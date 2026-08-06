@@ -1,28 +1,36 @@
 ---
-title: "Coin listings"
-description: "Request support for a digital asset or market on Quidax."
+title: "List a coin on Quidax"
+description: "For exchanges, issuers and projects that want their asset listed on Quidax."
 icon: "coins"
 ---
 
-Supported assets and markets grow with what our partners and their customers need. If your product depends on an asset or trading pair that is not yet available, tell us and we will assess it.
+If you issue or operate a digital asset, listing on Quidax puts it in front of our markets, our OTC desk and every business building on our APIs.
+
+<Card title="Register your interest" icon="envelope" href="mailto:support@quidax.com" horizontal>
+  Send your listing request to **support@quidax.com** with the details below.
+</Card>
 
 ## Who this is for
 
 <Columns cols={2}>
-  <Card title="Businesses integrating Quidax" icon="plug">
-    You need an asset or market that your customers are asking for, or that your product depends on.
+  <Card title="Token issuers and projects" icon="rocket">
+    You want your asset available to trade, hold and move across Quidax's supported markets.
   </Card>
 
-  <Card title="Token issuers and projects" icon="rocket">
-    You want your asset listed and made available across Quidax's markets and partner integrations.
+  <Card title="Exchanges and partners" icon="building">
+    You operate a venue or product with an asset you would like listed and supported on Quidax.
   </Card>
 </Columns>
+
+<Note>
+  Already integrating and simply need an asset your customers are asking for? Raise it during onboarding or with your Quidax representative. Requests are assessed alongside your integration, so the asset can be ready when you launch.
+</Note>
 
 ## How the review works
 
 <Steps>
-  <Step title="Submit your interest">
-    Send the asset details to your Quidax representative, or raise it during onboarding if you are still integrating.
+  <Step title="Submit your listing request">
+    Email [support@quidax.com](mailto:support@quidax.com) with the information below.
   </Step>
 
   <Step title="Initial assessment">
@@ -37,8 +45,8 @@ Supported assets and markets grow with what our partners and their customers nee
     Where applicable, we agree terms, obligations and any regulatory considerations for the markets involved.
   </Step>
 
-  <Step title="Decision and enablement">
-    Approved assets are enabled for the relevant products, and you are told which endpoints and networks they are available on.
+  <Step title="Listing and enablement">
+    Approved assets are enabled for the relevant products and markets, and announced to our users and partners.
   </Step>
 </Steps>
 
@@ -53,32 +61,44 @@ Supported assets and markets grow with what our partners and their customers nee
     - Whether the asset is a stablecoin, and how it is backed.
   </Accordion>
 
-  <Accordion title="Demand and use case" icon="chart-line">
-    - Why you need the asset, and for which product.
-    - Expected monthly volume and typical transaction size.
-    - The markets and corridors involved.
-    - Trading pairs you need, and against which currencies.
-  </Accordion>
-
-  <Accordion title="Project and compliance" icon="shield-check">
+  <Accordion title="Project and team" icon="users">
     - Issuing entity and jurisdiction.
     - Team and ownership information.
-    - Audits, attestations or reserve reports.
-    - Existing exchange listings and liquidity venues.
-    - Any regulatory approvals or restrictions.
+    - Website, documentation and whitepaper.
+    - Roadmap and current stage of the project.
   </Accordion>
 
-  <Accordion title="Liquidity" icon="droplets">
+  <Accordion title="Market and liquidity" icon="chart-line">
+    - Existing exchange listings and liquidity venues.
+    - Available depth on those venues.
     - Market makers you work with.
-    - Available depth on existing venues.
     - Any liquidity support you can commit to at launch.
+    - Trading pairs you want on Quidax, and against which currencies.
+  </Accordion>
+
+  <Accordion title="Compliance" icon="shield-check">
+    - Audits, attestations or reserve reports.
+    - Smart contract audit reports.
+    - Any regulatory approvals, opinions or restrictions.
+    - Jurisdictions where the asset is restricted.
+  </Accordion>
+
+  <Accordion title="Demand" icon="megaphone">
+    - Community size and activity.
+    - Demand in the markets Quidax covers.
+    - Expected volume once listed.
+    - Any launch or marketing plans you would like to coordinate.
   </Accordion>
 </AccordionGroup>
 
-<Note>
-  Supported assets and networks differ by product and change over time. Retrieve the current list from the relevant API endpoint rather than hard-coding it, so newly listed assets appear in your product without a release.
-</Note>
+<Tip>
+  The strongest submissions lead with demand and liquidity: who wants to trade the asset in our markets, and how depth will be maintained after listing.
+</Tip>
 
-<Card title="Talk to the team about a listing" icon="calendar" href="/get-started/schedule-a-demo" horizontal>
-  Bring your asset details and expected volume to the call.
+## Once an asset is listed
+
+Newly listed assets become available through the same endpoints as everything else. Businesses building on Quidax retrieve supported assets and networks dynamically, so a listing reaches integrations without them shipping a release.
+
+<Card title="Start a listing conversation" icon="envelope" href="mailto:support@quidax.com" horizontal>
+  Email **support@quidax.com** with your asset details, liquidity arrangements and target timeline.
 </Card>

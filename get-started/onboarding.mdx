@@ -6,17 +6,29 @@ icon: "clipboard-check"
 
 Before processing live transactions, your organisation completes Quidax's business, compliance, commercial and technical onboarding.
 
-Each product runs on its own platform, so onboarding happens per platform. If you use more than one product, you complete the relevant steps for each.
+Onboarding happens per platform. If you use more than one product, you complete the relevant steps for each.
+
+## Where to sign up
+
+| Product | Sign up |
+| --- | --- |
+| Payments | [dashboard.basqet.com/signup](https://dashboard.basqet.com/signup) |
+| Ramp | [ramp-merchant.quidax.io/sign-up](https://ramp-merchant.quidax.io/sign-up) |
+| Wallets and Orderbook | [pro.quidax.io/en_US/register](https://pro.quidax.io/en_US/register) — select the **Business** tab |
+
+<Note>
+  Every account goes through compliance review before it is enabled for live transactions. Registering creates your account and gets you into the dashboard; our team reviews your submitted documents, may come back with clarifications, and shares any agreements that need to be executed.
+</Note>
 
 ## Onboarding by product
 
 <Tabs>
   <Tab title="Payments">
-    Payments onboarding is self-serve. Create your Basqet account, start building against the sandbox immediately, and submit your business details in parallel.
+    Payments onboarding is self-serve. Create your account, start building against the sandbox immediately, and complete your business review in parallel.
 
     <Steps>
       <Step title="Create your Basqet account">
-        Sign up with a business email address and verify it.
+        Sign up at [dashboard.basqet.com/signup](https://dashboard.basqet.com/signup) with a business email address and verify it.
       </Step>
 
       <Step title="Build in the sandbox">
@@ -27,22 +39,26 @@ Each product runs on its own platform, so onboarding happens per platform. If yo
         Upload your company documents and complete the compliance questionnaire from the dashboard.
       </Step>
 
+      <Step title="Compliance review">
+        Our compliance team reviews your submission. They may reach out for clarification, request additional documents, or share the API agreement for execution.
+      </Step>
+
       <Step title="Confirm settlement and pricing">
         Choose your settlement currency and confirm your commercial terms.
       </Step>
 
       <Step title="Get live keys">
-        Once your business is approved, live credentials are enabled and you can switch your integration over.
+        Once approved, live credentials are enabled and you can switch your integration over.
       </Step>
     </Steps>
   </Tab>
 
   <Tab title="Ramp">
-    Ramp onboarding is guided by the Quidax team, so your implementation, corridors and limits are approved before launch.
+    Ramp activation is guided by the Quidax team, so your implementation, corridors and limits are approved before launch.
 
     <Steps>
-      <Step title="Talk to the team">
-        [Schedule a demo](/get-started/schedule-a-demo) and share your use case, markets and expected volume.
+      <Step title="Register and talk to the team">
+        Create your account at [ramp-merchant.quidax.io/sign-up](https://ramp-merchant.quidax.io/sign-up), then [schedule a demo](/get-started/schedule-a-demo) to share your use case, markets and expected volume.
       </Step>
 
       <Step title="Choose your integration model">
@@ -53,12 +69,16 @@ Each product runs on its own platform, so onboarding happens per platform. If yo
         Submit your company documents, ownership details, compliance policies and flow-of-funds diagram.
       </Step>
 
+      <Step title="Execute agreements">
+        Sign the API agreement and any other terms applicable to your implementation.
+      </Step>
+
       <Step title="Agree commercial terms">
         Confirm your pricing, corridors, currencies, settlement model and transaction limits.
       </Step>
 
-      <Step title="Get platform access">
-        Your Ramp dashboard is provisioned, and you create API keys and configure webhooks there.
+      <Step title="Activate and integrate">
+        Your Ramp account is enabled for production. Create API keys and configure webhooks from the dashboard.
       </Step>
     </Steps>
 
@@ -67,34 +87,83 @@ Each product runs on its own platform, so onboarding happens per platform. If yo
     </Note>
   </Tab>
 
-  <Tab title="Core API">
-    The Core API covers Wallets and Orderbook. Onboarding is guided by the Quidax team.
+  <Tab title="Wallets">
+    Wallets is served by the Core API, on the same account as Orderbook. What we review depends on whether you are holding assets for your own business or issuing wallets to your end users.
 
     <Steps>
+      <Step title="Register your business account">
+        Sign up at [pro.quidax.io/en_US/register](https://pro.quidax.io/en_US/register) and select the **Business** tab.
+      </Step>
+
       <Step title="Talk to the team">
-        [Schedule a demo](/get-started/schedule-a-demo) and share the product you are building, the assets and markets you need, and your expected volume.
+        [Schedule a demo](/get-started/schedule-a-demo) and share the product you are building, the assets you need, and your expected volume.
       </Step>
 
       <Step title="Complete business and compliance review">
         Submit your company documents, ownership details, compliance policies and flow-of-funds diagram.
       </Step>
 
+      <Step title="Share your end-user verification setup">
+        This step applies if you plan to onboard your own users and issue them wallets. We review:
+
+        - Your master service agreement with your KYC provider.
+        - A video walkthrough of your in-app KYC flow, or both, depending on your setup.
+
+        <Note>
+          Building wallets for your own business or internal units rather than for external end users? This step does not apply — say so early and we will scope the review accordingly.
+        </Note>
+      </Step>
+
+      <Step title="Execute the API agreement">
+        The API agreement is shared for signature as part of enabling wallet issuance.
+      </Step>
+
+      <Step title="Agree commercial terms">
+        Confirm fees, discounts, limits and any liquidity commitments.
+      </Step>
+
+      <Step title="Set up account access and 2FA">
+        Decide how the account will be owned and accessed, then enable two-factor authentication with Google Authenticator. It is required before you can create API keys or process withdrawals.
+
+        <Card title="Create an account" icon="user-plus" href="/get-started/create-an-account" horizontal>
+          Account ownership options and 2FA setup.
+        </Card>
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="Orderbook">
+    Orderbook onboarding is the lighter of the two on this platform. You are trading and accessing liquidity on your own account, so no end-user verification review is involved.
+
+    <Steps>
+      <Step title="Register your business account">
+        Sign up at [pro.quidax.io/en_US/register](https://pro.quidax.io/en_US/register) and select the **Business** tab.
+      </Step>
+
+      <Step title="Talk to the team">
+        [Schedule a demo](/get-started/schedule-a-demo) and share the markets you need, your expected volume and typical transaction sizes.
+      </Step>
+
+      <Step title="Complete business and compliance review">
+        Submit your company documents, ownership details and compliance policies.
+      </Step>
+
       <Step title="Agree commercial terms">
         Confirm trading fees, discounts, limits and any liquidity commitments.
       </Step>
 
-      <Step title="Get platform access">
-        Your Core API account is provisioned. Designate the account owner who will hold dashboard access.
-      </Step>
+      <Step title="Set up account access and 2FA">
+        Decide how the account will be owned and accessed, then enable two-factor authentication with Google Authenticator. It is required before you can create API keys or process withdrawals.
 
-      <Step title="Enable two-factor authentication">
-        Two-factor authentication with Google Authenticator secures the account. It is required before you can create API keys or process withdrawals.
+        <Card title="Create an account" icon="user-plus" href="/get-started/create-an-account" horizontal>
+          Account ownership options and 2FA setup.
+        </Card>
       </Step>
     </Steps>
 
-    <Note>
-      Core API dashboard access is held by a single account owner today. Choose an owner with a shared, organisation-controlled email address, and store the two-factor recovery details in your team's password manager so access is never tied to one person's device.
-    </Note>
+    <Tip>
+      Adding Wallets later keeps the same account and credentials. You complete the end-user verification review at that point.
+    </Tip>
   </Tab>
 </Tabs>
 
@@ -121,8 +190,16 @@ Requirements vary by country, entity type, product and risk profile.
   <Accordion title="Compliance" icon="shield-check">
     - Regulatory or compliance policies.
     - Anti-money laundering controls.
-    - Customer verification process and evidence, where you onboard your own customers.
     - Source-of-funds information.
+    - Your customer verification process, where you onboard your own customers.
+  </Accordion>
+
+  <Accordion title="End-user verification" icon="user-check">
+    Requested where you issue wallets to your own users, or integrate Ramp via the API:
+
+    - Your master service agreement with your KYC provider.
+    - A video recording of your in-app KYC flow.
+    - Sample evidence of a verified customer record.
   </Accordion>
 
   <Accordion title="Product and commercial" icon="chart-line">
@@ -130,19 +207,16 @@ Requirements vary by country, entity type, product and risk profile.
     - Expected currencies, countries and transaction volumes.
     - Website, application or product materials.
   </Accordion>
+
+  <Accordion title="Agreements" icon="file-signature">
+    - The API agreement, shared for execution where your implementation requires it.
+    - Any product-specific or commercial terms.
+  </Accordion>
 </AccordionGroup>
 
 <Tip>
   Gathering these documents before your first call is the single biggest thing you can do to shorten onboarding.
 </Tip>
-
-## Assets and markets
-
-If your product depends on an asset or market that is not yet listed, raise it during onboarding. Listing requests are assessed alongside your integration, so the asset can be ready when you launch.
-
-<Card title="Request a coin listing" icon="coins" href="/get-started/coin-listings" horizontal>
-  What we assess, what to send, and how the review works.
-</Card>
 
 ## Next steps
 

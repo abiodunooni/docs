@@ -51,9 +51,15 @@ Ramp has two integration models. Your approved implementation determines which o
   </Card>
 </Columns>
 
+Ramp supports **NGN** and **GHS**.
+
 <Note>
   Fiat legs settle between Quidax and an account belonging to the transacting party. This keeps every transaction traceable from source to destination, and is worth designing for early if your product involves paying out to a beneficiary.
 </Note>
+
+<Card title="Ramp documentation" icon="arrow-right-arrow-left" href="/ramp" horizontal>
+  Endpoints, widget setup, webhooks, statuses, errors and limits.
+</Card>
 
 ## Payments
 
@@ -66,15 +72,21 @@ Use Payments to:
 - Track payment statuses.
 - Convert received payments.
 - Settle in a supported fiat currency or digital asset.
-- Send crypto payouts from the dashboard, or programmatically through the Core API.
+- Send crypto payouts from the dashboard, or programmatically through the API.
+
+Fiat settlement is supported across **NGN, GHS, ZAR, KES, XAF, XOF, UGX, ZMW, TZS, USD, EUR** and **GBP**.
 
 <Tip>
-  Payments is the only product with self-serve sign-up and a full sandbox, so you can build and test the complete flow before your business review is finished.
+  Payments is the only product with self-serve sign-up and a full sandbox, so you can build and test the complete flow while your business review is in progress.
 </Tip>
+
+<Card title="Payments documentation" icon="credit-card" href="/basqet" horizontal>
+  Endpoints, sandbox, webhooks, statuses, errors and limits.
+</Card>
 
 ## Wallets
 
-Wallets provides the infrastructure for holding, receiving and sending supported digital assets.
+Wallets provides the infrastructure for holding, receiving and sending supported digital assets. It is served by the Quidax Core API.
 
 Use Wallets to:
 
@@ -86,6 +98,14 @@ Use Wallets to:
 - Track deposits and withdrawals.
 - Build custodial wallet experiences.
 - Maintain balances for customers or business units.
+
+<Note>
+  If you plan to issue wallets to your own end users, onboarding includes an additional review of how you verify those users. Trading or holding assets on your own account does not. See [Onboarding](/get-started/onboarding).
+</Note>
+
+<Card title="Wallets documentation" icon="wallet" href="/wallets" horizontal>
+  Endpoints, subaccounts, webhooks, statuses, errors and limits.
+</Card>
 
 ## Orderbook
 
@@ -102,9 +122,27 @@ Use Orderbook to:
 - Convert between supported trading pairs.
 - Access liquidity for bulk transactions.
 
-<Note>
-  Wallets and Orderbook are served by the same platform, the Core API. One account, one set of API keys and one webhook configuration covers both.
-</Note>
+Orderbook markets are quoted against **NGN, GHS, XAF, XOF** and **ZAR**.
+
+<Card title="Orderbook documentation" icon="chart-candlestick" href="/orderbook" horizontal>
+  Markets, order types, webhooks, statuses, errors and rate limits.
+</Card>
+
+## Wallets and Orderbook on one account
+
+Wallets and Orderbook are served by the same Quidax business account. One login, one set of API keys and one webhook configuration covers both.
+
+They are approved separately, though, because they carry different requirements:
+
+| | Wallets | Orderbook |
+| --- | --- | --- |
+| What you are doing | Issuing and managing wallets, often for your end users | Trading and accessing liquidity on your own account |
+| Onboarding | Standard business review, plus a review of how you verify end users if you issue wallets to them | Standard business review |
+| Typical use | Custodial wallets, exchanges, brokerages, neobanks | Treasury, conversion, liquidity, bulk execution |
+
+<Tip>
+  Starting with Orderbook only and adding Wallets later is a common path. You keep the same account and credentials, and complete the additional review when you are ready to issue wallets.
+</Tip>
 
 ## Which product should I use?
 
@@ -124,16 +162,15 @@ Use Orderbook to:
 
 ## Platforms at a glance
 
-Each platform has its own dashboard, onboarding, API keys and webhook configuration.
-
-| | Ramp | Payments | Core API (Wallets + Orderbook) |
+| | Ramp | Payments | Wallets and Orderbook |
 | --- | --- | --- | --- |
-| Sign-up | Guided by the Quidax team | Self-serve | Guided by the Quidax team |
+| Sign-up | Self-serve registration, activated by the Quidax team | Self-serve | Self-serve registration, activated by the Quidax team |
 | Integration models | Widget or API | API and dashboard | API |
-| Sandbox | Production testing | Full sandbox | Production testing |
+| Testing | Production | Full sandbox | Production |
+| Fiat currencies | NGN, GHS | 12 settlement currencies | NGN, GHS, XAF, XOF, ZAR |
 | Dashboard access | Per-platform login | Per-platform login | Single account owner |
-| Crypto payouts | — | Dashboard or Core API | API |
+| Crypto payouts | — | Dashboard or API | API |
 
 <Card title="See how each platform is set up" icon="clipboard-check" href="/get-started/onboarding" horizontal>
-  Onboarding requirements, documents and review steps per product.
+  Sign-up links, onboarding requirements and review steps per product.
 </Card>
