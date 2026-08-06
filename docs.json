@@ -3,8 +3,8 @@
   "name": "Quidax Documentation",
   "colors": {
     "primary": "#6100A5",
-    "light": "#1F0048",
-    "dark": "#B890FE"
+    "light": "#B890FE",
+    "dark": "#1F0048"
   },
   "logo": {
     "light": "/images/light-log.svg",
