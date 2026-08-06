@@ -114,7 +114,20 @@ html[data-current-path="/"] .nav-tabs-item[data-active] > div {
 
 /* Tab bar */
 
-/* The API Reference tab is pushed to the far right by
-   align-api-reference-tab.js. A CSS-only rule cannot do it reliably here,
-   because the tab container is not a flex row and margin-left: auto has
-   nothing to push against. */
+/* Push the API Reference tab to the far right, away from the product tabs.
+   .nav-tabs is already a flex row, but it shrinks to fit its tabs, so
+   margin-left: auto has no free space to absorb. Stretching it to the full
+   width of the bar gives the margin something to push against.
+   Keyed on the href rather than position, so it holds if tabs are added or
+   reordered. Left alone on small screens, where the tab bar scrolls. */
+
+@media (min-width: 768px) {
+  .nav-tabs {
+    width: 100%;
+    flex-grow: 1;
+  }
+
+  .nav-tabs-item[href^="/api-reference"] {
+    margin-left: auto;
+  }
+}
