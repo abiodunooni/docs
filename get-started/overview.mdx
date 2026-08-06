@@ -1,0 +1,123 @@
+---
+title: "Overview"
+description: "Build stablecoin, payment, wallet and trading products with Quidax."
+icon: "compass"
+---
+
+Quidax provides the infrastructure businesses need to move between fiat currencies and digital assets, accept crypto payments, create and manage wallets, and execute trades through an order book.
+
+Use our APIs to add digital asset functionality to your product without building the underlying exchange, liquidity, custody and settlement infrastructure from scratch.
+
+## What you can build
+
+<Columns cols={2}>
+  <Card title="On-ramp and off-ramp" icon="arrow-right-arrow-left" horizontal>
+    Let customers buy digital assets with local currency, or sell and receive local currency.
+  </Card>
+
+  <Card title="Crypto checkout" icon="credit-card" horizontal>
+    Accept crypto payments and settle in your preferred currency.
+  </Card>
+
+  <Card title="Wallet infrastructure" icon="wallet" horizontal>
+    Create and manage wallets for your business or your customers, and move assets in and out.
+  </Card>
+
+  <Card title="Trading and conversion" icon="chart-line" horizontal>
+    Convert between fiat, stablecoins and other digital assets, and place orders across supported markets.
+  </Card>
+</Columns>
+
+You can also access liquidity for individual and bulk transactions, and combine any of the above into a single product experience.
+
+## Products
+
+<CardGroup cols={2}>
+  <Card title="Ramp" icon="arrow-right-arrow-left" href="/ramp">
+    Move customers between local currencies and digital assets, through a hosted widget or the API.
+  </Card>
+
+  <Card title="Payments" icon="credit-card" href="/basqet">
+    Accept crypto payments, track their status and settle in fiat or digital assets. Powered by Basqet.
+  </Card>
+
+  <Card title="Wallets" icon="wallet" href="/wallets">
+    Create subaccounts, generate deposit addresses, and send and receive supported digital assets.
+  </Card>
+
+  <Card title="Orderbook" icon="chart-candlestick" href="/orderbook">
+    Retrieve market data, place and manage orders, and access liquidity across supported markets.
+  </Card>
+</CardGroup>
+
+## How the products work together
+
+Quidax products can be used independently or combined. For example:
+
+| What you want to build | Products |
+| --- | --- |
+| Let customers fund digital asset wallets with local currency | Ramp + Wallets |
+| Accept crypto and settle merchants in fiat | Payments + Ramp |
+| Create customer balances and trade on their behalf | Wallets + Orderbook |
+| An exchange, brokerage or investment product | Ramp + Wallets + Orderbook |
+| Accept, store and disburse digital assets | Payments + Wallets |
+
+## How access is organised
+
+Each product has its own platform, with its own dashboard, API keys and webhook configuration:
+
+<Columns cols={3}>
+  <Card title="Ramp" icon="arrow-right-arrow-left">
+    Its own dashboard, credentials and webhooks. Onboarding is guided by the Quidax team.
+  </Card>
+
+  <Card title="Payments" icon="credit-card">
+    Self-serve sign-up on Basqet, with its own dashboard, credentials, webhooks and sandbox.
+  </Card>
+
+  <Card title="Core API" icon="server">
+    Wallets and Orderbook share one platform, one set of credentials and one webhook configuration.
+  </Card>
+</Columns>
+
+<Note>
+  You only set up the platforms you use. If you integrate more than one product, plan for separate credentials and webhook endpoints per platform, and store them under clearly named environment variables.
+</Note>
+
+## Getting started
+
+<Steps>
+  <Step title="Choose your product">
+    Compare what each product does and pick the one that matches the experience you want to build.
+
+    <Card title="Products" icon="grid-2" href="/get-started/products" horizontal />
+  </Step>
+
+  <Step title="Complete onboarding">
+    Sign up, submit your business details and get your use case approved for production.
+
+    <Card title="Onboarding" icon="clipboard-check" href="/get-started/onboarding" horizontal />
+  </Step>
+
+  <Step title="Create your account and keys">
+    Set up your dashboard access, enable two-factor authentication and issue API credentials.
+
+    <Card title="Create an account" icon="user-plus" href="/get-started/create-an-account" horizontal />
+  </Step>
+
+  <Step title="Make your first request">
+    Authenticate, configure pricing and webhooks, and run an end-to-end transaction.
+
+    <Card title="Quickstart" icon="rocket" href="/get-started/quickstart" horizontal />
+  </Step>
+
+  <Step title="Test and go live">
+    Work through the test scenarios, then run the go-live checklist before enabling customers.
+
+    <Card title="Go-live checklist" icon="circle-check" href="/get-started/go-live-checklist" horizontal />
+  </Step>
+</Steps>
+
+<Tip>
+  Not sure which products fit your use case? [Schedule a demo](/get-started/schedule-a-demo) and the team will map your flow to the right combination.
+</Tip>

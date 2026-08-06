@@ -79,9 +79,32 @@
         "tab": "Get Started",
         "groups": [
           {
-            "group": "Get Started",
+            "group": "Introduction",
             "pages": [
-              "ramp"
+              "get-started/overview",
+              "get-started/products",
+              "get-started/coverage"
+            ]
+          },
+          {
+            "group": "Set up",
+            "pages": [
+              "get-started/onboarding",
+              "get-started/create-an-account",
+              "get-started/quickstart",
+              "testing",
+              "get-started/go-live-checklist"
+            ]
+          },
+          {
+            "group": "Resources",
+            "pages": [
+              "get-started/migrate-to-quidax",
+              "get-started/coin-listings",
+              "get-started/pricing",
+              "get-started/licences",
+              "get-started/schedule-a-demo",
+              "support"
             ]
           }
         ]

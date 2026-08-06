@@ -1,0 +1,139 @@
+---
+title: "Products"
+description: "Choose the Quidax product that matches the experience you want to build."
+icon: "grid-2"
+---
+
+Quidax provides four products across three platforms. Use them independently or combine them.
+
+<CardGroup cols={2}>
+  <Card title="Ramp" icon="arrow-right-arrow-left" href="#ramp">
+    Fiat to crypto, crypto to fiat.
+  </Card>
+
+  <Card title="Payments" icon="credit-card" href="#payments">
+    Accept crypto payments.
+  </Card>
+
+  <Card title="Wallets" icon="wallet" href="#wallets">
+    Hold, receive and send assets.
+  </Card>
+
+  <Card title="Orderbook" icon="chart-candlestick" href="#orderbook">
+    Market data and trade execution.
+  </Card>
+</CardGroup>
+
+## Ramp
+
+Ramp helps your customers move between local currencies and digital assets.
+
+Use Ramp to:
+
+- Let customers buy stablecoins or other supported assets with fiat.
+- Let customers sell digital assets and receive fiat.
+- Add deposits and withdrawals to an exchange or wallet.
+- Collect local currency and settle your business in stablecoins.
+- Fund stablecoin positions and pay recipients in local currency.
+- Embed an on-ramp or off-ramp experience in your product.
+
+### Widget or API
+
+Ramp has two integration models. Your approved implementation determines which one you use.
+
+<Columns cols={2}>
+  <Card title="Hosted widget" icon="window">
+    Quidax renders the full experience and verifies each end user inside the widget, so you do not build or maintain a KYC flow. Fastest path to launch.
+  </Card>
+
+  <Card title="API" icon="code">
+    You own the interface end to end. Because your customers transact through your own product, you verify them yourself and share evidence of your KYC process during onboarding.
+  </Card>
+</Columns>
+
+<Note>
+  Fiat legs settle between Quidax and an account belonging to the transacting party. This keeps every transaction traceable from source to destination, and is worth designing for early if your product involves paying out to a beneficiary.
+</Note>
+
+## Payments
+
+Payments is powered by Basqet, Quidax's crypto payment gateway.
+
+Use Payments to:
+
+- Accept supported digital assets from customers.
+- Generate payment requests.
+- Track payment statuses.
+- Convert received payments.
+- Settle in a supported fiat currency or digital asset.
+- Send crypto payouts from the dashboard, or programmatically through the Core API.
+
+<Tip>
+  Payments is the only product with self-serve sign-up and a full sandbox, so you can build and test the complete flow before your business review is finished.
+</Tip>
+
+## Wallets
+
+Wallets provides the infrastructure for holding, receiving and sending supported digital assets.
+
+Use Wallets to:
+
+- Create customer subaccounts.
+- Retrieve balances.
+- Generate deposit addresses.
+- Receive digital assets.
+- Send assets to internal or external wallets.
+- Track deposits and withdrawals.
+- Build custodial wallet experiences.
+- Maintain balances for customers or business units.
+
+## Orderbook
+
+Orderbook provides market data and APIs for executing trades across supported Quidax markets.
+
+Use Orderbook to:
+
+- Retrieve available markets.
+- View prices and market depth.
+- Place market and limit orders.
+- Monitor open orders.
+- Retrieve completed trades.
+- Cancel eligible open orders.
+- Convert between supported trading pairs.
+- Access liquidity for bulk transactions.
+
+<Note>
+  Wallets and Orderbook are served by the same platform, the Core API. One account, one set of API keys and one webhook configuration covers both.
+</Note>
+
+## Which product should I use?
+
+| Requirement | Recommended product |
+| --- | --- |
+| Let users deposit local currency and receive stablecoins | Ramp |
+| Let users sell stablecoins and receive local currency | Ramp |
+| Accept crypto as payment | Payments |
+| Settle crypto payments in fiat | Payments |
+| Create wallets for customers | Wallets |
+| Send and receive digital assets | Wallets |
+| Buy or sell through an exchange market | Orderbook |
+| Build a crypto exchange or brokerage | Wallets + Orderbook + Ramp |
+| Collect fiat and settle in stablecoins | Ramp |
+| Collect crypto and settle merchants in fiat | Payments + Ramp |
+| Execute large liquidity transactions | Orderbook or institutional liquidity |
+
+## Platforms at a glance
+
+Each platform has its own dashboard, onboarding, API keys and webhook configuration.
+
+| | Ramp | Payments | Core API (Wallets + Orderbook) |
+| --- | --- | --- | --- |
+| Sign-up | Guided by the Quidax team | Self-serve | Guided by the Quidax team |
+| Integration models | Widget or API | API and dashboard | API |
+| Sandbox | Production testing | Full sandbox | Production testing |
+| Dashboard access | Per-platform login | Per-platform login | Single account owner |
+| Crypto payouts | — | Dashboard or Core API | API |
+
+<Card title="See how each platform is set up" icon="clipboard-check" href="/get-started/onboarding" horizontal>
+  Onboarding requirements, documents and review steps per product.
+</Card>

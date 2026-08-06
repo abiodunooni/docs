@@ -1,0 +1,147 @@
+---
+title: "Create an account"
+description: "Set up dashboard access for the platform you are integrating with."
+icon: "user-plus"
+---
+
+Create a Quidax business account to begin onboarding and access the developer environment.
+
+Because each product runs on its own platform, you create an account on the platform for the product you are building with. Accounts are separate, and so are their credentials and webhook settings.
+
+## Before you begin
+
+You should have:
+
+- Your official business name.
+- A business email address controlled by your organisation.
+- A phone number.
+- Basic information about your organisation.
+- Access to an authenticator application, such as Google Authenticator.
+
+## Create your account
+
+<Tabs>
+  <Tab title="Payments">
+    <Steps>
+      <Step title="Sign up on Basqet">
+        Create your account with a business email address.
+      </Step>
+
+      <Step title="Verify your email">
+        Confirm the verification email to activate your account.
+      </Step>
+
+      <Step title="Add your business details">
+        Enter your company information and upload your documents from the dashboard.
+      </Step>
+
+      <Step title="Enable two-factor authentication">
+        Turn on two-factor authentication for every user with dashboard access.
+      </Step>
+
+      <Step title="Start in the sandbox">
+        Sandbox credentials are available immediately, so you can begin integrating right away.
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="Ramp">
+    <Steps>
+      <Step title="Request access">
+        [Schedule a demo](/get-started/schedule-a-demo) so the team can confirm your use case, markets and integration model.
+      </Step>
+
+      <Step title="Complete onboarding">
+        Submit your business, compliance and commercial information.
+
+        <Card title="Onboarding" icon="clipboard-check" href="/get-started/onboarding" horizontal />
+      </Step>
+
+      <Step title="Activate your dashboard">
+        Your Ramp dashboard is provisioned once your business is approved. Set your password and enable two-factor authentication on first sign-in.
+      </Step>
+
+      <Step title="Create API keys and webhooks">
+        Issue credentials and configure your webhook endpoint from the Ramp dashboard.
+
+        <Card title="Quickstart" icon="rocket" href="/get-started/quickstart" horizontal />
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="Core API">
+    The Core API covers Wallets and Orderbook.
+
+    <Steps>
+      <Step title="Request access">
+        [Schedule a demo](/get-started/schedule-a-demo) so the team can confirm your use case, assets and markets.
+      </Step>
+
+      <Step title="Complete onboarding">
+        Submit your business, compliance and commercial information.
+
+        <Card title="Onboarding" icon="clipboard-check" href="/get-started/onboarding" horizontal />
+      </Step>
+
+      <Step title="Designate an account owner">
+        Core API dashboard access sits with one account owner. Use a shared, organisation-controlled email address rather than an individual's.
+      </Step>
+
+      <Step title="Set up two-factor authentication">
+        Scan the QR code with Google Authenticator and confirm the six-digit code. Save the recovery details in your team's password manager.
+
+        <Warning>
+          Two-factor authentication is required before you can create API keys or process withdrawals. Set it up as your first action on the dashboard so it never blocks you mid-integration.
+        </Warning>
+      </Step>
+
+      <Step title="Create API keys and webhooks">
+        Issue credentials and configure your webhook endpoint.
+
+        <Card title="Quickstart" icon="rocket" href="/get-started/quickstart" horizontal />
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+## Two-factor authentication
+
+Two-factor authentication protects your dashboard and the actions that move funds.
+
+<Steps>
+  <Step title="Install an authenticator app">
+    Google Authenticator is supported across all platforms.
+  </Step>
+
+  <Step title="Scan the QR code">
+    Open the security settings in your dashboard and scan the code shown.
+  </Step>
+
+  <Step title="Confirm the code">
+    Enter the six-digit code to complete setup.
+  </Step>
+
+  <Step title="Store the recovery details">
+    Keep the recovery information in your organisation's password manager so more than one person can restore access.
+  </Step>
+</Steps>
+
+<Note>
+  On the Core API, two-factor authentication is checked when you create API keys and when you process withdrawals. Setting it up early means both are ready when you need them.
+</Note>
+
+## Account security
+
+To protect your integration:
+
+- Use an email address controlled by your organisation.
+- Enable two-factor authentication.
+- Do not share account passwords.
+- Create separate API credentials for each environment and platform.
+- Restrict credentials to authorised systems and team members.
+- Never place secret keys in frontend or mobile application code.
+- Rotate credentials when access changes or exposure is suspected.
+
+<Tip>
+  Where a platform's dashboard access sits with a single owner, treat the credentials as shared infrastructure: an organisation-controlled mailbox, a password manager entry, and at least two people who can recover the second factor.
+</Tip>

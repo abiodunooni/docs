@@ -1,0 +1,141 @@
+---
+title: "Quickstart"
+description: "Authenticate with Quidax and make your first API request."
+icon: "rocket"
+---
+
+This guide shows the general process for setting up credentials, configuring your pricing and making your first request.
+
+<Note>
+  Credentials are issued per platform. Keys created on Payments work on Payments, and keys created on the Core API work across Wallets and Orderbook. If you are integrating more than one product, repeat these steps on each platform.
+</Note>
+
+## Prerequisites
+
+- Access to the dashboard for the product you are integrating with. See [Create an account](/get-started/create-an-account).
+- Two-factor authentication enabled, using Google Authenticator. On the Core API this is required before keys can be created.
+- A backend service that can store secrets and receive webhooks over HTTPS.
+
+<Steps>
+  <Step title="Create an API key">
+    From your dashboard, open the developer or API settings and create a new key.
+
+    <Tabs>
+      <Tab title="Payments">
+        Sandbox and live keys are issued separately. Start with the sandbox pair, and swap to live keys after your business is approved.
+      </Tab>
+
+      <Tab title="Ramp">
+        Create your key in the Ramp dashboard. Keys are scoped to your Ramp account and to the integration model you were approved for, widget or API.
+      </Tab>
+
+      <Tab title="Core API">
+        Confirm the action with your six-digit authenticator code. The same key pair covers both Wallets and Orderbook.
+      </Tab>
+    </Tabs>
+
+    Copy the secret when it is shown. For security, it is not displayed again.
+  </Step>
+
+  <Step title="Store your credentials">
+    Store credentials as environment variables rather than directly in your code. Name them by platform so multi-product integrations stay unambiguous.
+
+    ```bash .env
+    QUIDAX_API_KEY=your_api_key
+    QUIDAX_SECRET_KEY=your_secret_key
+    ```
+
+    Never expose a secret key in browser code, mobile applications, public repositories, logs, support messages or screenshots.
+  </Step>
+
+  <Step title="Configure your pricing">
+    Before you transact, set the pricing your integration will use. This is part of setup, not an afterthought — quotes and settlement amounts are calculated from it.
+
+    In your dashboard, confirm:
+
+    - The commercial rate or fee agreed in your terms.
+    - Any markup you apply on top of the Quidax rate.
+    - Discounts that apply to your account or volume tier.
+    - The settlement currency for each flow.
+
+    <Tip>
+      Run a test quote after saving and check the returned amounts against a manual calculation. Catching a pricing misconfiguration here is far cheaper than catching it in production.
+    </Tip>
+
+    <Card title="How we price" icon="tag" href="/get-started/pricing" horizontal>
+      Fee components, spreads and volume tiers.
+    </Card>
+  </Step>
+
+  <Step title="Make your first request">
+    Use a public endpoint to confirm that your application can reach Quidax.
+
+    ```bash
+    curl --request GET \
+      --url https://openapi.quidax.io/exchange-open-api/api/v1/markets \
+      --header "Accept: application/json"
+    ```
+
+    A successful response returns the markets currently available through the endpoint.
+  </Step>
+
+  <Step title="Make an authenticated request">
+    Authenticated requests must be made from your backend using the credentials issued to your account.
+
+    ```javascript
+    const response = await fetch(
+      "https://openapi.quidax.io/exchange-open-api/api/v1/users/me/wallets",
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${process.env.QUIDAX_API_KEY}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Quidax request failed: ${response.status} ${error}`);
+    }
+
+    const result = await response.json();
+    console.log(result);
+    ```
+  </Step>
+
+  <Step title="Configure webhooks">
+    Webhooks notify your application when an asynchronous event changes. Each platform has its own webhook configuration, so register an endpoint on every platform you use.
+
+    Your webhook endpoint should:
+
+    - Use HTTPS.
+    - Accept the documented HTTP method.
+    - Verify that the event came from Quidax.
+    - Return a successful response quickly.
+    - Process time-consuming work asynchronously.
+    - Handle duplicate events safely.
+    - Store received event identifiers.
+    - Retrieve the latest transaction state before crediting a customer where required.
+  </Step>
+
+  <Step title="Test the complete flow">
+    Do not test only the successful path. Work through pending, failed, expired and duplicate scenarios before you launch.
+
+    <Card title="Testing" icon="flask" href="/testing" horizontal>
+      Sandbox and production testing, and the scenarios to cover.
+    </Card>
+  </Step>
+</Steps>
+
+## Next steps
+
+<Columns cols={2}>
+  <Card title="Go-live checklist" icon="circle-check" href="/get-started/go-live-checklist">
+    Everything to confirm before enabling customers.
+  </Card>
+
+  <Card title="Contact support" icon="life-ring" href="/support">
+    Get help with your integration or a live transaction.
+  </Card>
+</Columns>

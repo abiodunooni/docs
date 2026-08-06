@@ -1,0 +1,84 @@
+---
+title: "Coin listings"
+description: "Request support for a digital asset or market on Quidax."
+icon: "coins"
+---
+
+Supported assets and markets grow with what our partners and their customers need. If your product depends on an asset or trading pair that is not yet available, tell us and we will assess it.
+
+## Who this is for
+
+<Columns cols={2}>
+  <Card title="Businesses integrating Quidax" icon="plug">
+    You need an asset or market that your customers are asking for, or that your product depends on.
+  </Card>
+
+  <Card title="Token issuers and projects" icon="rocket">
+    You want your asset listed and made available across Quidax's markets and partner integrations.
+  </Card>
+</Columns>
+
+## How the review works
+
+<Steps>
+  <Step title="Submit your interest">
+    Send the asset details to your Quidax representative, or raise it during onboarding if you are still integrating.
+  </Step>
+
+  <Step title="Initial assessment">
+    We review the asset against our listing, compliance and risk criteria.
+  </Step>
+
+  <Step title="Technical and liquidity review">
+    We assess network support, custody requirements, market-making and liquidity arrangements.
+  </Step>
+
+  <Step title="Commercial and legal review">
+    Where applicable, we agree terms, obligations and any regulatory considerations for the markets involved.
+  </Step>
+
+  <Step title="Decision and enablement">
+    Approved assets are enabled for the relevant products, and you are told which endpoints and networks they are available on.
+  </Step>
+</Steps>
+
+## What to include in your request
+
+<AccordionGroup>
+  <Accordion title="Asset details" icon="coins">
+    - Asset name, ticker and contract addresses.
+    - Networks the asset is issued on.
+    - Token standard and decimals.
+    - Total and circulating supply.
+    - Whether the asset is a stablecoin, and how it is backed.
+  </Accordion>
+
+  <Accordion title="Demand and use case" icon="chart-line">
+    - Why you need the asset, and for which product.
+    - Expected monthly volume and typical transaction size.
+    - The markets and corridors involved.
+    - Trading pairs you need, and against which currencies.
+  </Accordion>
+
+  <Accordion title="Project and compliance" icon="shield-check">
+    - Issuing entity and jurisdiction.
+    - Team and ownership information.
+    - Audits, attestations or reserve reports.
+    - Existing exchange listings and liquidity venues.
+    - Any regulatory approvals or restrictions.
+  </Accordion>
+
+  <Accordion title="Liquidity" icon="droplets">
+    - Market makers you work with.
+    - Available depth on existing venues.
+    - Any liquidity support you can commit to at launch.
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  Supported assets and networks differ by product and change over time. Retrieve the current list from the relevant API endpoint rather than hard-coding it, so newly listed assets appear in your product without a release.
+</Note>
+
+<Card title="Talk to the team about a listing" icon="calendar" href="/get-started/schedule-a-demo" horizontal>
+  Bring your asset details and expected volume to the call.
+</Card>

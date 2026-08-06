@@ -1,0 +1,77 @@
+---
+title: "Migrate to Quidax"
+description: "Move an existing integration to Quidax without disrupting your customers."
+icon: "arrow-right-arrow-left"
+---
+
+If you already run a live product on another provider, you can move to Quidax incrementally. Most migrations run both providers in parallel for a short period, then shift volume once the new flow is proven.
+
+## Plan your migration
+
+<Steps>
+  <Step title="Map your current flows">
+    List every flow you run today: on-ramp, off-ramp, payments, wallet creation, deposits, withdrawals, trades and settlement. Note the volume and value of each.
+  </Step>
+
+  <Step title="Match each flow to a Quidax product">
+    Identify which product covers each flow, and which platform it lives on.
+
+    <Card title="Products" icon="grid-2" href="/get-started/products" horizontal />
+  </Step>
+
+  <Step title="Complete onboarding">
+    Bring your existing volumes, corridors and compliance documentation to onboarding. An established track record usually speeds up commercial and compliance review.
+
+    <Card title="Onboarding" icon="clipboard-check" href="/get-started/onboarding" horizontal />
+  </Step>
+
+  <Step title="Map your data model">
+    Reconcile your concepts with Quidax's: customer to subaccount, wallet to wallet and address, payment to payment request, order to order. Decide how you will store Quidax references against your existing records.
+  </Step>
+
+  <Step title="Build behind a provider switch">
+    Put the new integration behind a routing layer or feature flag so you can move flows one at a time, and roll back per flow.
+  </Step>
+
+  <Step title="Run a controlled pilot">
+    Route a small share of live volume through Quidax, then reconcile fully before increasing it.
+
+    <Card title="Testing" icon="flask" href="/testing" horizontal />
+  </Step>
+
+  <Step title="Shift volume and decommission">
+    Increase the share of traffic in stages. Keep the previous provider available until every in-flight transaction has settled and reconciled.
+  </Step>
+</Steps>
+
+## What to watch during migration
+
+<AccordionGroup>
+  <Accordion title="In-flight transactions" icon="clock">
+    Transactions started on your previous provider must finish there. Route by the provider that created the transaction, not by the current default.
+  </Accordion>
+
+  <Accordion title="Balances and treasury" icon="scale">
+    Fund your Quidax operational balances before you route volume, and rebalance across providers as traffic shifts.
+  </Accordion>
+
+  <Accordion title="Reconciliation" icon="list-checks">
+    Run reconciliation across both providers for the full parallel period. Keep provider identity on every internal record so historical reporting stays correct.
+  </Accordion>
+
+  <Accordion title="Webhooks and statuses" icon="webhook">
+    Status names and event shapes differ between providers. Normalise them into your own internal statuses rather than mapping provider values straight into your UI.
+  </Accordion>
+
+  <Accordion title="Customer experience" icon="users">
+    Deposit addresses, supported networks, fees and limits may change. Communicate changes before they take effect, and stop advertising addresses you no longer monitor.
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+  Migrate your lowest-risk flow first, usually a read-only or low-value one. It proves credentials, webhooks and reconciliation end to end before any customer money depends on it.
+</Tip>
+
+<Card title="Talk to the team about your migration" icon="calendar" href="/get-started/schedule-a-demo" horizontal>
+  Share your current provider, volumes and target timeline.
+</Card>

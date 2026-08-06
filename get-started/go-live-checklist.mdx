@@ -1,0 +1,121 @@
+---
+title: "Go-live checklist"
+description: "Confirm every area is ready before you enable customers."
+icon: "circle-check"
+---
+
+Use this checklist before enabling your Quidax integration for customers. Work through it per platform if you are launching more than one product.
+
+<AccordionGroup>
+  <Accordion title="Business and compliance" icon="building">
+    - Business verification is complete.
+    - The approved use case matches the implemented transaction flow.
+    - Required agreements have been signed.
+    - Production countries and currencies have been approved.
+    - Transaction limits have been confirmed.
+    - Compliance escalation contacts have been assigned.
+    - Customer terms and disclosures have been reviewed.
+    - Any required customer verification process has been implemented. On Ramp, this applies where you integrate via the API and verify your own customers.
+  </Accordion>
+
+  <Accordion title="Credentials and security" icon="key">
+    - Production credentials are stored in a secrets manager.
+    - Credentials are labelled by platform, so Payments, Ramp and Core API keys cannot be confused.
+    - Sandbox credentials are not used in production.
+    - Secret keys are not exposed in frontend or mobile code.
+    - Two-factor authentication is enabled for dashboard users, and recovery details are stored where more than one person can reach them.
+    - API access is limited to authorised systems.
+    - IP restrictions have been configured where supported.
+    - Credential-rotation procedures have been documented.
+    - Logs do not contain credentials or sensitive personal information.
+    - All requests use HTTPS. Quidax requires secure HTTPS connections for API calls.
+  </Accordion>
+
+  <Accordion title="Transaction handling" icon="arrows-rotate">
+    - Supported currencies and networks are retrieved dynamically where possible.
+    - Amount and currency inputs are validated.
+    - Transaction limits are checked.
+    - Pending transactions are not treated as completed.
+    - Failed and expired transactions are handled correctly.
+    - Duplicate requests cannot result in duplicate customer credits.
+    - Duplicate webhook events are handled safely.
+    - Refund and reversal processes have been tested.
+    - Customer-facing statuses use clear language.
+  </Accordion>
+
+  <Accordion title="Fiat flows" icon="banknote">
+    - Collection and payout accounts belong to the transacting party, so funds are traceable from source to destination.
+    - Your interface collects the account details you need up front, and validates them before submission.
+    - Customers are told which account their payout will arrive in before they confirm.
+    - Settlement timing is communicated in your customer-facing copy.
+  </Accordion>
+
+  <Accordion title="Wallets and blockchain transactions" icon="wallet">
+    - The correct network is shown before a deposit or withdrawal.
+    - Unsupported network deposits are clearly warned against.
+    - Destination tags or memos are collected where required.
+    - Withdrawal addresses are validated.
+    - Blockchain confirmation requirements have been considered.
+    - Crypto withdrawal fees are shown or accounted for.
+    - Internal and external transfers can be distinguished.
+    - Your withdrawal runbook accounts for the authenticator code required on the Core API.
+  </Accordion>
+
+  <Accordion title="Webhooks" icon="webhook">
+    - A production webhook URL is registered on every platform you use, and each uses HTTPS.
+    - Webhook authenticity is verified.
+    - Events are acknowledged quickly.
+    - Processing is idempotent.
+    - Failed processing is retried.
+    - Events are logged with sensitive fields removed.
+    - A fallback polling or reconciliation process exists.
+    - Alerts have been configured for repeated webhook failures.
+  </Accordion>
+
+  <Accordion title="Balances and settlement" icon="scale">
+    - Required operational balances are funded.
+    - Prefunding or reserve requirements have been met.
+    - Low-balance alerts have been configured.
+    - Settlement currencies and schedules are confirmed.
+    - Fees are included in balance and reconciliation calculations.
+    - Treasury owners have access to the required reports.
+    - Funding and settlement escalation procedures are documented.
+  </Accordion>
+
+  <Accordion title="Reconciliation" icon="list-checks">
+    - Every transaction has an internal unique reference.
+    - Quidax references are stored against internal transactions.
+    - Transaction states are reconciled regularly.
+    - Wallet balances are reconciled.
+    - Fees are recorded separately.
+    - Settlement reports have been tested.
+    - Missing or mismatched transactions trigger an alert.
+    - Finance and Operations understand the reconciliation process.
+  </Accordion>
+
+  <Accordion title="Operational readiness" icon="headset">
+    - Support teams understand the customer journey.
+    - Internal teams can retrieve a transaction using its reference.
+    - Support escalation contacts are documented.
+    - Common customer issues have response procedures.
+    - Monitoring is enabled for API errors and latency.
+    - Incident owners and communication channels are defined.
+    - A rollback or feature-disable process is available.
+    - Initial production volume will be monitored closely.
+  </Accordion>
+</AccordionGroup>
+
+## Final approval
+
+Before launching, confirm that:
+
+- Quidax has approved the production integration.
+- Production credentials have been tested.
+- A controlled live transaction has succeeded.
+- The transaction appears correctly in both systems.
+- Settlement and reconciliation have been verified.
+- Product, Engineering, Compliance and Operations have approved the launch.
+
+<Tip>
+  Launch to a small internal or invite-only group first, and hold there for a full settlement and reconciliation cycle before opening up to all customers.
+</Tip>

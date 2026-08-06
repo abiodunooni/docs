@@ -1,3 +1,71 @@
 ---
-title: "support"
+title: "Contact support"
+description: "Get help with your Quidax account, API integration or live transactions."
+icon: "life-ring"
 ---
+
+Support is organised per platform. When you get in touch, say which product you are using — Ramp, Payments or the Core API — so your request reaches the right team first time.
+
+<Columns cols={2}>
+  <Card title="Account and onboarding" icon="clipboard-check">
+    Questions about verification, documents, approvals, limits or commercial terms. Contact your Quidax representative.
+  </Card>
+
+  <Card title="Integration help" icon="code">
+    Questions about endpoints, credentials, webhooks or errors. Contact Support or your assigned integration representative.
+  </Card>
+</Columns>
+
+## What to include
+
+The more of this you send up front, the faster a request is resolved:
+
+- The product and platform involved.
+- Your account or merchant identifier.
+- The transaction reference, both yours and the Quidax reference.
+- The timestamp, including timezone.
+- The request and response, with secrets removed.
+- The webhook payload, if one was received.
+- What you expected to happen, and what happened instead.
+
+<Warning>
+  Never include API keys, secret keys or full customer identification documents in a support message. If you believe a credential has been exposed, rotate it immediately and then tell us.
+</Warning>
+
+## Production incidents
+
+For a production incident:
+
+<Steps>
+  <Step title="Stop automatic retries">
+    Pause retries if they could create duplicate transactions.
+  </Step>
+
+  <Step title="Preserve your evidence">
+    Keep the relevant request, response and webhook logs.
+  </Step>
+
+  <Step title="Confirm the current state">
+    Retrieve the latest transaction status through the API before acting on it.
+  </Step>
+
+  <Step title="Escalate">
+    Contact the designated support or escalation channel, and include all relevant transaction references.
+  </Step>
+</Steps>
+
+<Warning>
+  Do not manually credit or debit a customer until the transaction state has been confirmed.
+</Warning>
+
+## Other ways to get help
+
+<Columns cols={2}>
+  <Card title="Testing" icon="flask" href="/testing">
+    Sandbox and production testing, and the scenarios to cover.
+  </Card>
+
+  <Card title="Schedule a demo" icon="calendar" href="/get-started/schedule-a-demo">
+    New requirements, new markets or a larger rollout.
+  </Card>
+</Columns>

@@ -1,3 +1,119 @@
 ---
-title: "testing"
+title: "Testing"
+description: "How to test your Quidax integration before and after launch."
+icon: "flask"
 ---
+
+Test environments differ by product. Plan for this early so your release schedule accounts for it.
+
+<Columns cols={2}>
+  <Card title="Payments" icon="credit-card">
+    Includes a full sandbox. Build and test the complete payment lifecycle with sandbox credentials, then swap to live keys.
+  </Card>
+
+  <Card title="Ramp and Core API" icon="server">
+    Tested directly in production using small live transactions, so what you verify is exactly what your customers will experience.
+  </Card>
+</Columns>
+
+## Testing Payments in the sandbox
+
+Sandbox credentials are issued as soon as you create your Basqet account, so you can integrate while your business review is in progress.
+
+<Steps>
+  <Step title="Use sandbox keys">
+    Keep sandbox and live credentials in separate environment variables, and make the active environment visible in your logs and admin tools.
+  </Step>
+
+  <Step title="Exercise the payment lifecycle">
+    Create payment requests and drive them through each status your application handles.
+  </Step>
+
+  <Step title="Point webhooks at a test endpoint">
+    Register a sandbox webhook URL and confirm your handler verifies, acknowledges and processes events idempotently.
+  </Step>
+
+  <Step title="Repeat once on live keys">
+    Before launch, run one small live payment end to end to confirm production credentials, webhooks and settlement.
+  </Step>
+</Steps>
+
+## Testing Ramp and the Core API in production
+
+These products are tested against production, with real balances and real settlement. Treat the first phase of testing as a controlled pilot.
+
+<Steps>
+  <Step title="Fund a small operational balance">
+    Use an amount large enough to cover minimums and network fees, and small enough to be inconsequential.
+  </Step>
+
+  <Step title="Restrict access">
+    Limit the integration to internal users or a feature flag until the flow is verified.
+  </Step>
+
+  <Step title="Run one transaction per flow">
+    Complete a full cycle for each flow you support: an on-ramp, an off-ramp, a deposit, a withdrawal, an order, a conversion.
+
+    <Note>
+      On the Core API, withdrawals are confirmed with your Google Authenticator code. Have the authenticator to hand for your first withdrawal test.
+    </Note>
+  </Step>
+
+  <Step title="Reconcile every test transaction">
+    Confirm each transaction appears with matching references, amounts and fees in both Quidax and your own system.
+  </Step>
+
+  <Step title="Test the unhappy paths deliberately">
+    Trigger validation errors, insufficient balances, unsupported networks and limit breaches with intentionally invalid requests. These cost nothing and are where most launch issues hide.
+  </Step>
+
+  <Step title="Scale up gradually">
+    Increase volume in steps, monitoring errors, latency and reconciliation at each level.
+  </Step>
+</Steps>
+
+<Tip>
+  Tag every test transaction with a recognisable internal reference prefix. It makes reconciliation trivial and keeps test records easy to exclude from reporting.
+</Tip>
+
+## Scenarios to cover
+
+Do not test only the successful path. Your integration should handle:
+
+<AccordionGroup>
+  <Accordion title="Transaction states" icon="arrows-rotate">
+    - Successful transactions.
+    - Pending transactions.
+    - Failed transactions.
+    - Expired transactions.
+    - Reversed or refunded transactions.
+  </Accordion>
+
+  <Accordion title="Webhooks" icon="webhook">
+    - Duplicate webhook delivery.
+    - Delayed webhook delivery.
+    - Out-of-order events.
+    - Webhook received before your own record is committed.
+    - Your endpoint being briefly unavailable.
+  </Accordion>
+
+  <Accordion title="Inputs and limits" icon="triangle-alert">
+    - Invalid input.
+    - Insufficient balances.
+    - Unsupported currencies or networks.
+    - Transaction-limit errors.
+    - Amounts below the minimum or above the maximum.
+  </Accordion>
+
+  <Accordion title="Network conditions" icon="wifi">
+    - Network timeouts.
+    - Retries that must not create duplicate transactions.
+    - Requests where the response is lost but the transaction succeeded.
+  </Accordion>
+</AccordionGroup>
+
+## Before you launch
+
+<Card title="Go-live checklist" icon="circle-check" href="/get-started/go-live-checklist" horizontal>
+  Business, security, transaction, settlement and operational readiness.
+</Card>
