@@ -114,14 +114,7 @@ html[data-current-path="/"] .nav-tabs-item[data-active] > div {
 
 /* Tab bar */
 
-/* Push the API Reference tab to the right of the tab bar, away from the
-   product tabs. Keyed on the href rather than position, so it holds if
-   tabs are added or reordered. Left alone on small screens, where the
-   tab bar scrolls horizontally. */
-
-@media (min-width: 768px) {
-  .nav-tabs-item[href*="/api-reference"],
-  .nav-tabs-item:has(a[href*="/api-reference"]) {
-    margin-left: auto;
-  }
-}
+/* The API Reference tab is pushed to the far right by
+   align-api-reference-tab.js. A CSS-only rule cannot do it reliably here,
+   because the tab container is not a flex row and margin-left: auto has
+   nothing to push against. */
