@@ -175,6 +175,17 @@
         ]
       },
       {
+        "tab": "Developer Tools",
+        "groups": [
+          {
+            "group": "Developer",
+            "pages": [
+              "orderbook"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "API Reference",
         "groups": [
           {
@@ -185,7 +196,6 @@
           },
           {
             "group": "Ramp",
-            "openapi": "/openapi/ramp.json",
             "pages": [
               "api-reference/ramp/introduction",
               {
@@ -241,17 +251,6 @@
                   "api-reference/ramp/banks/list-supported-institutions"
                 ]
               }
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Developer Tools",
-        "groups": [
-          {
-            "group": "Developer",
-            "pages": [
-              "orderbook"
             ]
           }
         ]

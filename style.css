@@ -110,3 +110,18 @@
 html[data-current-path="/"] .nav-tabs-item[data-active] > div {
   display: none !important;
 }
+
+
+/* Tab bar */
+
+/* Push the API Reference tab to the right of the tab bar, away from the
+   product tabs. Keyed on the href rather than position, so it holds if
+   tabs are added or reordered. Left alone on small screens, where the
+   tab bar scrolls horizontally. */
+
+@media (min-width: 768px) {
+  .nav-tabs-item[href*="/api-reference"],
+  .nav-tabs-item:has(a[href*="/api-reference"]) {
+    margin-left: auto;
+  }
+}
