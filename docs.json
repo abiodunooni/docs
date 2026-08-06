@@ -2,9 +2,9 @@
   "theme": "palm",
   "name": "Quidax Documentation",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#6100A5",
+    "light": "#1F0048",
+    "dark": "#B890FE"
   },
   "logo": {
     "light": "/images/light-log.svg",
