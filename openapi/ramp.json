@@ -687,7 +687,7 @@
       "post": {
         "tags": ["On-ramp"],
         "summary": "Create an on-ramp transaction",
-        "description": "Creates a transaction that converts fiat to a digital asset and delivers it to a wallet address you supply.\n\nThe `merchant_reference` must be unique. Reusing one returns a duplicate transaction error.",
+        "description": "Creates a transaction that converts fiat to a digital asset.\n\nWhere the converted asset is delivered depends on whether you send `wallet_address`:\n\n- **Include `wallet_address`** — the asset is sent to that address on the network you specify. Use this when each customer holds their own wallet.\n- **Omit `wallet_address`** — the asset is credited to your Ramp merchant custodial wallet, and you credit the customer on your own ledger. Use this when you hold balances for your customers.\n\nThe `merchant_reference` must be unique. Reusing one returns a duplicate transaction error.",
         "operationId": "initiate-on-ramp-transaction",
         "requestBody": {
           "required": true,
@@ -695,7 +695,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["from_currency", "to_currency", "from_amount", "merchant_reference", "customer", "wallet_address"],
+                "required": ["from_currency", "to_currency", "from_amount", "merchant_reference", "customer"],
                 "properties": {
                   "from_currency": { "$ref": "#/components/schemas/FiatCurrency" },
                   "to_currency": { "$ref": "#/components/schemas/CryptoCurrency" },
@@ -712,6 +712,7 @@
                   "customer": { "$ref": "#/components/schemas/Customer" },
                   "wallet_address": {
                     "type": "object",
+                    "description": "Where the converted asset is delivered. Omit this object entirely to have the asset credited to your merchant custodial wallet instead. Sending it empty or partially filled is not the same as omitting it.",
                     "required": ["address", "network"],
                     "properties": {
                       "address": {
@@ -840,7 +841,7 @@
       "post": {
         "tags": ["On-ramp"],
         "summary": "Confirm an on-ramp transaction",
-        "description": "Locks the quote and generates a single-use bank account for the customer's deposit.\n\nThe customer must transfer exactly `amount_expected`, which is the transaction amount plus the processor fee and VAT. Deposits above or below that amount are rejected. The name on the paying account must match the customer name on the transaction, because third-party deposits are not supported.\n\nOnly confirm when the customer is ready to pay.",
+        "description": "Locks the quote and generates a single-use bank account for the customer's deposit. This request takes no body.\n\nThe customer must transfer exactly `amount_expected`, which is the transaction amount plus the processor fee and VAT. Deposits above or below that amount are rejected. The name on the paying account must match the customer name on the transaction, because third-party deposits are not supported.\n\nNote that `data.reference` here is the **bank account** reference (`BANK_ACCOUNT_...`), not the transaction reference. Store it separately — overwriting the `TRX-...` reference from the create response breaks transaction lookups.\n\nOnly confirm when the customer is ready to pay.",
         "operationId": "confirm-on-ramp-transaction",
         "parameters": [{ "$ref": "#/components/parameters/MerchantReference" }],
         "responses": {
@@ -861,7 +862,11 @@
                             "account_name": { "type": "string", "example": "Quidax / Ada Lovelace" },
                             "account_number": { "type": "string", "example": "0565084270" },
                             "bank_name": { "type": "string", "example": "Test Bank" },
-                            "reference": { "type": "string", "example": "BANK_ACCOUNT_8f8102c76be41979" },
+                            "reference": {
+                              "type": "string",
+                              "description": "Reference for the generated bank account. This is not the transaction reference — do not overwrite the `TRX-...` value with it.",
+                              "example": "BANK_ACCOUNT_8f8102c76be41979"
+                            },
                             "amount": { "type": "string", "description": "Base transaction amount, before fees.", "example": "2000.0" },
                             "amount_expected": { "type": "string", "description": "Exact total the customer must transfer, including the processor fee and VAT.", "example": "2053.75" },
                             "processor_fee": { "type": "string", "example": "50.0" },

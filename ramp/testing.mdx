@@ -21,37 +21,76 @@ Ramp is tested against production, with real balances and real settlement. That 
 
 A complete on-ramp and off-ramp round trip costs a few dollars in fees and spread.
 
-## Run a controlled pilot
+## Before you start
 
 <Steps>
+  <Step title="Generate a production API key">
+    In the merchant dashboard, go to **Settings > Preferences > API Keys** and select **Generate new API key**. Store the private key server-side only.
+  </Step>
+
+  <Step title="Configure your webhook endpoint">
+    Set a publicly reachable HTTPS URL in the dashboard. Your handler should verify `X-Ramp-Signature`, store the event, return `2xx` promptly and process idempotently.
+  </Step>
+
   <Step title="Fund a small operational balance">
     Enough to cover the minimums plus network fees, and small enough to be inconsequential.
   </Step>
 
-  <Step title="Restrict access">
-    Keep the integration behind a feature flag or limited to internal users until every flow is verified.
-  </Step>
-
-  <Step title="Tag every test transaction">
-    Use a recognisable `merchant_reference` prefix, for example `test-`. Reconciliation becomes trivial and test records stay easy to exclude from reporting.
-  </Step>
-
-  <Step title="Run one transaction per flow">
-    Complete a full cycle for each direction and each currency you are approved for.
-
-    - **On-ramp, NGN** — create, confirm, pay the exact amount, confirm the stablecoin arrives.
-    - **On-ramp, GHS** — cover both `next_step` values, `PIN` and `OTP`.
-    - **Off-ramp** — create, fetch institutions, attach the payout account, confirm, send, confirm the payout lands.
-  </Step>
-
-  <Step title="Reconcile each one">
-    Confirm every transaction appears with matching references, amounts and fees in both Ramp and your own system. Check `processor_fee`, `vat`, `blockchain_fee` and `stamp_charge` land where you expect.
-  </Step>
-
-  <Step title="Scale up gradually">
-    Raise volume in steps, watching errors, latency and reconciliation at each level.
+  <Step title="Restrict access and tag your transactions">
+    Keep the integration behind a feature flag or internal users. Use a recognisable `merchant_reference` prefix such as `test-`, so test records are trivial to find and exclude from reporting.
   </Step>
 </Steps>
+
+## The controlled production test
+
+Run this sequence end to end before opening the flow to any real cohort. Use the smallest amount your production limits permit.
+
+| # | Action | Pass criteria |
+| --- | --- | --- |
+| 0 | Access and setup | The key is stored server-side and the webhook endpoint is reachable. |
+| 1 | Create the transaction | `200` with `status: ok`. The transaction is `pending`. The `TRX-...` reference and `to_amount` are stored separately from your `merchant_reference`. |
+| 2 | Refresh, if the amount changes | Updated `from_amount` and `to_amount` return against the same `merchant_reference`. No duplicate transaction is created. |
+| 3 | Confirm | A bank account and `amount_expected` return, with the fee and VAT fields. |
+| 4 | Present payment instructions | The amount displayed equals `amount_expected` exactly. The base `amount` is never shown as the transfer figure when the two differ. |
+| 5 | Pay from a name-matched account | Ramp confirms the deposit and the transaction moves to `processing`. |
+| 6 | Handle the processing event | The handler accepts repeated `processing` events safely. **The customer is not credited at this stage.** |
+| 7 | Verify settlement | `buy_transaction.successful` arrives with `data.status: completed`. The customer is credited exactly once and the destination balance increases. |
+| 8 | Reconcile across systems | Amounts, currency, `merchant_reference` and state match across the API response, the webhook, the dashboard, the balance and your own ledger. |
+| 9 | Validate failure handling | `data.status: needs_attention` and `error_message` are recorded, the customer is not credited, and your escalation path fires. |
+| 10 | Open limited traffic | Only after every check above passes. Monitor errors, latency, webhook delivery, balances and reconciliation before increasing. |
+
+<Warning>
+  **Stop conditions.** Do not open public traffic if any of these is true:
+
+  - The production API key is unavailable or not working.
+  - The first transaction does not settle to its destination.
+  - The `successful` webhook is not received.
+  - The dashboard and your ledger do not reconcile.
+  - You cannot guarantee that a customer is credited exactly once.
+</Warning>
+
+<Note>
+  Do not deliberately force a live failure to test step 9 without agreeing it with the Quidax team first. Use sample payloads replayed against your own endpoint instead.
+</Note>
+
+## Dashboard checks
+
+| Area | Where | What to confirm |
+| --- | --- | --- |
+| API keys | **Settings > Preferences > API Keys** | Generate and manage your production private key. |
+| Transactions | **Transactions > Transaction Monitoring** | Search by reference and confirm status, amount, currency and timestamps. |
+| Balances | **Wallets** | Confirm the purchased asset was credited, where you settle to a merchant custodial wallet. |
+
+## Cover every flow you support
+
+Repeat the sequence for each direction and currency you are approved for.
+
+- **On-ramp, NGN** — create, confirm, pay the exact amount, confirm the asset arrives.
+- **On-ramp, GHS** — cover both `next_step` values, `PIN` and `OTP`.
+- **On-ramp, custodial mode** — omit `wallet_address` and confirm the asset lands in your merchant wallet rather than on-chain.
+- **Off-ramp** — create, fetch institutions, attach the payout account, confirm, send, confirm the payout lands.
+
+Check that `processor_fee`, `vat`, `blockchain_fee` and `stamp_charge` all land where you expect.
 
 ## Test the failures deliberately
 
@@ -140,6 +179,21 @@ You do not need a live transaction for most of this. Replay captured payloads ag
     - Off-ramp customers are told the exact amount, asset, network and tag.
   </Accordion>
 </AccordionGroup>
+
+## Acceptance criteria
+
+Treat launch as blocked until all of these hold:
+
+- The production API key is active and stored securely.
+- Your HTTPS webhook endpoint receives and safely processes all required events.
+- One controlled transaction has completed end to end.
+- That transaction settled to its destination and appears in **Transaction Monitoring**.
+- Your customer was credited exactly once, and every reference and amount reconciles.
+- Named technical contacts, a support channel, pause authority and an initial traffic cap are agreed.
+
+<Tip>
+  That last one is the one teams skip. Agree in advance **who can pause the flow** and what the initial traffic cap is, on both sides. It costs a five-minute conversation before launch and saves an hour of confusion during an incident.
+</Tip>
 
 <Card title="Go-live checklist" icon="circle-check" href="/get-started/go-live-checklist" horizontal>
   Business, security, transaction, settlement and operational readiness.

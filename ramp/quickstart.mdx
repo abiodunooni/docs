@@ -14,7 +14,9 @@ This walks you through one on-ramp transaction against the live API, using the s
 
 <Steps>
   <Step title="Get your keys">
-    From the merchant dashboard, copy your secret key (`sk_...`) for API calls and your public key (`pub_...`) for the widget.
+    In the [merchant dashboard](https://ramp-merchant.quidax.io), go to **Settings > Preferences > API Keys** and select **Generate new API key**.
+
+    Copy your secret key (`sk_...`) for API calls and your public key (`pub_...`) for the widget.
   </Step>
 
   <Step title="Store them as environment variables">
@@ -34,6 +36,10 @@ This walks you through one on-ramp transaction against the live API, using the s
 
   <Step title="Have a wallet address ready">
     You need a destination address on a [supported network](/ramp/coverage#assets-and-networks). Use one you control so you can confirm the funds arrive.
+
+    <Note>
+      Holding balances for your customers rather than sending on-chain? Omit `wallet_address` and the asset settles to your merchant custodial wallet instead. See [settlement modes](/ramp/on-ramp#choose-a-settlement-mode).
+    </Note>
   </Step>
 </Steps>
 

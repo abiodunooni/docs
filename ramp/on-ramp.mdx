@@ -14,11 +14,40 @@ create → refresh (optional) → confirm → customer pays → webhooks → com
   All requests go to `https://ramp-be.quidax.io/api/v1/merchants` and carry your secret key in the `x-private-key` header.
 </Note>
 
+## Choose a settlement mode
+
+Before you write any code, decide where the converted asset should land. This is set per transaction by whether you send `wallet_address`, and it shapes the rest of your integration.
+
+<Columns cols={2}>
+  <Card title="Direct to wallet" icon="wallet">
+    **Include `wallet_address`.**
+
+    The asset is sent on-chain to the address you specify. Each transaction produces a blockchain payout with a transaction hash.
+
+    Use this when your customers hold their own wallets, or when you deliver assets to an address they give you.
+  </Card>
+
+  <Card title="Merchant custodial wallet" icon="building-columns">
+    **Omit `wallet_address` entirely.**
+
+    The asset is credited to your Ramp merchant custodial wallet, and you credit the customer on your own ledger.
+
+    Use this when you hold balances on your customers' behalf, such as an exchange funding user accounts.
+  </Card>
+</Columns>
+
+<Warning>
+  Omitting `wallet_address` means leaving the object out of the request altogether. Sending it empty, null or partially filled is not the same thing and will not route to your custodial wallet.
+</Warning>
+
+Everything else in the flow is identical. The difference shows up at the end: in direct-to-wallet mode you reconcile against the on-chain payout, and in custodial mode you reconcile against your merchant wallet balance.
+
 ## 1. Create the transaction
 
 Generate a unique `merchant_reference` and store it against your order before calling.
 
-```bash
+<CodeGroup>
+```bash Direct to wallet
 curl -X POST 'https://ramp-be.quidax.io/api/v1/merchants/custodial/on_ramp_transactions/initiate' \
   -H 'accept: application/json' \
   -H 'content-type: application/json' \
@@ -39,6 +68,25 @@ curl -X POST 'https://ramp-be.quidax.io/api/v1/merchants/custodial/on_ramp_trans
     }
   }'
 ```
+
+```bash Merchant custodial wallet
+curl -X POST 'https://ramp-be.quidax.io/api/v1/merchants/custodial/on_ramp_transactions/initiate' \
+  -H 'accept: application/json' \
+  -H 'content-type: application/json' \
+  -H "x-private-key: $RAMP_SECRET_KEY" \
+  -d '{
+    "from_currency": "ngn",
+    "to_currency": "usdt",
+    "from_amount": "3000",
+    "merchant_reference": "order_12345",
+    "customer": {
+      "email": "ada@example.com",
+      "first_name": "Ada",
+      "last_name": "Lovelace"
+    }
+  }'
+```
+</CodeGroup>
 
 ```json Response
 {
@@ -73,6 +121,8 @@ Store `reference` as well as your `merchant_reference`. You need `reference` to 
 
   <Accordion title="Validate the address and network first" icon="link">
     An invalid address returns `Invalid address format`, and an unsupported network returns `Invalid network`. Validate client-side to save your customer a round trip.
+
+    This applies only in direct-to-wallet mode. In custodial mode there is no address to validate.
   </Accordion>
 </AccordionGroup>
 
@@ -122,8 +172,16 @@ How the customer pays depends on the currency.
     }
     ```
 
+    The confirm request takes no body.
+
     <Warning>
       Display `amount_expected`, not `amount`. It is the transaction amount plus the processor fee and VAT, and it is the exact figure the customer must transfer. The provider rejects overpayment and underpayment alike.
+    </Warning>
+
+    <Warning>
+      `data.reference` in this response is the **bank account** reference (`BANK_ACCOUNT_...`), not the transaction reference. It is a different value from the `TRX-...` reference returned when you created the transaction.
+
+      Store them in separate fields. Overwriting the `TRX-...` value with this one is an easy mistake to make, since both arrive as `reference`, and it breaks every subsequent transaction lookup.
     </Warning>
 
     The account is single-use and tied to this transaction, so the customer does not need to add a payment reference or narration. Duplicate deposits to the same account are rejected and reversed by the provider.
@@ -275,15 +333,30 @@ Static accounts are available for NGN on request. The customer's BVN is required
 
 <Card title="Create an auto-swap account" icon="code" href="/api-reference/ramp/on-ramp/create-an-auto-swap-account" horizontal />
 
+## Identifiers and amounts
+
+Three identifiers and three amounts travel through this flow. Storing them in distinct fields is what makes reconciliation and support possible later.
+
+| Field | Comes from | Rule |
+| --- | --- | --- |
+| `merchant_reference` | You | Unique per transaction. Use it in the refresh and confirm URLs. |
+| `reference` (`TRX-...`) | Create response | The transaction identifier. Use it to fetch the transaction. |
+| `reference` (`BANK_ACCOUNT_...`) | Confirm response | The generated payment account. Store separately, never over the `TRX-...` value. |
+| `from_amount` | Your request | The base fiat amount being purchased. |
+| `amount_expected` | Confirm response | The exact fiat total the customer transfers, including fee and VAT. Display this one. |
+| `to_amount` | Any response | The asset amount expected to settle. |
+
 ## Checklist
 
-1. Generate a unique `merchant_reference` for every transaction and never reuse one.
-2. Store both `merchant_reference` and the Quidax `reference`.
-3. Validate the wallet address and network before creating the transaction.
-4. Confirm only when the customer is ready to pay.
-5. Show `amount_expected` and discourage rounding.
-6. Make sure the paying account is in the customer's own name.
-7. Treat webhooks as the source of truth, and requery to reconcile.
+1. Decide your settlement mode, and be consistent about it per flow.
+2. Generate a unique `merchant_reference` for every transaction and never reuse one.
+3. Store the `TRX-...` and `BANK_ACCOUNT_...` references in separate fields.
+4. Validate the wallet address and network before creating the transaction, in direct-to-wallet mode.
+5. Confirm only when the customer is ready to pay.
+6. Show `amount_expected` and discourage rounding.
+7. Make sure the paying account is in the customer's own name.
+8. Credit your customer only once, on `buy_transaction.successful`.
+9. Treat webhooks as the source of truth, and requery to reconcile.
 
 ## Next
 

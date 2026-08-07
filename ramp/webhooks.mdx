@@ -45,6 +45,21 @@ Every payload has the same shape: an `event` name and a `data` object.
 }
 ```
 
+<Warning>
+  Branch on `event`, not on `data.status`. They are different fields with different vocabularies, and they do not mirror each other — `buy_transaction.successful` carries `data.status: "completed"`, and `buy_transaction.failed` carries `data.status: "needs_attention"`.
+
+  `event` is the reliable discriminator. Treat `data.status` as detail about the transaction, not as the name of what happened.
+</Warning>
+
+| Event | `data.status` you should expect |
+| --- | --- |
+| `buy_transaction.processing` | `processing` |
+| `buy_transaction.successful` | `completed` |
+| `buy_transaction.failed` | `needs_attention` |
+| `sell_transaction.processing` | `processing` |
+| `sell_transaction.successful` | `completed` |
+| `sell_transaction.failed` | `needs_attention` |
+
 ## Verify the signature
 
 Ramp signs the webhook body with HMAC-SHA256 using your app's latest active secret key. Compute the digest over the raw body and compare it with `X-Ramp-Signature`.
@@ -125,6 +140,14 @@ Because deliveries retry, your handler must be idempotent. Key on the combinatio
 </Tip>
 
 ## Events
+
+Subscribe to all three events for each direction you support, and be explicit about which one credits your customer.
+
+| Event | Your action |
+| --- | --- |
+| `*_transaction.processing` | Store idempotently and return `2xx`. **Do not credit the customer.** May arrive more than once. |
+| `*_transaction.successful` | Terminal success. **Credit the customer exactly once**, and verify the balance moved. |
+| `*_transaction.failed` | **Do not credit.** Record `error_message` and trigger your support escalation. |
 
 <AccordionGroup>
   <Accordion title="buy_transaction.processing" icon="arrow-down">

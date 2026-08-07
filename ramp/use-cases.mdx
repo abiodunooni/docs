@@ -1,0 +1,185 @@
+---
+title: "Use cases"
+description: "What businesses build with Ramp, and the architecture each one implies."
+icon: "lightbulb"
+---
+
+Ramp handles the banking, liquidity and compliance layers so you can focus on distribution and product experience. What that looks like in practice depends on your business.
+
+## Common patterns
+
+<Columns cols={2}>
+  <Card title="Wallet providers" icon="wallet">
+    **Fiat entry and exit for your users.**
+
+    Users top up in local currency and cash out to their bank account, without leaving your app.
+
+    On-ramp and off-ramp, widget or API.
+  </Card>
+
+  <Card title="Exchanges" icon="chart-candlestick">
+    **Local currency conversion at scale.**
+
+    Give users in your supported markets a local funding and withdrawal rail against their exchange balance.
+
+    Both directions, API, usually settling to a merchant custodial wallet.
+  </Card>
+
+  <Card title="Payment and remittance platforms" icon="money-bill-transfer">
+    **Stablecoins as settlement rails.**
+
+    Move value cross-border on-chain, then pay the recipient in local currency on the last mile.
+
+    Off-ramp led, API.
+  </Card>
+
+  <Card title="Betting and gaming" icon="dice">
+    **Fast deposits and payouts.**
+
+    Players deposit in local currency and receive winnings back to their bank or mobile money account.
+
+    Both directions, commonly the widget.
+  </Card>
+
+  <Card title="DeFi and Web3 apps" icon="cube">
+    **Stablecoin on-ramps for your users.**
+
+    Let users enter your protocol with local currency instead of arriving with assets already in hand.
+
+    On-ramp led, widget or API.
+  </Card>
+
+  <Card title="Neobanks and consumer apps" icon="mobile">
+    **Embedded conversion.**
+
+    Add a conversion experience inside an app people already use daily.
+
+    Both directions, widget distributed in-app.
+  </Card>
+</Columns>
+
+### Worked examples
+
+<AccordionGroup>
+  <Accordion title="A wallet with local top-up and cash-out" icon="wallet">
+    A crypto wallet operating in Nigeria wants users to top up in Naira and cash out to their bank account.
+
+    They embed the widget. Users get a native-feeling deposit and withdrawal experience inside the app, and Quidax handles the virtual account, verification, conversion and payout. The wallet provider builds nothing beyond the embed.
+  </Accordion>
+
+  <Accordion title="A remittance platform paying the last mile" icon="money-bill-transfer">
+    A remittance company receives USD abroad and needs to pay Naira to recipients in Nigeria. It already has rails for USD to USDT, but not for USDT to Naira.
+
+    It integrates the off-ramp API. When a payout is triggered, Ramp assigns a deposit address, receives the stablecoin, converts it and pays the recipient's bank account directly. Webhooks keep both systems in step.
+  </Accordion>
+
+  <Accordion title="A dollar savings product funded in local currency" icon="chart-line">
+    A fintech building a dollar savings product wants users to fund accounts with Naira.
+
+    It calls the on-ramp API with its own wallet address, and Ramp generates a virtual account per customer. Fiat arriving is converted automatically and sent to the fintech's wallet, and the fintech credits the user's in-app balance.
+  </Accordion>
+
+  <Accordion title="A betting platform paying winnings quickly" icon="dice">
+    A sports betting platform needs to pay winnings in Naira fast.
+
+    Players deposit in Naira on the way in and withdraw in Naira on the way out. The platform uses the widget for both directions and never builds a banking integration.
+  </Accordion>
+</AccordionGroup>
+
+## Architectural patterns
+
+These change how you build, not just what you offer. Each is worth knowing before you design your integration.
+
+### Exchange funding via a merchant custodial wallet
+
+If you hold balances for your users, you do not want an on-chain payout per transaction. Omit `wallet_address` when creating an on-ramp transaction and the converted asset credits your Ramp merchant custodial wallet instead. You then credit the user on your own ledger, once, on `buy_transaction.successful`.
+
+Off-ramp runs the same way in reverse: you initiate with the customer's payout details, Ramp returns a deposit address, and you withdraw from your own account to it.
+
+This keeps one balance to reconcile rather than thousands of individual payouts, which is why it is the usual choice for exchanges.
+
+<Card title="Settlement modes" icon="building-columns" href="/ramp/on-ramp#choose-a-settlement-mode" horizontal>
+  How to pick between direct-to-wallet and custodial settlement.
+</Card>
+
+### Split-leg integration where your licence covers only one side
+
+If your licence lets you handle fiat but not hold digital assets, or the reverse, Ramp can split the integration so the leg you cannot legally hold sits on Quidax infrastructure.
+
+A merchant with e-money permissions but no digital asset registration can run on-ramp by collecting fiat into their own licensed account, while Quidax delivers the stablecoin to the end user directly. Off-ramp is the inverse.
+
+<Note>
+  This is scoped case by case with the Quidax product and compliance teams. If your licence covers only one side of the transaction, raise it early — it shapes the integration, and it is usually workable.
+</Note>
+
+### Multi-corridor treasury consolidation
+
+Each corridor settles in its own local currency to a local account, because aggregating across currencies would place FX risk on Quidax on your behalf.
+
+If you want a single consolidated position, settle to stablecoin rather than to fiat, and convert on your own treasury side. This is operationally cleaner and is what most enterprise customers do.
+
+### Aggregator and sub-merchant models
+
+If you serve sub-merchants rather than end users directly, Ramp supports that under the aggregator tier. You take on the merchant onboarding policy, a prohibited merchant policy and a merchant list with verification status.
+
+Limits are enforced per user, so your sub-merchants share the caps that apply to you. Your revenue comes from the markup you configure on top of the quoted rate.
+
+<Card title="Rates and markup" icon="percent" href="/ramp/rates-and-markup" horizontal>
+  How to configure a markup, per market or per user segment.
+</Card>
+
+### Mobile money as the primary rail
+
+In Ghana, mobile money reaches roughly 80% of consumer endpoints and settles in under five minutes, while bank rails reach formal account holders more slowly but carry higher per-transaction caps.
+
+If your customers are consumers, lead with mobile money and treat bank transfer as the higher-ticket path. It reaches people a bank-only integration cannot.
+
+### Running the widget and the API together
+
+These are not mutually exclusive. A common pattern is the API for institutional or high-tier users where you want full control of the experience, and the widget for retail users where Quidax-hosted verification lifts conversion.
+
+Starting on the widget and moving to the API later does not mean redoing compliance onboarding — your business verification and master services agreement carry over, and only the commercial schedule is re-papered.
+
+### Embedded distribution
+
+You do not have to be the merchant of record. The widget is designed to be distributed inside products people already use, and it appears in wallets, global platforms and consumer apps as a conversion surface.
+
+In this model the Quidax branding in the widget is the point: your users get a verified, compliant conversion experience and you carry none of the banking or compliance obligations.
+
+## What Ramp does not do
+
+Worth knowing early, so you do not design around something that is not there.
+
+<AccordionGroup>
+  <Accordion title="Stablecoin to stablecoin swaps" icon="circle-x">
+    The core product is fiat to stablecoin and stablecoin to fiat. Asset-to-asset conversion is not part of Ramp.
+
+    If you need conversion between digital assets, that belongs on [Orderbook](/orderbook).
+  </Accordion>
+
+  <Accordion title="Settling multiple corridors to one fiat account" icon="circle-x">
+    Each corridor settles in local currency to a local account. Cross-currency aggregation would put FX risk on Quidax on your behalf.
+
+    Settle to stablecoin instead if you want a single consolidated position.
+  </Accordion>
+
+  <Accordion title="Third-party deposits and payouts" icon="circle-x">
+    The name on the paying or receiving account must match the customer on the transaction. This holds on both directions and is not configurable.
+  </Accordion>
+
+  <Accordion title="Corridor or vertical exclusivity" icon="circle-x">
+    Exclusivity on a corridor or a vertical is not offered. Committed volume is instead recognised through pricing and dedicated capacity.
+  </Accordion>
+</AccordionGroup>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="How it works" icon="route" href="/ramp/how-it-works" horizontal />
+
+  <Card title="Coverage and limits" icon="globe" href="/ramp/coverage" horizontal />
+
+  <Card title="Quickstart" icon="rocket" href="/ramp/quickstart" horizontal />
+
+  <Card title="Schedule a demo" icon="calendar" href="/get-started/schedule-a-demo" horizontal />
+</CardGroup>
