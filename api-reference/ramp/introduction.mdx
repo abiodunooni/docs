@@ -101,6 +101,29 @@ curl 'https://ramp-be.quidax.io/api/v1/merchants/on_ramp_transactions?page=1&per
 
 The date filters are what you want for reconciliation runs.
 
+List responses carry a `meta` object alongside `data`:
+
+```json
+{
+  "status": "ok",
+  "message": "Transactions fetched successfully",
+  "data": [],
+  "meta": {
+    "page": 1,
+    "per_page": 25,
+    "total_count": 16,
+    "total_pages": 1,
+    "next_page": null
+  }
+}
+```
+
+Page until `next_page` is `null` rather than counting against `total_pages` yourself.
+
+<Note>
+  Validation errors on list endpoints return `message` and `data` only, without the `status` field the rest of the API uses. Handle a missing `status` rather than assuming it is present.
+</Note>
+
 ## Idempotency and retries
 
 Ramp keys transactions on your `merchant_reference`. If a request times out and you do not know whether it landed, retry with the same reference: a duplicate error confirms the original succeeded.

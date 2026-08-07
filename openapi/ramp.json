@@ -17,12 +17,30 @@
     }
   ],
   "tags": [
-    { "name": "Rates and limits", "description": "Quotes, limits and payment methods." },
-    { "name": "On-ramp", "description": "Fiat to stablecoin. Also called buy transactions." },
-    { "name": "Off-ramp", "description": "Stablecoin to fiat. Also called sell transactions." },
-    { "name": "Transactions", "description": "Fetch single transactions and paginated lists." },
-    { "name": "Refunds", "description": "Respond to refund requests on on-ramp transactions." },
-    { "name": "Banks", "description": "Supported institutions and account verification." }
+    {
+      "name": "Rates and limits",
+      "description": "Quotes, limits and payment methods."
+    },
+    {
+      "name": "On-ramp",
+      "description": "Fiat to stablecoin. Also called buy transactions."
+    },
+    {
+      "name": "Off-ramp",
+      "description": "Stablecoin to fiat. Also called sell transactions."
+    },
+    {
+      "name": "Transactions",
+      "description": "Fetch single transactions and paginated lists."
+    },
+    {
+      "name": "Refunds",
+      "description": "Respond to refund requests on on-ramp transactions."
+    },
+    {
+      "name": "Banks",
+      "description": "Supported institutions and account verification."
+    }
   ],
   "components": {
     "securitySchemes": {
@@ -39,7 +57,9 @@
         "in": "path",
         "required": true,
         "description": "The unique reference you generated when initiating the transaction.",
-        "schema": { "type": "string" },
+        "schema": {
+          "type": "string"
+        },
         "example": "order_12345"
       },
       "QuidaxReference": {
@@ -47,50 +67,71 @@
         "in": "path",
         "required": true,
         "description": "The Quidax transaction reference returned when the transaction was initiated, for example `TRX-29U3YLYGC8`.",
-        "schema": { "type": "string" },
+        "schema": {
+          "type": "string"
+        },
         "example": "TRX-29U3YLYGC8"
       },
       "Page": {
         "name": "page",
         "in": "query",
         "description": "Page number. Must be a positive integer.",
-        "schema": { "type": "integer", "default": 1 }
+        "schema": {
+          "type": "integer",
+          "default": 1
+        }
       },
       "PerPage": {
         "name": "per_page",
         "in": "query",
         "description": "Records per page. Must be a positive integer.",
-        "schema": { "type": "integer", "default": 25, "maximum": 50 }
+        "schema": {
+          "type": "integer",
+          "default": 25,
+          "maximum": 50
+        }
       },
       "StatusFilter": {
         "name": "status",
         "in": "query",
         "description": "Filter by transaction status.",
-        "schema": { "$ref": "#/components/schemas/TransactionStatus" }
+        "schema": {
+          "$ref": "#/components/schemas/TransactionStatus"
+        }
       },
       "FromCurrencyFilter": {
         "name": "from_currency",
         "in": "query",
         "description": "Filter by source currency code, for example `ngn` or `usdt`.",
-        "schema": { "type": "string" }
+        "schema": {
+          "type": "string"
+        }
       },
       "ToCurrencyFilter": {
         "name": "to_currency",
         "in": "query",
         "description": "Filter by destination currency code, for example `usdt` or `ngn`.",
-        "schema": { "type": "string" }
+        "schema": {
+          "type": "string"
+        }
       },
       "StartDate": {
         "name": "start_date",
         "in": "query",
         "description": "Start date, formatted `YYYY-MM-DD`. Must be sent with `end_date`.",
-        "schema": { "type": "string", "format": "date" }
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
       },
       "EndDate": {
         "name": "end_date",
         "in": "query",
         "description": "End date, formatted `YYYY-MM-DD`. Must be sent with `start_date`.",
-        "schema": { "type": "string", "format": "date" }
+        "schema": {
+          "type": "string",
+          "format": "date"
+        }
       }
     },
     "schemas": {
@@ -111,23 +152,46 @@
       },
       "FiatCurrency": {
         "type": "string",
-        "enum": ["ngn", "ghs"],
+        "enum": [
+          "ngn",
+          "ghs"
+        ],
         "default": "ngn"
       },
       "CryptoCurrency": {
         "type": "string",
-        "enum": ["usdt", "usdc", "cngn", "xaut", "usat"],
+        "enum": [
+          "usdt",
+          "usdc",
+          "cngn",
+          "xaut",
+          "usat"
+        ],
         "default": "usdt"
       },
       "Network": {
         "type": "string",
         "description": "Blockchain network. Availability differs per asset.",
-        "enum": ["trc20", "erc20", "bep20", "celo", "solana", "polygon", "base", "ton", "lsk"],
+        "enum": [
+          "trc20",
+          "erc20",
+          "bep20",
+          "celo",
+          "solana",
+          "polygon",
+          "base",
+          "ton",
+          "lsk"
+        ],
         "default": "bep20"
       },
       "Customer": {
         "type": "object",
-        "required": ["email", "first_name", "last_name"],
+        "required": [
+          "email",
+          "first_name",
+          "last_name"
+        ],
         "properties": {
           "email": {
             "type": "string",
@@ -153,7 +217,12 @@
           "status": {
             "type": "string",
             "description": "Result of the request.",
-            "enum": ["ok", "bad_request", "forbidden", "not_found"],
+            "enum": [
+              "ok",
+              "bad_request",
+              "forbidden",
+              "not_found"
+            ],
             "example": "ok"
           },
           "message": {
@@ -166,15 +235,26 @@
       "Error": {
         "type": "object",
         "properties": {
-          "status": { "type": "string", "example": "bad_request" },
-          "message": { "type": "string", "example": "Invalid amount" },
-          "data": { "type": "null" }
+          "status": {
+            "type": "string",
+            "example": "bad_request"
+          },
+          "message": {
+            "type": "string",
+            "example": "Invalid amount"
+          },
+          "data": {
+            "type": "null"
+          }
         }
       },
       "Transaction": {
         "type": "object",
         "properties": {
-          "public_id": { "type": "string", "example": "6a089a1a-7633-4e4c-b6e6-39da723dd4fa" },
+          "public_id": {
+            "type": "string",
+            "example": "6a089a1a-7633-4e4c-b6e6-39da723dd4fa"
+          },
           "reference": {
             "type": "string",
             "description": "The Quidax transaction reference. Use this when fetching the transaction.",
@@ -185,107 +265,254 @@
             "description": "The unique reference you supplied.",
             "example": "order_12345"
           },
-          "mode": { "type": "string", "enum": ["buy", "sell"], "example": "buy" },
-          "status": { "$ref": "#/components/schemas/TransactionStatus" },
-          "from_currency": { "type": "string", "example": "ngn" },
-          "to_currency": { "type": "string", "example": "usdt" },
-          "from_amount": { "type": "string", "example": "3000.0" },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "buy",
+              "sell"
+            ],
+            "example": "buy"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TransactionStatus"
+          },
+          "from_currency": {
+            "type": "string",
+            "example": "ngn"
+          },
+          "to_currency": {
+            "type": "string",
+            "example": "usdt"
+          },
+          "from_amount": {
+            "type": "string",
+            "example": "3000.0"
+          },
           "to_amount": {
             "type": "string",
             "description": "Estimated amount the customer receives, at the quote held when the transaction was created or last refreshed.",
             "example": "1.23"
           },
-          "network": { "type": "string", "example": "trc20" },
-          "blockchain_fee": { "type": "string", "example": "1.0" },
+          "network": {
+            "type": "string",
+            "example": "trc20"
+          },
+          "blockchain_fee": {
+            "type": "string",
+            "example": "1.0"
+          },
           "stamp_charge": {
             "type": "string",
             "description": "Stamp duty applied to the transaction, where applicable.",
             "example": "0.0"
           },
-          "error_message": { "type": ["string", "null"], "example": null },
-          "created_at": { "type": "string", "format": "date-time" },
-          "updated_at": { "type": "string", "format": "date-time" }
+          "error_message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": null
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       },
       "CryptoPayout": {
         "type": "object",
         "description": "The stablecoin sent to the customer on an on-ramp transaction.",
         "properties": {
-          "public_id": { "type": "string" },
-          "transaction_hash": { "type": "string", "example": "0x2c8cb922aede1464ec575c" },
-          "status": { "type": "string", "example": "completed" },
-          "amount": { "type": "string", "example": "1.927314" },
-          "processor_fee": { "type": "string", "example": "0.025" },
-          "address": { "type": "string", "example": "FQw1J6qke2JDgjzLmdzeU7mxKgNDePK2Stf81XGpUZog" },
-          "network": { "type": "string", "example": "solana" },
-          "currency": { "type": "string", "example": "usdc" },
-          "created_at": { "type": "string", "format": "date-time" },
-          "updated_at": { "type": "string", "format": "date-time" }
+          "public_id": {
+            "type": "string"
+          },
+          "transaction_hash": {
+            "type": "string",
+            "example": "0x2c8cb922aede1464ec575c"
+          },
+          "status": {
+            "type": "string",
+            "example": "completed"
+          },
+          "amount": {
+            "type": "string",
+            "example": "1.927314"
+          },
+          "processor_fee": {
+            "type": "string",
+            "example": "0.025"
+          },
+          "address": {
+            "type": "string",
+            "example": "FQw1J6qke2JDgjzLmdzeU7mxKgNDePK2Stf81XGpUZog"
+          },
+          "network": {
+            "type": "string",
+            "example": "solana"
+          },
+          "currency": {
+            "type": "string",
+            "example": "usdc"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       },
       "FiatDeposit": {
         "type": "object",
         "description": "The fiat received from the customer on an on-ramp transaction.",
         "properties": {
-          "public_id": { "type": "string" },
-          "status": { "type": "string", "example": "success" },
-          "currency": { "type": "string", "example": "ngn" },
-          "amount": { "type": "string", "example": "3000.0" },
-          "fee": { "type": "string", "example": "80.63" },
-          "created_at": { "type": "string", "format": "date-time" },
-          "updated_at": { "type": "string", "format": "date-time" }
+          "public_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "example": "success"
+          },
+          "currency": {
+            "type": "string",
+            "example": "ngn"
+          },
+          "amount": {
+            "type": "string",
+            "example": "3000.0"
+          },
+          "fee": {
+            "type": "string",
+            "example": "80.63"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       },
       "CryptoDeposit": {
         "type": "object",
         "description": "The stablecoin received from the customer on an off-ramp transaction.",
         "properties": {
-          "public_id": { "type": "string" },
-          "txid": { "type": "string", "example": "tx_123" },
-          "status": { "type": "string", "example": "accepted" },
-          "amount": { "type": "string", "example": "3.0" },
-          "currency": { "type": "string", "example": "usdt" },
-          "network": { "type": "string", "example": "bep20" },
-          "created_at": { "type": "string", "format": "date-time" },
-          "updated_at": { "type": "string", "format": "date-time" }
+          "public_id": {
+            "type": "string"
+          },
+          "txid": {
+            "type": "string",
+            "example": "tx_123"
+          },
+          "status": {
+            "type": "string",
+            "example": "accepted"
+          },
+          "amount": {
+            "type": "string",
+            "example": "3.0"
+          },
+          "currency": {
+            "type": "string",
+            "example": "usdt"
+          },
+          "network": {
+            "type": "string",
+            "example": "bep20"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       },
       "FiatPayout": {
         "type": "object",
         "description": "The fiat paid to the customer on an off-ramp transaction.",
         "properties": {
-          "public_id": { "type": "string" },
-          "status": { "type": "string", "example": "completed" },
-          "currency": { "type": "string", "example": "ghs" },
-          "amount": { "type": "string", "example": "33.64" },
-          "processor_fee": { "type": "string", "example": "2.0" },
-          "completed_at": { "type": ["string", "null"], "format": "date-time" },
-          "created_at": { "type": "string", "format": "date-time" },
-          "updated_at": { "type": "string", "format": "date-time" }
+          "public_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "example": "completed"
+          },
+          "currency": {
+            "type": "string",
+            "example": "ghs"
+          },
+          "amount": {
+            "type": "string",
+            "example": "33.64"
+          },
+          "processor_fee": {
+            "type": "string",
+            "example": "2.0"
+          },
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       },
       "OnRampTransactionDetail": {
         "allOf": [
-          { "$ref": "#/components/schemas/Transaction" },
+          {
+            "$ref": "#/components/schemas/Transaction"
+          },
           {
             "type": "object",
             "properties": {
               "crypto_payout": {
                 "oneOf": [
-                  { "$ref": "#/components/schemas/CryptoPayout" },
-                  { "type": "null" }
+                  {
+                    "$ref": "#/components/schemas/CryptoPayout"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ],
                 "description": "Null until the payout has been created."
               },
               "fiat_deposit": {
                 "oneOf": [
-                  { "$ref": "#/components/schemas/FiatDeposit" },
-                  { "type": "null" }
+                  {
+                    "$ref": "#/components/schemas/FiatDeposit"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ],
                 "description": "Null until the customer's deposit has been received."
               },
               "mobile_money_deposit": {
-                "type": ["object", "null"],
+                "type": [
+                  "object",
+                  "null"
+                ],
                 "description": "Present where the customer paid by mobile money."
               }
             }
@@ -294,20 +521,30 @@
       },
       "OffRampTransactionDetail": {
         "allOf": [
-          { "$ref": "#/components/schemas/Transaction" },
+          {
+            "$ref": "#/components/schemas/Transaction"
+          },
           {
             "type": "object",
             "properties": {
               "crypto_deposit": {
                 "oneOf": [
-                  { "$ref": "#/components/schemas/CryptoDeposit" },
-                  { "type": "null" }
+                  {
+                    "$ref": "#/components/schemas/CryptoDeposit"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
               "fiat_payout": {
                 "oneOf": [
-                  { "$ref": "#/components/schemas/FiatPayout" },
-                  { "type": "null" }
+                  {
+                    "$ref": "#/components/schemas/FiatPayout"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ],
                 "description": "Null until the payout has started."
               }
@@ -317,16 +554,58 @@
       },
       "PaginationMeta": {
         "type": "object",
+        "description": "Pagination state for a list response.",
         "properties": {
-          "page": { "type": "integer", "example": 1 },
-          "per_page": { "type": "integer", "example": 25 },
-          "total": { "type": "integer", "example": 132 }
+          "page": {
+            "type": "integer",
+            "description": "The page returned.",
+            "example": 1
+          },
+          "per_page": {
+            "type": "integer",
+            "description": "Records per page.",
+            "example": 25
+          },
+          "total_count": {
+            "type": "integer",
+            "description": "Total records matching the query, across all pages.",
+            "example": 16
+          },
+          "total_pages": {
+            "type": "integer",
+            "description": "Total number of pages available.",
+            "example": 1
+          },
+          "next_page": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "The next page number, or null on the last page.",
+            "example": null
+          }
+        }
+      },
+      "ListError": {
+        "type": "object",
+        "description": "Validation errors on list endpoints. Note that these responses carry `message` and `data` only, without the `status` field used elsewhere.",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Invalid currency"
+          },
+          "data": {
+            "type": "null"
+          }
         }
       },
       "Refund": {
         "type": "object",
         "properties": {
-          "public_id": { "type": "string", "example": "mref_abc123" },
+          "public_id": {
+            "type": "string",
+            "example": "mref_abc123"
+          },
           "refund_reference": {
             "type": "string",
             "description": "Ramp's identifier for the refund.",
@@ -339,27 +618,55 @@
           },
           "status": {
             "type": "string",
-            "enum": ["pending_refund_details", "refund_details_received", "completed"],
+            "enum": [
+              "pending_refund_details",
+              "refund_details_received",
+              "completed"
+            ],
             "example": "pending_refund_details"
           },
-          "amount": { "type": "string", "example": "1000.0" },
-          "currency": { "type": "string", "example": "NGN" },
-          "created_at": { "type": "string", "format": "date-time" },
-          "updated_at": { "type": "string", "format": "date-time" }
+          "amount": {
+            "type": "string",
+            "example": "1000.0"
+          },
+          "currency": {
+            "type": "string",
+            "example": "NGN"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       },
       "Institution": {
         "type": "object",
         "properties": {
-          "public_id": { "type": "string", "example": "f9cf0f2d-da7b-40cd-be43-e2b2a82f68b4" },
+          "public_id": {
+            "type": "string",
+            "example": "f9cf0f2d-da7b-40cd-be43-e2b2a82f68b4"
+          },
           "code": {
             "type": "string",
             "description": "Use this value as `bank_code` when adding a payout account.",
             "example": "0004"
           },
-          "name": { "type": "string", "example": "MTN" },
-          "created_at": { "type": "string", "format": "date-time" },
-          "updated_at": { "type": "string", "format": "date-time" }
+          "name": {
+            "type": "string",
+            "example": "MTN"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       }
     },
@@ -368,8 +675,14 @@
         "description": "The private key is missing or invalid.",
         "content": {
           "application/json": {
-            "schema": { "$ref": "#/components/schemas/Error" },
-            "example": { "status": "forbidden", "message": "Invalid private key", "data": null }
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "status": "forbidden",
+              "message": "Invalid private key",
+              "data": null
+            }
           }
         }
       },
@@ -377,8 +690,14 @@
         "description": "The resource could not be found.",
         "content": {
           "application/json": {
-            "schema": { "$ref": "#/components/schemas/Error" },
-            "example": { "status": "not_found", "message": "Transaction does not exist", "data": null }
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "status": "not_found",
+              "message": "Transaction does not exist",
+              "data": null
+            }
           }
         }
       },
@@ -386,8 +705,14 @@
         "description": "The request was invalid, incomplete or duplicated.",
         "content": {
           "application/json": {
-            "schema": { "$ref": "#/components/schemas/Error" },
-            "example": { "status": "bad_request", "message": "Invalid amount", "data": null }
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "status": "bad_request",
+              "message": "Invalid amount",
+              "data": null
+            }
           }
         }
       }
@@ -396,7 +721,9 @@
   "paths": {
     "/payment_methods": {
       "get": {
-        "tags": ["Rates and limits"],
+        "tags": [
+          "Rates and limits"
+        ],
         "summary": "List payment methods",
         "description": "Returns the payment methods currently available for a currency and direction. Use this to decide what to show your customer rather than hard-coding channels.",
         "operationId": "list-payment-methods",
@@ -406,14 +733,23 @@
             "in": "query",
             "required": true,
             "description": "Fiat currency code.",
-            "schema": { "$ref": "#/components/schemas/FiatCurrency" }
+            "schema": {
+              "$ref": "#/components/schemas/FiatCurrency"
+            }
           },
           {
             "name": "side",
             "in": "query",
             "required": true,
             "description": "Transaction direction.",
-            "schema": { "type": "string", "enum": ["on_ramp", "off_ramp"], "default": "on_ramp" }
+            "schema": {
+              "type": "string",
+              "enum": [
+                "on_ramp",
+                "off_ramp"
+              ],
+              "default": "on_ramp"
+            }
           }
         ],
         "responses": {
@@ -423,7 +759,9 @@
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/Envelope" },
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
                     {
                       "type": "object",
                       "properties": {
@@ -432,15 +770,41 @@
                           "items": {
                             "type": "object",
                             "properties": {
-                              "public_id": { "type": "string" },
-                              "currency": { "type": "string", "example": "ngn" },
-                              "currency_name": { "type": "string", "example": "Nigerian Naira" },
-                              "title": { "type": "string", "example": "Bank Transfer" },
-                              "code": { "type": "string", "example": "bank_transfer" },
-                              "side": { "type": "string", "example": "ON_RAMP" },
-                              "active": { "type": "boolean", "example": true },
-                              "created_at": { "type": "string", "format": "date-time" },
-                              "updated_at": { "type": "string", "format": "date-time" }
+                              "public_id": {
+                                "type": "string"
+                              },
+                              "currency": {
+                                "type": "string",
+                                "example": "ngn"
+                              },
+                              "currency_name": {
+                                "type": "string",
+                                "example": "Nigerian Naira"
+                              },
+                              "title": {
+                                "type": "string",
+                                "example": "Bank Transfer"
+                              },
+                              "code": {
+                                "type": "string",
+                                "example": "bank_transfer"
+                              },
+                              "side": {
+                                "type": "string",
+                                "example": "ON_RAMP"
+                              },
+                              "active": {
+                                "type": "boolean",
+                                "example": true
+                              },
+                              "created_at": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "updated_at": {
+                                "type": "string",
+                                "format": "date-time"
+                              }
                             }
                           }
                         }
@@ -468,14 +832,20 @@
               }
             }
           },
-          "400": { "$ref": "#/components/responses/BadRequest" },
-          "403": { "$ref": "#/components/responses/Forbidden" }
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
         }
       }
     },
     "/purchase_limits/buy": {
       "get": {
-        "tags": ["Rates and limits"],
+        "tags": [
+          "Rates and limits"
+        ],
         "summary": "Get on-ramp limits",
         "description": "Returns the minimum and maximum amounts a customer can spend in a given fiat currency. Check this before showing an amount input so your validation always matches the live limits.",
         "operationId": "get-buy-limits",
@@ -485,7 +855,9 @@
             "in": "query",
             "required": true,
             "description": "Fiat currency code.",
-            "schema": { "$ref": "#/components/schemas/FiatCurrency" }
+            "schema": {
+              "$ref": "#/components/schemas/FiatCurrency"
+            }
           }
         ],
         "responses": {
@@ -495,17 +867,31 @@
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/Envelope" },
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
                     {
                       "type": "object",
                       "properties": {
                         "data": {
                           "type": "object",
                           "properties": {
-                            "code": { "type": "string", "example": "ngn" },
-                            "min_value": { "type": "string", "example": "2000.0" },
-                            "max_value": { "type": "string", "example": "2000000.0" },
-                            "interval": { "type": "string", "example": "daily" }
+                            "code": {
+                              "type": "string",
+                              "example": "ngn"
+                            },
+                            "min_value": {
+                              "type": "string",
+                              "example": "2000.0"
+                            },
+                            "max_value": {
+                              "type": "string",
+                              "example": "2000000.0"
+                            },
+                            "interval": {
+                              "type": "string",
+                              "example": "daily"
+                            }
                           }
                         }
                       }
@@ -515,19 +901,30 @@
                 "example": {
                   "status": "ok",
                   "message": "Fiat currency limit retrieved",
-                  "data": { "code": "ngn", "min_value": "2000.0", "max_value": "2000000.0", "interval": "daily" }
+                  "data": {
+                    "code": "ngn",
+                    "min_value": "2000.0",
+                    "max_value": "2000000.0",
+                    "interval": "daily"
+                  }
                 }
               }
             }
           },
-          "400": { "$ref": "#/components/responses/BadRequest" },
-          "403": { "$ref": "#/components/responses/Forbidden" }
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
         }
       }
     },
     "/purchase_limits/sell": {
       "get": {
-        "tags": ["Rates and limits"],
+        "tags": [
+          "Rates and limits"
+        ],
         "summary": "Get off-ramp limits",
         "description": "Returns the minimum and maximum amounts a customer can sell in a given digital asset.",
         "operationId": "get-sell-limits",
@@ -537,7 +934,9 @@
             "in": "query",
             "required": true,
             "description": "Digital asset code.",
-            "schema": { "$ref": "#/components/schemas/CryptoCurrency" }
+            "schema": {
+              "$ref": "#/components/schemas/CryptoCurrency"
+            }
           }
         ],
         "responses": {
@@ -548,19 +947,30 @@
                 "example": {
                   "status": "ok",
                   "message": "Crypto sell limit retrieved",
-                  "data": { "code": "usdt", "min_value": "2.0", "max_value": "3000.0", "interval": "daily" }
+                  "data": {
+                    "code": "usdt",
+                    "min_value": "2.0",
+                    "max_value": "3000.0",
+                    "interval": "daily"
+                  }
                 }
               }
             }
           },
-          "400": { "$ref": "#/components/responses/BadRequest" },
-          "403": { "$ref": "#/components/responses/Forbidden" }
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
         }
       }
     },
     "/purchase_quotes/buy": {
       "get": {
-        "tags": ["Rates and limits"],
+        "tags": [
+          "Rates and limits"
+        ],
         "summary": "Get an on-ramp quote",
         "description": "Returns the digital asset amount a customer receives for a fiat amount, along with the estimated fiat processing fee. Quotes are indicative until a transaction is created, and are held for roughly 10 seconds.",
         "operationId": "get-buy-quote",
@@ -570,28 +980,37 @@
             "in": "query",
             "required": true,
             "description": "Fiat currency the customer pays with.",
-            "schema": { "$ref": "#/components/schemas/FiatCurrency" }
+            "schema": {
+              "$ref": "#/components/schemas/FiatCurrency"
+            }
           },
           {
             "name": "token",
             "in": "query",
             "required": true,
             "description": "Digital asset the customer receives.",
-            "schema": { "$ref": "#/components/schemas/CryptoCurrency" }
+            "schema": {
+              "$ref": "#/components/schemas/CryptoCurrency"
+            }
           },
           {
             "name": "fiat_amount",
             "in": "query",
             "required": true,
             "description": "Fiat amount the customer wants to spend.",
-            "schema": { "type": "string", "default": "20000" }
+            "schema": {
+              "type": "string",
+              "default": "20000"
+            }
           },
           {
             "name": "token_network",
             "in": "query",
             "required": true,
             "description": "Network the asset will be delivered on.",
-            "schema": { "$ref": "#/components/schemas/Network" }
+            "schema": {
+              "$ref": "#/components/schemas/Network"
+            }
           }
         ],
         "responses": {
@@ -601,15 +1020,25 @@
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/Envelope" },
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
                     {
                       "type": "object",
                       "properties": {
                         "data": {
                           "type": "object",
                           "properties": {
-                            "fee": { "type": "string", "description": "Estimated fiat processing fee.", "example": "0.5" },
-                            "to_amount": { "type": "string", "description": "Digital asset the customer receives.", "example": "11.93" }
+                            "fee": {
+                              "type": "string",
+                              "description": "Estimated fiat processing fee.",
+                              "example": "0.5"
+                            },
+                            "to_amount": {
+                              "type": "string",
+                              "description": "Digital asset the customer receives.",
+                              "example": "11.93"
+                            }
                           }
                         }
                       }
@@ -619,19 +1048,28 @@
                 "example": {
                   "status": "ok",
                   "message": "Crypto currency amount retrieved",
-                  "data": { "fee": "0.5", "to_amount": "11.93" }
+                  "data": {
+                    "fee": "0.5",
+                    "to_amount": "11.93"
+                  }
                 }
               }
             }
           },
-          "400": { "$ref": "#/components/responses/BadRequest" },
-          "403": { "$ref": "#/components/responses/Forbidden" }
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
         }
       }
     },
     "/purchase_quotes/sell": {
       "get": {
-        "tags": ["Rates and limits"],
+        "tags": [
+          "Rates and limits"
+        ],
         "summary": "Get an off-ramp quote",
         "description": "Returns the fiat amount a customer receives for a digital asset amount, along with the estimated processing fee. Stamp duty, where it applies, is deducted from the converted amount and is not included here.",
         "operationId": "get-sell-quote",
@@ -641,28 +1079,37 @@
             "in": "query",
             "required": true,
             "description": "Digital asset the customer sells.",
-            "schema": { "$ref": "#/components/schemas/CryptoCurrency" }
+            "schema": {
+              "$ref": "#/components/schemas/CryptoCurrency"
+            }
           },
           {
             "name": "currency",
             "in": "query",
             "required": true,
             "description": "Fiat currency the customer receives.",
-            "schema": { "$ref": "#/components/schemas/FiatCurrency" }
+            "schema": {
+              "$ref": "#/components/schemas/FiatCurrency"
+            }
           },
           {
             "name": "token_amount",
             "in": "query",
             "required": true,
             "description": "Amount of the digital asset the customer wants to sell.",
-            "schema": { "type": "string", "default": "10" }
+            "schema": {
+              "type": "string",
+              "default": "10"
+            }
           },
           {
             "name": "token_network",
             "in": "query",
             "required": true,
             "description": "Network the customer will send the asset on.",
-            "schema": { "$ref": "#/components/schemas/Network" }
+            "schema": {
+              "$ref": "#/components/schemas/Network"
+            }
           }
         ],
         "responses": {
@@ -673,19 +1120,28 @@
                 "example": {
                   "status": "ok",
                   "message": "Fiat currency amount retrieved",
-                  "data": { "fee": "50.0", "to_amount": "15947.94" }
+                  "data": {
+                    "fee": "50.0",
+                    "to_amount": "15947.94"
+                  }
                 }
               }
             }
           },
-          "400": { "$ref": "#/components/responses/BadRequest" },
-          "403": { "$ref": "#/components/responses/Forbidden" }
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
         }
       }
     },
     "/custodial/on_ramp_transactions/initiate": {
       "post": {
-        "tags": ["On-ramp"],
+        "tags": [
+          "On-ramp"
+        ],
         "summary": "Create an on-ramp transaction",
         "description": "Creates a transaction that converts fiat to a digital asset.\n\nWhere the converted asset is delivered depends on whether you send `wallet_address`:\n\n- **Include `wallet_address`** — the asset is sent to that address on the network you specify. Use this when each customer holds their own wallet.\n- **Omit `wallet_address`** — the asset is credited to your Ramp merchant custodial wallet, and you credit the customer on your own ledger. Use this when you hold balances for your customers.\n\nThe `merchant_reference` must be unique. Reusing one returns a duplicate transaction error.",
         "operationId": "initiate-on-ramp-transaction",
@@ -695,10 +1151,20 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["from_currency", "to_currency", "from_amount", "merchant_reference", "customer"],
+                "required": [
+                  "from_currency",
+                  "to_currency",
+                  "from_amount",
+                  "merchant_reference",
+                  "customer"
+                ],
                 "properties": {
-                  "from_currency": { "$ref": "#/components/schemas/FiatCurrency" },
-                  "to_currency": { "$ref": "#/components/schemas/CryptoCurrency" },
+                  "from_currency": {
+                    "$ref": "#/components/schemas/FiatCurrency"
+                  },
+                  "to_currency": {
+                    "$ref": "#/components/schemas/CryptoCurrency"
+                  },
                   "from_amount": {
                     "type": "string",
                     "description": "Fiat amount the customer pays.",
@@ -709,18 +1175,25 @@
                     "description": "Your unique reference for this transaction.",
                     "example": "order_12345"
                   },
-                  "customer": { "$ref": "#/components/schemas/Customer" },
+                  "customer": {
+                    "$ref": "#/components/schemas/Customer"
+                  },
                   "wallet_address": {
                     "type": "object",
                     "description": "Where the converted asset is delivered. Omit this object entirely to have the asset credited to your merchant custodial wallet instead. Sending it empty or partially filled is not the same as omitting it.",
-                    "required": ["address", "network"],
+                    "required": [
+                      "address",
+                      "network"
+                    ],
                     "properties": {
                       "address": {
                         "type": "string",
                         "description": "Destination wallet address. Validate it before calling this endpoint.",
                         "example": "0x2c8cb922aede1464ec575c"
                       },
-                      "network": { "$ref": "#/components/schemas/Network" }
+                      "network": {
+                        "$ref": "#/components/schemas/Network"
+                      }
                     }
                   }
                 }
@@ -730,8 +1203,15 @@
                 "to_currency": "usdt",
                 "from_amount": "3000",
                 "merchant_reference": "order_12345",
-                "customer": { "email": "ada@example.com", "first_name": "Ada", "last_name": "Lovelace" },
-                "wallet_address": { "address": "0x2c8cb922aede1464ec575c", "network": "bep20" }
+                "customer": {
+                  "email": "ada@example.com",
+                  "first_name": "Ada",
+                  "last_name": "Lovelace"
+                },
+                "wallet_address": {
+                  "address": "0x2c8cb922aede1464ec575c",
+                  "network": "bep20"
+                }
               }
             }
           }
@@ -743,8 +1223,17 @@
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/Envelope" },
-                    { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/Transaction" } } }
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Transaction"
+                        }
+                      }
+                    }
                   ]
                 },
                 "example": {
@@ -772,39 +1261,87 @@
             "content": {
               "application/json": {
                 "examples": {
-                  "Invalid amount": { "value": { "status": "bad_request", "message": "Invalid amount", "data": null } },
-                  "Duplicate transaction": { "value": { "status": "bad_request", "message": "Transaction with reference already exists", "data": null } },
-                  "Invalid address format": { "value": { "status": "bad_request", "message": "Invalid address format", "data": null } },
-                  "Invalid network": { "value": { "status": "bad_request", "message": "Invalid network", "data": null } }
+                  "Invalid amount": {
+                    "value": {
+                      "status": "bad_request",
+                      "message": "Invalid amount",
+                      "data": null
+                    }
+                  },
+                  "Duplicate transaction": {
+                    "value": {
+                      "status": "bad_request",
+                      "message": "Transaction with reference already exists",
+                      "data": null
+                    }
+                  },
+                  "Invalid address format": {
+                    "value": {
+                      "status": "bad_request",
+                      "message": "Invalid address format",
+                      "data": null
+                    }
+                  },
+                  "Invalid network": {
+                    "value": {
+                      "status": "bad_request",
+                      "message": "Invalid network",
+                      "data": null
+                    }
+                  }
                 }
               }
             }
           },
-          "403": { "$ref": "#/components/responses/Forbidden" }
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
         }
       }
     },
     "/custodial/on_ramp_transactions/{merchant_reference}/refresh": {
       "put": {
-        "tags": ["On-ramp"],
+        "tags": [
+          "On-ramp"
+        ],
         "summary": "Refresh an on-ramp transaction",
         "description": "Recalculates the quote on a transaction that has not been confirmed, and optionally changes the amount. Call this if the customer takes longer than the quote window to proceed.",
         "operationId": "refresh-on-ramp-transaction",
-        "parameters": [{ "$ref": "#/components/parameters/MerchantReference" }],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MerchantReference"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["from_currency", "to_currency", "from_amount"],
+                "required": [
+                  "from_currency",
+                  "to_currency",
+                  "from_amount"
+                ],
                 "properties": {
-                  "from_currency": { "$ref": "#/components/schemas/FiatCurrency" },
-                  "to_currency": { "$ref": "#/components/schemas/CryptoCurrency" },
-                  "from_amount": { "type": "string", "description": "Updated fiat amount.", "example": "3000" }
+                  "from_currency": {
+                    "$ref": "#/components/schemas/FiatCurrency"
+                  },
+                  "to_currency": {
+                    "$ref": "#/components/schemas/CryptoCurrency"
+                  },
+                  "from_amount": {
+                    "type": "string",
+                    "description": "Updated fiat amount.",
+                    "example": "3000"
+                  }
                 }
               },
-              "example": { "from_currency": "ngn", "to_currency": "usdt", "from_amount": "3000" }
+              "example": {
+                "from_currency": "ngn",
+                "to_currency": "usdt",
+                "from_amount": "3000"
+              }
             }
           }
         },
@@ -815,8 +1352,17 @@
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/Envelope" },
-                    { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/Transaction" } } }
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Transaction"
+                        }
+                      }
+                    }
                   ]
                 }
               }
@@ -827,23 +1373,43 @@
             "content": {
               "application/json": {
                 "examples": {
-                  "Invalid currency pair": { "value": { "status": "bad_request", "message": "Currency swap not allowed: ngn -> usdtg", "data": null } },
-                  "Refresh failed": { "value": { "status": "bad_request", "message": "Failed to refresh on-ramp transaction", "data": null } }
+                  "Invalid currency pair": {
+                    "value": {
+                      "status": "bad_request",
+                      "message": "Currency swap not allowed: ngn -> usdtg",
+                      "data": null
+                    }
+                  },
+                  "Refresh failed": {
+                    "value": {
+                      "status": "bad_request",
+                      "message": "Failed to refresh on-ramp transaction",
+                      "data": null
+                    }
+                  }
                 }
               }
             }
           },
-          "403": { "$ref": "#/components/responses/Forbidden" }
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
         }
       }
     },
     "/custodial/on_ramp_transactions/{merchant_reference}/confirm": {
       "post": {
-        "tags": ["On-ramp"],
+        "tags": [
+          "On-ramp"
+        ],
         "summary": "Confirm an on-ramp transaction",
         "description": "Locks the quote and generates a single-use bank account for the customer's deposit. This request takes no body.\n\nThe customer must transfer exactly `amount_expected`, which is the transaction amount plus the processor fee and VAT. Deposits above or below that amount are rejected. The name on the paying account must match the customer name on the transaction, because third-party deposits are not supported.\n\nNote that `data.reference` here is the **bank account** reference (`BANK_ACCOUNT_...`), not the transaction reference. Store it separately — overwriting the `TRX-...` reference from the create response breaks transaction lookups.\n\nOnly confirm when the customer is ready to pay.",
         "operationId": "confirm-on-ramp-transaction",
-        "parameters": [{ "$ref": "#/components/parameters/MerchantReference" }],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MerchantReference"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Transaction successfully confirmed.",
@@ -851,28 +1417,62 @@
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/Envelope" },
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
                     {
                       "type": "object",
                       "properties": {
                         "data": {
                           "type": "object",
                           "properties": {
-                            "public_id": { "type": "string" },
-                            "account_name": { "type": "string", "example": "Quidax / Ada Lovelace" },
-                            "account_number": { "type": "string", "example": "0565084270" },
-                            "bank_name": { "type": "string", "example": "Test Bank" },
+                            "public_id": {
+                              "type": "string"
+                            },
+                            "account_name": {
+                              "type": "string",
+                              "example": "Quidax / Ada Lovelace"
+                            },
+                            "account_number": {
+                              "type": "string",
+                              "example": "0565084270"
+                            },
+                            "bank_name": {
+                              "type": "string",
+                              "example": "Test Bank"
+                            },
                             "reference": {
                               "type": "string",
                               "description": "Reference for the generated bank account. This is not the transaction reference — do not overwrite the `TRX-...` value with it.",
                               "example": "BANK_ACCOUNT_8f8102c76be41979"
                             },
-                            "amount": { "type": "string", "description": "Base transaction amount, before fees.", "example": "2000.0" },
-                            "amount_expected": { "type": "string", "description": "Exact total the customer must transfer, including the processor fee and VAT.", "example": "2053.75" },
-                            "processor_fee": { "type": "string", "example": "50.0" },
-                            "vat": { "type": "string", "description": "VAT charged on the processor fee.", "example": "3.75" },
-                            "created_at": { "type": "string", "format": "date-time" },
-                            "updated_at": { "type": "string", "format": "date-time" }
+                            "amount": {
+                              "type": "string",
+                              "description": "Base transaction amount, before fees.",
+                              "example": "2000.0"
+                            },
+                            "amount_expected": {
+                              "type": "string",
+                              "description": "Exact total the customer must transfer, including the processor fee and VAT.",
+                              "example": "2053.75"
+                            },
+                            "processor_fee": {
+                              "type": "string",
+                              "example": "50.0"
+                            },
+                            "vat": {
+                              "type": "string",
+                              "description": "VAT charged on the processor fee.",
+                              "example": "3.75"
+                            },
+                            "created_at": {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "updated_at": {
+                              "type": "string",
+                              "format": "date-time"
+                            }
                           }
                         }
                       }
@@ -899,14 +1499,20 @@
               }
             }
           },
-          "403": { "$ref": "#/components/responses/Forbidden" },
-          "404": { "$ref": "#/components/responses/NotFound" }
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
         }
       }
     },
     "/custodial/on_ramp_transactions/initiate_mobile_money": {
       "post": {
-        "tags": ["On-ramp"],
+        "tags": [
+          "On-ramp"
+        ],
         "summary": "Initiate a mobile money deposit",
         "description": "Requests a GHS mobile money debit against an on-ramp transaction you have already created.\n\nThe response carries `next_step`, which tells you how the customer authorises the debit:\n\n- `OTP` — the provider sends a one-time code. Collect it and call **Verify a mobile money OTP**.\n- `PIN` — the provider pushes a prompt to the customer's handset. They approve it there and you take no further action.\n\nCall this endpoint again to send the customer a new code. There is no cap on resends.",
         "operationId": "initiate-mobile-money-deposit",
@@ -916,7 +1522,11 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["merchant_reference", "phone_number", "network_provider"],
+                "required": [
+                  "merchant_reference",
+                  "phone_number",
+                  "network_provider"
+                ],
                 "properties": {
                   "merchant_reference": {
                     "type": "string",
@@ -931,7 +1541,11 @@
                   "network_provider": {
                     "type": "string",
                     "description": "The customer's mobile money provider.",
-                    "enum": ["MTN", "AIRTEL", "VODAFONE"],
+                    "enum": [
+                      "MTN",
+                      "AIRTEL",
+                      "VODAFONE"
+                    ],
                     "example": "MTN"
                   }
                 }
@@ -951,7 +1565,9 @@
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/Envelope" },
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
                     {
                       "type": "object",
                       "properties": {
@@ -960,17 +1576,29 @@
                           "properties": {
                             "next_step": {
                               "type": "string",
-                              "enum": ["OTP", "PIN"],
+                              "enum": [
+                                "OTP",
+                                "PIN"
+                              ],
                               "description": "How the customer authorises the debit."
                             },
-                            "fee": { "type": "string", "example": "23.0" },
-                            "amount": { "type": "string", "example": "1000.0" },
+                            "fee": {
+                              "type": "string",
+                              "example": "23.0"
+                            },
+                            "amount": {
+                              "type": "string",
+                              "example": "1000.0"
+                            },
                             "instruction": {
                               "type": "string",
                               "description": "Prompt you can show the customer. The wording differs between OTP and PIN.",
                               "example": "You will receive a prompt on your mobile number ******7778 to enter your PIN to authorize your payment request of GHS 1000"
                             },
-                            "currency": { "type": "string", "example": "ghs" }
+                            "currency": {
+                              "type": "string",
+                              "example": "ghs"
+                            }
                           }
                         }
                       }
@@ -995,17 +1623,25 @@
             "description": "The deposit could not be initiated.",
             "content": {
               "application/json": {
-                "example": { "status": "bad_request", "message": "Mobile money deposit failed", "data": null }
+                "example": {
+                  "status": "bad_request",
+                  "message": "Mobile money deposit failed",
+                  "data": null
+                }
               }
             }
           },
-          "403": { "$ref": "#/components/responses/Forbidden" }
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
         }
       }
     },
     "/custodial/on_ramp_transactions/verify_mobile_money_otp/": {
       "post": {
-        "tags": ["On-ramp"],
+        "tags": [
+          "On-ramp"
+        ],
         "summary": "Verify a mobile money OTP",
         "description": "Submits the one-time code the provider sent to the customer. Only call this when `next_step` was `OTP`.\n\nThis endpoint is idempotent, so a customer can submit a code more than once for the same transaction without it being charged twice. If the code expires, initiate the deposit again to send a new one.",
         "operationId": "verify-mobile-money-otp",
@@ -1015,13 +1651,26 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["merchant_reference", "otp"],
+                "required": [
+                  "merchant_reference",
+                  "otp"
+                ],
                 "properties": {
-                  "merchant_reference": { "type": "string", "example": "order_12345" },
-                  "otp": { "type": "string", "description": "The code the provider sent to the customer.", "example": "123456" }
+                  "merchant_reference": {
+                    "type": "string",
+                    "example": "order_12345"
+                  },
+                  "otp": {
+                    "type": "string",
+                    "description": "The code the provider sent to the customer.",
+                    "example": "123456"
+                  }
                 }
               },
-              "example": { "merchant_reference": "order_12345", "otp": "123456" }
+              "example": {
+                "merchant_reference": "order_12345",
+                "otp": "123456"
+              }
             }
           }
         },
@@ -1030,7 +1679,11 @@
             "description": "Mobile money deposit verified.",
             "content": {
               "application/json": {
-                "example": { "status": "ok", "message": "Mobile money deposit verified", "data": "OTP verified successfully" }
+                "example": {
+                  "status": "ok",
+                  "message": "Mobile money deposit verified",
+                  "data": "OTP verified successfully"
+                }
               }
             }
           },
@@ -1039,22 +1692,56 @@
             "content": {
               "application/json": {
                 "examples": {
-                  "Transaction not found": { "value": { "status": "bad_request", "message": "Transaction not found", "data": null } },
-                  "Deposit already exists": { "value": { "status": "bad_request", "message": "Fiat deposit already exists", "data": null } },
-                  "Failed to verify OTP": { "value": { "status": "bad_request", "message": "Failed to verify the OTP for your mobile money deposit. Please try again.", "data": null } },
-                  "Missing OTP token": { "value": { "status": "bad_request", "message": "Missing OTP token", "data": null } },
-                  "Deposit not found": { "value": { "status": "bad_request", "message": "Deposit not found", "data": null } }
+                  "Transaction not found": {
+                    "value": {
+                      "status": "bad_request",
+                      "message": "Transaction not found",
+                      "data": null
+                    }
+                  },
+                  "Deposit already exists": {
+                    "value": {
+                      "status": "bad_request",
+                      "message": "Fiat deposit already exists",
+                      "data": null
+                    }
+                  },
+                  "Failed to verify OTP": {
+                    "value": {
+                      "status": "bad_request",
+                      "message": "Failed to verify the OTP for your mobile money deposit. Please try again.",
+                      "data": null
+                    }
+                  },
+                  "Missing OTP token": {
+                    "value": {
+                      "status": "bad_request",
+                      "message": "Missing OTP token",
+                      "data": null
+                    }
+                  },
+                  "Deposit not found": {
+                    "value": {
+                      "status": "bad_request",
+                      "message": "Deposit not found",
+                      "data": null
+                    }
+                  }
                 }
               }
             }
           },
-          "403": { "$ref": "#/components/responses/Forbidden" }
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
         }
       }
     },
     "/custodial/auto_swap/initiate_onramp": {
       "get": {
-        "tags": ["On-ramp"],
+        "tags": [
+          "On-ramp"
+        ],
         "summary": "Create an auto-swap account",
         "description": "Creates a **static** NGN bank account tied to one customer. Any fiat sent to it is converted automatically and delivered to the wallet address you registered, with no per-transaction API call.\n\nUse this for recurring funding, where a customer keeps their own account details. For one-off purchases, use the standard on-ramp flow, which issues a single-use account per transaction.\n\nStatic accounts are available for NGN on request and require the customer's BVN.",
         "operationId": "create-auto-swap-account",
@@ -1064,35 +1751,80 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["customer", "coin_deposit", "bank_account"],
+                "required": [
+                  "customer",
+                  "coin_deposit",
+                  "bank_account"
+                ],
                 "properties": {
-                  "customer": { "$ref": "#/components/schemas/Customer" },
+                  "customer": {
+                    "$ref": "#/components/schemas/Customer"
+                  },
                   "coin_deposit": {
                     "type": "object",
                     "description": "Where converted funds are delivered.",
-                    "required": ["address", "network", "currency"],
+                    "required": [
+                      "address",
+                      "network",
+                      "currency"
+                    ],
                     "properties": {
-                      "address": { "type": "string", "description": "Destination wallet address.", "example": "0x2c8cb922aede1464ec575c" },
-                      "network": { "$ref": "#/components/schemas/Network" },
-                      "currency": { "$ref": "#/components/schemas/CryptoCurrency" }
+                      "address": {
+                        "type": "string",
+                        "description": "Destination wallet address.",
+                        "example": "0x2c8cb922aede1464ec575c"
+                      },
+                      "network": {
+                        "$ref": "#/components/schemas/Network"
+                      },
+                      "currency": {
+                        "$ref": "#/components/schemas/CryptoCurrency"
+                      }
                     }
                   },
                   "bank_account": {
                     "type": "object",
                     "description": "Details needed to open the static account.",
-                    "required": ["bvn", "bank_code", "currency"],
+                    "required": [
+                      "bvn",
+                      "bank_code",
+                      "currency"
+                    ],
                     "properties": {
-                      "bvn": { "type": "string", "description": "The customer's Bank Verification Number.", "example": "22222222222" },
-                      "bank_code": { "type": "string", "description": "Bank the static account is opened with. `035` is Wema Bank.", "example": "035" },
-                      "currency": { "type": "string", "example": "ngn" }
+                      "bvn": {
+                        "type": "string",
+                        "description": "The customer's Bank Verification Number.",
+                        "example": "22222222222"
+                      },
+                      "bank_code": {
+                        "type": "string",
+                        "description": "Bank the static account is opened with. `035` is Wema Bank.",
+                        "example": "035"
+                      },
+                      "currency": {
+                        "type": "string",
+                        "example": "ngn"
+                      }
                     }
                   }
                 }
               },
               "example": {
-                "customer": { "email": "ada@example.com", "first_name": "Ada", "last_name": "Lovelace" },
-                "coin_deposit": { "address": "0x2c8cb922aede1464ec575c", "network": "bep20", "currency": "usdt" },
-                "bank_account": { "bvn": "22222222222", "bank_code": "035", "currency": "ngn" }
+                "customer": {
+                  "email": "ada@example.com",
+                  "first_name": "Ada",
+                  "last_name": "Lovelace"
+                },
+                "coin_deposit": {
+                  "address": "0x2c8cb922aede1464ec575c",
+                  "network": "bep20",
+                  "currency": "usdt"
+                },
+                "bank_account": {
+                  "bvn": "22222222222",
+                  "bank_code": "035",
+                  "currency": "ngn"
+                }
               }
             }
           }
@@ -1107,7 +1839,11 @@
                   "message": "Auto swap successfully created",
                   "data": {
                     "public_id": "c869619a-ce05-4111-95bf-a09559d053a3",
-                    "customer": { "email": "ada@example.com", "first_name": "Ada", "last_name": "Lovelace" },
+                    "customer": {
+                      "email": "ada@example.com",
+                      "first_name": "Ada",
+                      "last_name": "Lovelace"
+                    },
                     "side": "onramp",
                     "deposit_bank_account": {
                       "account_number": "1234567890",
@@ -1121,14 +1857,20 @@
               }
             }
           },
-          "400": { "$ref": "#/components/responses/BadRequest" },
-          "403": { "$ref": "#/components/responses/Forbidden" }
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
         }
       }
     },
     "/custodial/off_ramp_transactions/initiate": {
       "post": {
-        "tags": ["Off-ramp"],
+        "tags": [
+          "Off-ramp"
+        ],
         "summary": "Create an off-ramp transaction",
         "description": "Creates a transaction that converts a digital asset to fiat and pays it to the customer's bank or mobile money account.\n\nThe amount of the asset you send determines the fiat the customer receives. The `merchant_reference` must be unique.",
         "operationId": "initiate-off-ramp-transaction",
@@ -1138,14 +1880,36 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["from_currency", "to_currency", "from_amount", "network", "customer", "merchant_reference"],
+                "required": [
+                  "from_currency",
+                  "to_currency",
+                  "from_amount",
+                  "network",
+                  "customer",
+                  "merchant_reference"
+                ],
                 "properties": {
-                  "from_currency": { "$ref": "#/components/schemas/CryptoCurrency" },
-                  "to_currency": { "$ref": "#/components/schemas/FiatCurrency" },
-                  "from_amount": { "type": "string", "description": "Amount of the asset the customer is selling.", "example": "3" },
-                  "network": { "$ref": "#/components/schemas/Network" },
-                  "customer": { "$ref": "#/components/schemas/Customer" },
-                  "merchant_reference": { "type": "string", "example": "order_67890" }
+                  "from_currency": {
+                    "$ref": "#/components/schemas/CryptoCurrency"
+                  },
+                  "to_currency": {
+                    "$ref": "#/components/schemas/FiatCurrency"
+                  },
+                  "from_amount": {
+                    "type": "string",
+                    "description": "Amount of the asset the customer is selling.",
+                    "example": "3"
+                  },
+                  "network": {
+                    "$ref": "#/components/schemas/Network"
+                  },
+                  "customer": {
+                    "$ref": "#/components/schemas/Customer"
+                  },
+                  "merchant_reference": {
+                    "type": "string",
+                    "example": "order_67890"
+                  }
                 }
               },
               "example": {
@@ -1153,7 +1917,11 @@
                 "to_currency": "ghs",
                 "from_amount": "3",
                 "network": "bep20",
-                "customer": { "email": "ada@example.com", "first_name": "Ada", "last_name": "Lovelace" },
+                "customer": {
+                  "email": "ada@example.com",
+                  "first_name": "Ada",
+                  "last_name": "Lovelace"
+                },
                 "merchant_reference": "order_67890"
               }
             }
@@ -1166,8 +1934,17 @@
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/Envelope" },
-                    { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/Transaction" } } }
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Transaction"
+                        }
+                      }
+                    }
                   ]
                 },
                 "example": {
@@ -1195,39 +1972,86 @@
             "content": {
               "application/json": {
                 "examples": {
-                  "Invalid amount": { "value": { "status": "bad_request", "message": "Invalid amount", "data": null } },
-                  "Missing first name": { "value": { "status": "bad_request", "message": "customer first name is missing", "data": null } },
-                  "Missing last name": { "value": { "status": "bad_request", "message": "customer last name is missing", "data": null } },
-                  "Invalid customer": { "value": { "status": "bad_request", "message": "Invalid customer", "data": null } }
+                  "Invalid amount": {
+                    "value": {
+                      "status": "bad_request",
+                      "message": "Invalid amount",
+                      "data": null
+                    }
+                  },
+                  "Missing first name": {
+                    "value": {
+                      "status": "bad_request",
+                      "message": "customer first name is missing",
+                      "data": null
+                    }
+                  },
+                  "Missing last name": {
+                    "value": {
+                      "status": "bad_request",
+                      "message": "customer last name is missing",
+                      "data": null
+                    }
+                  },
+                  "Invalid customer": {
+                    "value": {
+                      "status": "bad_request",
+                      "message": "Invalid customer",
+                      "data": null
+                    }
+                  }
                 }
               }
             }
           },
-          "403": { "$ref": "#/components/responses/Forbidden" }
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
         }
       }
     },
     "/custodial/off_ramp_transactions/{merchant_reference}/refresh": {
       "put": {
-        "tags": ["Off-ramp"],
+        "tags": [
+          "Off-ramp"
+        ],
         "summary": "Refresh an off-ramp transaction",
         "description": "Recalculates the quote before the customer sends the asset. Use the same `merchant_reference` you used to create the transaction.",
         "operationId": "refresh-off-ramp-transaction",
-        "parameters": [{ "$ref": "#/components/parameters/MerchantReference" }],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MerchantReference"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["from_currency", "to_currency", "from_amount"],
+                "required": [
+                  "from_currency",
+                  "to_currency",
+                  "from_amount"
+                ],
                 "properties": {
-                  "from_currency": { "$ref": "#/components/schemas/CryptoCurrency" },
-                  "to_currency": { "$ref": "#/components/schemas/FiatCurrency" },
-                  "from_amount": { "type": "string", "example": "3" }
+                  "from_currency": {
+                    "$ref": "#/components/schemas/CryptoCurrency"
+                  },
+                  "to_currency": {
+                    "$ref": "#/components/schemas/FiatCurrency"
+                  },
+                  "from_amount": {
+                    "type": "string",
+                    "example": "3"
+                  }
                 }
               },
-              "example": { "from_currency": "usdt", "to_currency": "ghs", "from_amount": "3" }
+              "example": {
+                "from_currency": "usdt",
+                "to_currency": "ghs",
+                "from_amount": "3"
+              }
             }
           }
         },
@@ -1238,8 +2062,17 @@
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/Envelope" },
-                    { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/Transaction" } } }
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Transaction"
+                        }
+                      }
+                    }
                   ]
                 }
               }
@@ -1250,32 +2083,58 @@
             "content": {
               "application/json": {
                 "examples": {
-                  "Currency swap not allowed": { "value": { "status": "bad_request", "message": "Currency swap not allowed", "data": null } },
-                  "Refresh failed": { "value": { "status": "bad_request", "message": "Failed to refresh off-ramp transaction", "data": null } }
+                  "Currency swap not allowed": {
+                    "value": {
+                      "status": "bad_request",
+                      "message": "Currency swap not allowed",
+                      "data": null
+                    }
+                  },
+                  "Refresh failed": {
+                    "value": {
+                      "status": "bad_request",
+                      "message": "Failed to refresh off-ramp transaction",
+                      "data": null
+                    }
+                  }
                 }
               }
             }
           },
-          "403": { "$ref": "#/components/responses/Forbidden" }
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
         }
       }
     },
     "/custodial/off_ramp_transactions/{merchant_reference}/bank_account": {
       "post": {
-        "tags": ["Off-ramp"],
+        "tags": [
+          "Off-ramp"
+        ],
         "summary": "Add a payout account",
         "description": "Attaches the bank or mobile money account that will receive the fiat payout.\n\nRamp resolves the account and compares the resolved name against the customer name on the transaction. If they do not match, the account is not attached. Add the payout account before confirming the transaction.",
         "operationId": "add-off-ramp-payout-account",
-        "parameters": [{ "$ref": "#/components/parameters/MerchantReference" }],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MerchantReference"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["currency_code", "bank_code", "account_number"],
+                "required": [
+                  "currency_code",
+                  "bank_code",
+                  "account_number"
+                ],
                 "properties": {
-                  "currency_code": { "$ref": "#/components/schemas/FiatCurrency" },
+                  "currency_code": {
+                    "$ref": "#/components/schemas/FiatCurrency"
+                  },
                   "bank_code": {
                     "type": "string",
                     "description": "Institution code from **List supported institutions**.",
@@ -1288,7 +2147,11 @@
                   }
                 }
               },
-              "example": { "currency_code": "ghs", "bank_code": "0006", "account_number": "0123456789" }
+              "example": {
+                "currency_code": "ghs",
+                "bank_code": "0006",
+                "account_number": "0123456789"
+              }
             }
           }
         },
@@ -1321,23 +2184,43 @@
             "content": {
               "application/json": {
                 "examples": {
-                  "Failed to create account": { "value": { "status": "bad_request", "message": "Failed to create account", "data": null } },
-                  "Name does not match": { "value": { "status": "bad_request", "message": "Name does not match", "data": null } }
+                  "Failed to create account": {
+                    "value": {
+                      "status": "bad_request",
+                      "message": "Failed to create account",
+                      "data": null
+                    }
+                  },
+                  "Name does not match": {
+                    "value": {
+                      "status": "bad_request",
+                      "message": "Name does not match",
+                      "data": null
+                    }
+                  }
                 }
               }
             }
           },
-          "403": { "$ref": "#/components/responses/Forbidden" }
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
         }
       }
     },
     "/custodial/off_ramp_transactions/{merchant_reference}/confirm": {
       "post": {
-        "tags": ["Off-ramp"],
+        "tags": [
+          "Off-ramp"
+        ],
         "summary": "Confirm an off-ramp transaction",
         "description": "Generates the deposit address the customer sends the asset to.\n\nThe customer must send the exact amount, in the correct asset, on the correct network. Anything else may fail or need manual review. Confirm only after the payout account has been attached.",
         "operationId": "confirm-off-ramp-transaction",
-        "parameters": [{ "$ref": "#/components/parameters/MerchantReference" }],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MerchantReference"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Address successfully created.",
@@ -1345,23 +2228,45 @@
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/Envelope" },
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
                     {
                       "type": "object",
                       "properties": {
                         "data": {
                           "type": "object",
                           "properties": {
-                            "id": { "type": "string" },
-                            "address": { "type": "string", "description": "Where the customer sends the asset." },
+                            "id": {
+                              "type": "string"
+                            },
+                            "address": {
+                              "type": "string",
+                              "description": "Where the customer sends the asset."
+                            },
                             "tag": {
-                              "type": ["string", "null"],
+                              "type": [
+                                "string",
+                                "null"
+                              ],
                               "description": "Destination tag or memo. Null on networks that do not use one."
                             },
-                            "network": { "type": "string", "example": "bep20" },
-                            "currency": { "type": "string", "example": "usdt" },
-                            "assigned_at": { "type": "string", "format": "date-time" },
-                            "status": { "type": "string", "example": "assigned" }
+                            "network": {
+                              "type": "string",
+                              "example": "bep20"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "example": "usdt"
+                            },
+                            "assigned_at": {
+                              "type": "string",
+                              "format": "date-time"
+                            },
+                            "status": {
+                              "type": "string",
+                              "example": "assigned"
+                            }
                           }
                         }
                       }
@@ -1384,18 +2289,28 @@
               }
             }
           },
-          "400": { "$ref": "#/components/responses/BadRequest" },
-          "404": { "$ref": "#/components/responses/NotFound" }
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
         }
       }
     },
     "/on_ramp_transaction/{reference}": {
       "get": {
-        "tags": ["Transactions"],
+        "tags": [
+          "Transactions"
+        ],
         "summary": "Fetch an on-ramp transaction",
         "description": "Returns the current state of an on-ramp transaction, including the fiat deposit and the crypto payout.\n\nPass the Quidax `reference` returned when the transaction was created, not your own `merchant_reference`.",
         "operationId": "fetch-on-ramp-transaction",
-        "parameters": [{ "$ref": "#/components/parameters/QuidaxReference" }],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/QuidaxReference"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Transaction found.",
@@ -1403,8 +2318,17 @@
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/Envelope" },
-                    { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/OnRampTransactionDetail" } } }
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/OnRampTransactionDetail"
+                        }
+                      }
+                    }
                   ]
                 },
                 "example": {
@@ -1451,18 +2375,28 @@
               }
             }
           },
-          "403": { "$ref": "#/components/responses/Forbidden" },
-          "404": { "$ref": "#/components/responses/NotFound" }
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
         }
       }
     },
     "/off_ramp_transaction/{reference}": {
       "get": {
-        "tags": ["Transactions"],
+        "tags": [
+          "Transactions"
+        ],
         "summary": "Fetch an off-ramp transaction",
         "description": "Returns the current state of an off-ramp transaction, including the crypto deposit and the fiat payout.",
         "operationId": "fetch-off-ramp-transaction",
-        "parameters": [{ "$ref": "#/components/parameters/QuidaxReference" }],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/QuidaxReference"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Transaction found.",
@@ -1470,8 +2404,17 @@
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/Envelope" },
-                    { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/OffRampTransactionDetail" } } }
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/OffRampTransactionDetail"
+                        }
+                      }
+                    }
                   ]
                 },
                 "example": {
@@ -1515,25 +2458,45 @@
               }
             }
           },
-          "403": { "$ref": "#/components/responses/Forbidden" },
-          "404": { "$ref": "#/components/responses/NotFound" }
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
         }
       }
     },
     "/on_ramp_transactions": {
       "get": {
-        "tags": ["Transactions"],
+        "tags": [
+          "Transactions"
+        ],
         "summary": "List on-ramp transactions",
         "description": "Returns a paginated list of on-ramp transactions for the authenticated app. Use the date filters for reconciliation runs.",
         "operationId": "list-on-ramp-transactions",
         "parameters": [
-          { "$ref": "#/components/parameters/Page" },
-          { "$ref": "#/components/parameters/PerPage" },
-          { "$ref": "#/components/parameters/StatusFilter" },
-          { "$ref": "#/components/parameters/FromCurrencyFilter" },
-          { "$ref": "#/components/parameters/ToCurrencyFilter" },
-          { "$ref": "#/components/parameters/StartDate" },
-          { "$ref": "#/components/parameters/EndDate" }
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/PerPage"
+          },
+          {
+            "$ref": "#/components/parameters/StatusFilter"
+          },
+          {
+            "$ref": "#/components/parameters/FromCurrencyFilter"
+          },
+          {
+            "$ref": "#/components/parameters/ToCurrencyFilter"
+          },
+          {
+            "$ref": "#/components/parameters/StartDate"
+          },
+          {
+            "$ref": "#/components/parameters/EndDate"
+          }
         ],
         "responses": {
           "200": {
@@ -1542,38 +2505,125 @@
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/Envelope" },
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
                     {
                       "type": "object",
                       "properties": {
-                        "data": { "type": "array", "items": { "$ref": "#/components/schemas/OnRampTransactionDetail" } },
-                        "meta": { "$ref": "#/components/schemas/PaginationMeta" }
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/OnRampTransactionDetail"
+                          }
+                        },
+                        "meta": {
+                          "$ref": "#/components/schemas/PaginationMeta"
+                        }
                       }
                     }
                   ]
+                },
+                "example": {
+                  "status": "ok",
+                  "message": "Transactions fetched successfully",
+                  "data": [
+                    {
+                      "public_id": "d5e46711-7f96-4d81-8f7a-57b6c7304090",
+                      "status": "completed",
+                      "mode": "buy",
+                      "from_currency": "ngn",
+                      "to_currency": "usdt",
+                      "from_amount": "3000.0",
+                      "to_amount": "2.0542",
+                      "network": "celo",
+                      "merchant_reference": "order_12345",
+                      "error_message": null
+                    }
+                  ],
+                  "meta": {
+                    "page": 1,
+                    "per_page": 25,
+                    "total_count": 16,
+                    "total_pages": 1,
+                    "next_page": null
+                  }
                 }
               }
             }
           },
-          "400": { "$ref": "#/components/responses/BadRequest" },
-          "403": { "$ref": "#/components/responses/Forbidden" }
+          "400": {
+            "description": "The query was invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListError"
+                },
+                "examples": {
+                  "Invalid currency": {
+                    "value": {
+                      "message": "Invalid currency",
+                      "data": null
+                    }
+                  },
+                  "Invalid status": {
+                    "value": {
+                      "message": "status is invalid",
+                      "data": null
+                    }
+                  },
+                  "Invalid date range": {
+                    "value": {
+                      "message": "start_date and end_date must both be present",
+                      "data": null
+                    }
+                  },
+                  "Invalid pagination": {
+                    "value": {
+                      "message": "page must be a positive integer",
+                      "data": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
         }
       }
     },
     "/off_ramp_transactions": {
       "get": {
-        "tags": ["Transactions"],
+        "tags": [
+          "Transactions"
+        ],
         "summary": "List off-ramp transactions",
         "description": "Returns a paginated list of off-ramp transactions for the authenticated app.",
         "operationId": "list-off-ramp-transactions",
         "parameters": [
-          { "$ref": "#/components/parameters/Page" },
-          { "$ref": "#/components/parameters/PerPage" },
-          { "$ref": "#/components/parameters/StatusFilter" },
-          { "$ref": "#/components/parameters/FromCurrencyFilter" },
-          { "$ref": "#/components/parameters/ToCurrencyFilter" },
-          { "$ref": "#/components/parameters/StartDate" },
-          { "$ref": "#/components/parameters/EndDate" }
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/PerPage"
+          },
+          {
+            "$ref": "#/components/parameters/StatusFilter"
+          },
+          {
+            "$ref": "#/components/parameters/FromCurrencyFilter"
+          },
+          {
+            "$ref": "#/components/parameters/ToCurrencyFilter"
+          },
+          {
+            "$ref": "#/components/parameters/StartDate"
+          },
+          {
+            "$ref": "#/components/parameters/EndDate"
+          }
         ],
         "responses": {
           "200": {
@@ -1582,27 +2632,100 @@
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/Envelope" },
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
                     {
                       "type": "object",
                       "properties": {
-                        "data": { "type": "array", "items": { "$ref": "#/components/schemas/OffRampTransactionDetail" } },
-                        "meta": { "$ref": "#/components/schemas/PaginationMeta" }
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/OffRampTransactionDetail"
+                          }
+                        },
+                        "meta": {
+                          "$ref": "#/components/schemas/PaginationMeta"
+                        }
                       }
                     }
                   ]
+                },
+                "example": {
+                  "status": "ok",
+                  "message": "Transactions fetched successfully",
+                  "data": [
+                    {
+                      "public_id": "d5e46711-7f96-4d81-8f7a-57b6c7304090",
+                      "status": "completed",
+                      "mode": "sell",
+                      "from_currency": "usdt",
+                      "to_currency": "ngn",
+                      "from_amount": "3.0",
+                      "to_amount": "3993.33",
+                      "network": "celo",
+                      "merchant_reference": "order_12345",
+                      "error_message": null
+                    }
+                  ],
+                  "meta": {
+                    "page": 1,
+                    "per_page": 25,
+                    "total_count": 16,
+                    "total_pages": 1,
+                    "next_page": null
+                  }
                 }
               }
             }
           },
-          "400": { "$ref": "#/components/responses/BadRequest" },
-          "403": { "$ref": "#/components/responses/Forbidden" }
+          "400": {
+            "description": "The query was invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListError"
+                },
+                "examples": {
+                  "Invalid currency": {
+                    "value": {
+                      "message": "Invalid currency",
+                      "data": null
+                    }
+                  },
+                  "Invalid status": {
+                    "value": {
+                      "message": "status is invalid",
+                      "data": null
+                    }
+                  },
+                  "Invalid date range": {
+                    "value": {
+                      "message": "start_date and end_date must both be present",
+                      "data": null
+                    }
+                  },
+                  "Invalid pagination": {
+                    "value": {
+                      "message": "page must be a positive integer",
+                      "data": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
         }
       }
     },
     "/custodial/banks": {
       "get": {
-        "tags": ["Banks"],
+        "tags": [
+          "Banks"
+        ],
         "summary": "List supported institutions",
         "description": "Returns the banks and mobile money providers supported in a country. Use each entry's `code` as the `bank_code` when adding a payout account or submitting refund details.\n\nFetch this list rather than hard-coding it, so newly supported institutions reach your integration without a release.",
         "operationId": "list-institutions",
@@ -1611,7 +2734,14 @@
             "name": "country",
             "in": "query",
             "description": "Country code.",
-            "schema": { "type": "string", "enum": ["NG", "GH"], "default": "NG" }
+            "schema": {
+              "type": "string",
+              "enum": [
+                "NG",
+                "GH"
+              ],
+              "default": "NG"
+            }
           }
         ],
         "responses": {
@@ -1621,48 +2751,110 @@
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/Envelope" },
-                    { "type": "object", "properties": { "data": { "type": "array", "items": { "$ref": "#/components/schemas/Institution" } } } }
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Institution"
+                          }
+                        }
+                      }
+                    }
                   ]
                 },
                 "example": {
                   "status": "ok",
                   "message": "Banks successfully fetched",
                   "data": [
-                    { "public_id": "f9cf0f2d-da7b-40cd-be43-e2b2a82f68b4", "code": "0004", "name": "MTN", "created_at": "2025-10-29T10:15:14.140Z", "updated_at": "2025-11-26T12:14:45.837Z" },
-                    { "public_id": "9024ec7a-1394-45d8-8e1a-3df32b4392ba", "code": "0006", "name": "VODAFONE", "created_at": "2025-10-29T10:15:14.176Z", "updated_at": "2025-11-26T12:14:13.552Z" },
-                    { "public_id": "207b1aac-af2a-4da7-832e-2a38c8a38644", "code": "0005", "name": "AIRTEL", "created_at": "2025-10-29T10:15:14.106Z", "updated_at": "2025-11-26T12:15:01.903Z" },
-                    { "public_id": "a1b49f16-2578-49e2-b04c-667231d08316", "code": "280100", "name": "Access Bank", "created_at": "2026-05-19T12:26:14.878Z", "updated_at": "2026-05-19T12:26:14.878Z" }
+                    {
+                      "public_id": "f9cf0f2d-da7b-40cd-be43-e2b2a82f68b4",
+                      "code": "0004",
+                      "name": "MTN",
+                      "created_at": "2025-10-29T10:15:14.140Z",
+                      "updated_at": "2025-11-26T12:14:45.837Z"
+                    },
+                    {
+                      "public_id": "9024ec7a-1394-45d8-8e1a-3df32b4392ba",
+                      "code": "0006",
+                      "name": "VODAFONE",
+                      "created_at": "2025-10-29T10:15:14.176Z",
+                      "updated_at": "2025-11-26T12:14:13.552Z"
+                    },
+                    {
+                      "public_id": "207b1aac-af2a-4da7-832e-2a38c8a38644",
+                      "code": "0005",
+                      "name": "AIRTEL",
+                      "created_at": "2025-10-29T10:15:14.106Z",
+                      "updated_at": "2025-11-26T12:15:01.903Z"
+                    },
+                    {
+                      "public_id": "a1b49f16-2578-49e2-b04c-667231d08316",
+                      "code": "280100",
+                      "name": "Access Bank",
+                      "created_at": "2026-05-19T12:26:14.878Z",
+                      "updated_at": "2026-05-19T12:26:14.878Z"
+                    }
                   ]
                 }
               }
             }
           },
-          "403": { "$ref": "#/components/responses/Forbidden" }
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
         }
       }
     },
     "/refunds/{merchant_reference}/verify_account": {
       "post": {
-        "tags": ["Refunds", "Banks"],
+        "tags": [
+          "Refunds",
+          "Banks"
+        ],
         "summary": "Verify a bank account",
         "description": "Resolves a bank account and returns the account holder's name. Call this before submitting refund details, so you can confirm the destination with your customer. A completed refund cannot be reversed.\n\nA failed verification returns `400` immediately.",
         "operationId": "verify-refund-account",
-        "parameters": [{ "$ref": "#/components/parameters/MerchantReference" }],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MerchantReference"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["account_number", "bank_code", "currency_code"],
+                "required": [
+                  "account_number",
+                  "bank_code",
+                  "currency_code"
+                ],
                 "properties": {
-                  "account_number": { "type": "string", "example": "0123456789" },
-                  "bank_code": { "type": "string", "example": "058" },
-                  "currency_code": { "type": "string", "example": "NGN" }
+                  "account_number": {
+                    "type": "string",
+                    "example": "0123456789"
+                  },
+                  "bank_code": {
+                    "type": "string",
+                    "example": "058"
+                  },
+                  "currency_code": {
+                    "type": "string",
+                    "example": "NGN"
+                  }
                 }
               },
-              "example": { "account_number": "0123456789", "bank_code": "058", "currency_code": "NGN" }
+              "example": {
+                "account_number": "0123456789",
+                "bank_code": "058",
+                "currency_code": "NGN"
+              }
             }
           }
         },
@@ -1684,33 +2876,62 @@
               }
             }
           },
-          "400": { "$ref": "#/components/responses/BadRequest" },
-          "403": { "$ref": "#/components/responses/Forbidden" },
-          "404": { "$ref": "#/components/responses/NotFound" }
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
         }
       }
     },
     "/refunds/{merchant_reference}/details": {
       "post": {
-        "tags": ["Refunds"],
+        "tags": [
+          "Refunds"
+        ],
         "summary": "Submit refund bank details",
         "description": "Submits the account that should receive a refund, in response to a `buy_transaction.refund.details_requested` webhook.\n\nSubmitting identical details more than once in the same refund cycle is safe. Ramp stores one submission and returns the refund.",
         "operationId": "submit-refund-details",
-        "parameters": [{ "$ref": "#/components/parameters/MerchantReference" }],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MerchantReference"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["account_number", "bank_code", "account_name"],
+                "required": [
+                  "account_number",
+                  "bank_code",
+                  "account_name"
+                ],
                 "properties": {
-                  "account_number": { "type": "string", "example": "0123456789" },
-                  "bank_code": { "type": "string", "example": "058" },
-                  "account_name": { "type": "string", "example": "Ada Lovelace" }
+                  "account_number": {
+                    "type": "string",
+                    "example": "0123456789"
+                  },
+                  "bank_code": {
+                    "type": "string",
+                    "example": "058"
+                  },
+                  "account_name": {
+                    "type": "string",
+                    "example": "Ada Lovelace"
+                  }
                 }
               },
-              "example": { "account_number": "0123456789", "bank_code": "058", "account_name": "Ada Lovelace" }
+              "example": {
+                "account_number": "0123456789",
+                "bank_code": "058",
+                "account_name": "Ada Lovelace"
+              }
             }
           }
         },
@@ -1721,8 +2942,17 @@
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/Envelope" },
-                    { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/Refund" } } }
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Refund"
+                        }
+                      }
+                    }
                   ]
                 },
                 "example": {
@@ -1742,19 +2972,31 @@
               }
             }
           },
-          "400": { "$ref": "#/components/responses/BadRequest" },
-          "403": { "$ref": "#/components/responses/Forbidden" },
-          "404": { "$ref": "#/components/responses/NotFound" }
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
         }
       }
     },
     "/refunds/{merchant_reference}": {
       "get": {
-        "tags": ["Refunds"],
+        "tags": [
+          "Refunds"
+        ],
         "summary": "Get a refund",
         "description": "Returns the refund attached to an on-ramp transaction. Use this to reconcile if you miss a refund webhook.",
         "operationId": "get-refund",
-        "parameters": [{ "$ref": "#/components/parameters/MerchantReference" }],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/MerchantReference"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Refund found.",
@@ -1762,8 +3004,17 @@
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/Envelope" },
-                    { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/Refund" } } }
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Refund"
+                        }
+                      }
+                    }
                   ]
                 },
                 "example": {
@@ -1783,12 +3034,18 @@
               }
             }
           },
-          "403": { "$ref": "#/components/responses/Forbidden" },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
           "404": {
             "description": "The refund could not be found.",
             "content": {
               "application/json": {
-                "example": { "status": "not_found", "message": "Refund not found", "data": null }
+                "example": {
+                  "status": "not_found",
+                  "message": "Refund not found",
+                  "data": null
+                }
               }
             }
           }
