@@ -50,13 +50,13 @@ Ramp is delivered three ways. They share one merchant account and one set of cre
 
 <Tabs>
   <Tab title="Widget">
-    A hosted pop-up you embed in your product. Quidax verifies each user inside the flow, then handles conversion and settlement.
+    A hosted pop-up you embed in your product. Quidax verifies each user once, on their first transaction, then handles conversion and settlement.
 
     **Best for** consumer apps, wallets and platforms that want the fastest path to market.
 
     **Effort** low. Embed a script tag and call `window.ramp.initialize()`.
 
-    Quidax owns end-user verification, banking relationships and liquidity. The widget carries Quidax branding, and users are verified as Quidax users even if they already completed verification with you.
+    Quidax owns end-user verification, banking relationships and liquidity — so you get an independent identity and sanctions check on every user, with nothing to build or maintain. The widget carries Quidax branding, and users are verified as Quidax users.
 
     <Card title="Widget integration" icon="window" href="/ramp/widget" horizontal />
   </Tab>
@@ -91,7 +91,7 @@ Ramp is delivered three ways. They share one merchant account and one set of cre
 | | Widget | API |
 | --- | --- | --- |
 | Who builds the interface | Quidax | You |
-| Who verifies the end user | Quidax, inside the flow | You, under your own licence |
+| Who verifies the end user | Quidax, once, inside the flow | You, under your own licence |
 | Who holds the customer relationship | Shared, users are Quidax users | You |
 | Integration effort | A script tag | REST plus webhooks |
 | Typical time to launch | 3 to 10 business days | 1 to 4 weeks |

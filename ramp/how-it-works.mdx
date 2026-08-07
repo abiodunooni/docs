@@ -52,8 +52,8 @@ Every Ramp transaction has two legs: a fiat leg and a crypto leg. Ramp converts 
         They enter the amount they want to buy.
       </Step>
 
-      <Step title="They verify their identity">
-        New users verify their email by OTP and complete verification inline. Existing Quidax users skip straight through.
+      <Step title="Quidax verifies them, once">
+        A first-time user verifies their email by OTP and completes identity verification inline — an independent check run on your behalf. It happens on their first transaction only; after that they are recognised and go straight to payment.
       </Step>
 
       <Step title="A bank account is generated">
@@ -176,10 +176,18 @@ Every Ramp transaction has two legs: a fiat leg and a crypto leg. Ramp converts 
     Abandonment does not emit a webhook. Poll the transaction, or reconcile with the list endpoints, if you need to know.
   </Accordion>
 
-  <Accordion title="Name matching" icon="user-check">
-    Ramp does not support third-party deposits or payouts. The name on the paying bank account must match the customer name on the transaction, and Ramp runs the same check on off-ramp payout accounts.
+  <Accordion title="Name matching, and who counts as the customer" icon="user-check">
+    The fiat account on a transaction must belong to the **customer named on that transaction**. Ramp checks the paying account on on-ramp and the payout account on off-ramp.
 
     Where a mismatch is found, the fiat deposit is rejected and refunded, or the payout account is not attached.
+
+    **This does not mean the sender and the beneficiary have to be the same person.** The customer on a transaction is whoever owns the fiat account on that leg, and you name them when you create it. So a remittance paying out to a recipient works normally: you initiate the off-ramp naming the *recipient* as the customer, with the recipient's account, and the check passes.
+
+    In other words, third-party pay-ins and payouts are a supported pattern on the API. What is not supported is a fiat account belonging to someone other than the customer you named.
+
+    <Note>
+      This works on the API because **you** verified those customers. Passing your own customer's name carries the obligation to have verified them and to produce that verification on request. On the widget the position is different — Quidax verifies the end user inside the flow, so the customer is always a Quidax-verified user.
+    </Note>
 
     For business customers, pass the first word of the business name as `first_name` and the remainder as `last_name`.
   </Accordion>

@@ -112,6 +112,23 @@ A merchant with e-money permissions but no digital asset registration can run on
   This is scoped case by case with the Quidax product and compliance teams. If your licence covers only one side of the transaction, raise it early — it shapes the integration, and it is usually workable.
 </Note>
 
+### Third-party pay-ins and payouts
+
+The sender and the beneficiary do not have to be the same person. Collect from one customer and pay out to another, which is what remittance, marketplace and disbursement flows require.
+
+The mechanism is simply who you name on each transaction. The customer on a transaction is whoever owns the fiat account on that leg, so you pass **your customer's** details when you create it and the name check is made against them:
+
+- **Paying a recipient** — initiate the off-ramp naming the recipient, with the recipient's account.
+- **Collecting from a payer** — initiate the on-ramp naming the payer, who transfers from their own account.
+
+Neither is a special mode. It falls out of naming each party correctly on their own leg.
+
+<Warning>
+  This is available on the API because **you** verified those customers. Passing your own customer's name carries the obligation to have verified them and to produce that verification when asked.
+
+  It is not available through the widget, where Quidax verifies the end user inside the flow and the customer is therefore always a Quidax-verified user.
+</Warning>
+
 ### Multi-corridor treasury consolidation
 
 Each corridor settles in its own local currency to a local account, because aggregating across currencies would place FX risk on Quidax on your behalf.
@@ -163,8 +180,10 @@ Worth knowing early, so you do not design around something that is not there.
     Settle to stablecoin instead if you want a single consolidated position.
   </Accordion>
 
-  <Accordion title="Third-party deposits and payouts" icon="circle-x">
-    The name on the paying or receiving account must match the customer on the transaction. This holds on both directions and is not configurable.
+  <Accordion title="A fiat account belonging to someone other than the named customer" icon="circle-x">
+    The paying or receiving account must belong to the customer named on that transaction, on both directions, and it is not configurable.
+
+    This is narrower than it sounds — it does **not** stop the sender and beneficiary being different people. See [Third-party pay-ins and payouts](#third-party-pay-ins-and-payouts) above.
   </Accordion>
 
   <Accordion title="Corridor or vertical exclusivity" icon="circle-x">

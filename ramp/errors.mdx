@@ -130,7 +130,9 @@ Leg statuses sit on the nested objects: `fiat_deposit.status`, `crypto_payout.st
   </Accordion>
 
   <Accordion title="Someone else paid" icon="user-xmark">
-    Third-party deposits are not supported. A name mismatch means the deposit is rejected and refunded to the customer, which starts the [refund flow](/ramp/refunds).
+    The paying account must belong to the customer you named on the transaction. A mismatch means the deposit is rejected and refunded, which starts the [refund flow](/ramp/refunds).
+
+    Note this is about the *named* customer, not about sender and beneficiary being the same person — see [who counts as the customer](/ramp/how-it-works#rules-that-apply-to-every-transaction).
   </Accordion>
 
   <Accordion title="A duplicate deposit was made" icon="copy">
