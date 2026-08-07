@@ -186,7 +186,11 @@ How the customer pays depends on the currency.
 
     The account is single-use and tied to this transaction, so the customer does not need to add a payment reference or narration. Duplicate deposits to the same account are rejected and reversed by the provider.
 
-    Confirm only when the customer is ready to pay, since confirming locks the quote.
+    Confirm only when the customer is ready to pay. Confirming locks the quote, and an unpaid transaction is **abandoned after 36 minutes**.
+
+    <Warning>
+      If the customer pays the wrong amount, the provider rejects it before it reaches Ramp, so **no webhook fires at all** and the transaction stays `pending` until it abandons. See [When a payment is rejected](/ramp/how-it-works#when-a-payment-is-rejected).
+    </Warning>
   </Tab>
 
   <Tab title="GHS mobile money">
@@ -307,7 +311,7 @@ The response nests both legs, so one call tells you what happened on each:
 The standard flow issues a fresh account per transaction. Where a customer funds repeatedly, auto swap gives them one **static** account instead: anything paid into it is converted and forwarded to the registered wallet automatically, with no per-transaction call.
 
 ```bash
-curl 'https://ramp-be.quidax.io/api/v1/merchants/custodial/auto_swap/initiate_onramp' \
+curl -X POST 'https://ramp-be.quidax.io/api/v1/merchants/custodial/auto_swap/initiate_onramp' \
   -H 'content-type: application/json' \
   -H "x-private-key: $RAMP_SECRET_KEY" \
   -d '{

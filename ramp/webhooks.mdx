@@ -62,7 +62,7 @@ Every payload has the same shape: an `event` name and a `data` object.
 
 ## Verify the signature
 
-Ramp signs the webhook body with HMAC-SHA256 using your app's latest active secret key. Compute the digest over the raw body and compare it with `X-Ramp-Signature`.
+Ramp signs the webhook with **HMAC-SHA256 over the raw request body**, hex encoded, using your app's latest active secret key. Compare that digest with `X-Ramp-Signature`.
 
 <CodeGroup>
 ```js Node.js
@@ -118,7 +118,94 @@ def verify_ramp_signature(raw_body: bytes, signature: str, secret_key: str) -> b
 
     return hmac.compare_digest(expected, signature)
 ```
+
+```go Go
+package ramp
+
+import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
+)
+
+func VerifySignature(rawBody []byte, signature, secretKey string) bool {
+	mac := hmac.New(sha256.New, []byte(secretKey))
+	mac.Write(rawBody)
+	expected := hex.EncodeToString(mac.Sum(nil))
+
+	return hmac.Equal([]byte(expected), []byte(signature))
+}
+```
+
+```php PHP
+<?php
+
+function verify_ramp_signature(
+    string $rawBody,
+    string $signature,
+    string $secretKey
+): bool {
+    $expected = hash_hmac('sha256', $rawBody, $secretKey);
+
+    return hash_equals($expected, $signature);
+}
+```
+
+```ruby Ruby
+require 'openssl'
+
+def verify_ramp_signature(raw_body, signature, secret_key)
+  expected = OpenSSL::HMAC.hexdigest('SHA256', secret_key, raw_body)
+
+  OpenSSL.secure_compare(expected, signature)
+end
+```
+
+```java Java
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.HexFormat;
+
+public final class RampSignature {
+    public static boolean verify(byte[] rawBody, String signature, String secretKey)
+            throws Exception {
+        Mac mac = Mac.getInstance("HmacSHA256");
+        mac.init(new SecretKeySpec(
+            secretKey.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+
+        String expected = HexFormat.of().formatHex(mac.doFinal(rawBody));
+
+        return MessageDigest.isEqual(
+            expected.getBytes(StandardCharsets.UTF_8),
+            signature.getBytes(StandardCharsets.UTF_8));
+    }
+}
+```
+
+```csharp C#
+using System.Security.Cryptography;
+using System.Text;
+
+public static class RampSignature
+{
+    public static bool Verify(byte[] rawBody, string signature, string secretKey)
+    {
+        using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secretKey));
+        var expected = Convert.ToHexString(hmac.ComputeHash(rawBody)).ToLowerInvariant();
+
+        return CryptographicOperations.FixedTimeEquals(
+            Encoding.UTF8.GetBytes(expected),
+            Encoding.UTF8.GetBytes(signature));
+    }
+}
+```
 </CodeGroup>
+
+<Note>
+  Each example compares digests in constant time. A plain `==` on the signature leaks timing information, and the fix costs nothing.
+</Note>
 
 <Warning>
   Verify against the raw body. Parsing and re-serialising the JSON changes key order and whitespace, which changes the digest and makes every signature fail.
@@ -129,9 +216,20 @@ def verify_ramp_signature(raw_body: bytes, signature: str, secret_key: str) -> b
 | Behaviour | Detail |
 | --- | --- |
 | Expected response | Any `2xx`. Ramp reads only the status code. |
-| Timeout | 10 seconds by default. |
+| Timeout | 10 seconds. |
 | Treated as failed | A timeout, an unreachable endpoint, or a non-`2xx` response. |
-| On failure | Ramp retries the delivery. |
+
+A failed delivery is retried up to five times, backing off each time:
+
+| Retry | Sent after the previous attempt | Elapsed since the first |
+| --- | --- | --- |
+| 1 | 1 minute | 1 minute |
+| 2 | 2 minutes | 3 minutes |
+| 3 | 4 minutes | 7 minutes |
+| 4 | 8 minutes | 15 minutes |
+| 5 | 16 minutes | 31 minutes |
+
+After the fifth retry the event is dropped. So a brief outage is absorbed, but an endpoint down for more than about half an hour loses events permanently — reconcile with the [list endpoints](/api-reference/ramp/transactions/list-on-ramp-transactions) rather than assuming delivery.
 
 Because deliveries retry, your handler must be idempotent. Key on the combination of `event`, `merchant_reference` and, for refunds, `refund_reference`.
 

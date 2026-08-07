@@ -4,7 +4,7 @@ description: "How Ramp prices a transaction, and how to add your own markup to e
 icon: "percent"
 ---
 
-Ramp lets you add your own percentage markup on top of the quoted rate. Your markup is collected on every transaction and passed back to you on settlement, which is how wallet providers, aggregators and platforms earn revenue on the flow rather than just carrying the cost of it.
+Ramp lets you add your own percentage markup on top of the quoted rate. It is collected on every transaction and accrues as revenue you withdraw from the merchant dashboard — which is how wallet providers, aggregators and platforms earn on the flow rather than just carrying the cost of it.
 
 ## How a rate is built
 
@@ -32,29 +32,39 @@ Ramp lets you add your own percentage markup on top of the quoted rate. Your mar
 
 ## Configure your markup
 
-Set it in the merchant dashboard, or through the API. You can vary it by:
+Markup is configured in the **merchant dashboard**. There is no API for it.
+
+<Note>
+  This is deliberate. Pricing is a commercial setting rather than a runtime one, so it changes in one place under whatever approval your team requires — not from application code where a deploy could move your margin unnoticed.
+</Note>
+
+You can set a different percentage for each combination of:
 
 <Columns cols={2}>
-  <Card title="Per market" icon="globe">
-    A different percentage per corridor, so you can price NGN and GHS independently based on what each market bears.
+  <Card title="Market" icon="globe">
+    Price NGN and GHS independently, based on what each market bears.
   </Card>
 
-  <Card title="Per user segment" icon="users">
-    A different percentage per segment, so retail and institutional customers can be priced differently on the same corridor.
+  <Card title="Direction" icon="arrow-right-arrow-left">
+    Price on-ramp and off-ramp separately. Most merchants do, because the competitive pressure differs on each side.
   </Card>
 </Columns>
 
-Markup applies to both directions. You can set it on on-ramp, off-ramp or both.
-
 <Tip>
-  Start conservative and adjust. Because the markup is inside the quoted rate, a change takes effect on the next quote — you do not need to ship anything to move your pricing.
+  Start conservative and adjust. Because the markup lives inside the quoted rate, a change takes effect on the next quote — you never ship code to move your pricing.
 </Tip>
 
 ## How you get paid
 
-Your markup accrues per transaction and is passed back to you on settlement. Nothing extra to invoice or reconcile against your customers: the difference between the base rate and what your customer paid is yours.
+Your markup accrues per transaction as a balance on your merchant account. **You withdraw it from the dashboard** when you want it.
 
-Because the quote already includes your markup, `to_amount` is exactly what your customer receives. You do not need to deduct anything yourself before displaying it.
+Nothing to invoice and nothing to reconcile against your customers: the difference between the base rate and what your customer paid is already yours, and it simply accumulates until you draw it down.
+
+Because the quote already includes your markup, `to_amount` is exactly what your customer receives. You do not deduct anything yourself before displaying it.
+
+<Note>
+  Markup revenue is separate from the funds moving through a transaction. A withdrawal draws down accrued markup, not customer balances.
+</Note>
 
 ## Worked example
 
@@ -120,7 +130,7 @@ Quotes fetched this way are indicative. The binding rate is the one returned whe
 
 <AccordionGroup>
   <Accordion title="Do not add your margin in your own code" icon="calculator">
-    Configure it as a Ramp markup instead. Adding a margin client-side means the amount you quote and the amount Ramp settles diverge, and every reconciliation has to account for the gap. Configured markup keeps one number across the quote, the transaction and the settlement.
+    Configure it in the dashboard instead. Adding a margin client-side means the amount you quote and the amount Ramp settles diverge, and every reconciliation has to account for the gap. A configured markup keeps one number across the quote, the transaction and your revenue.
   </Accordion>
 
   <Accordion title="Quote close to the moment of commitment" icon="clock">
@@ -132,7 +142,13 @@ Quotes fetched this way are indicative. The binding rate is the one returned whe
   </Accordion>
 
   <Accordion title="Reconcile markup separately from fees" icon="chart-line">
-    Your markup arrives in settlement, while `processor_fee`, `vat`, `blockchain_fee` and `stamp_charge` are per-transaction costs. Track them apart so your margin reporting stays clean.
+    Markup accrues to a balance you draw down from the dashboard, while `processor_fee`, `vat`, `blockchain_fee` and `stamp_charge` are per-transaction costs on the transaction itself. Track them apart so your margin reporting stays clean.
+
+    Because withdrawals are periodic and manual, your accrued markup will not line up with any single day's transactions. Reconcile the accrual against transaction volume, and the withdrawal against your bank separately.
+  </Accordion>
+
+  <Accordion title="Decide who owns the pricing" icon="users">
+    Since markup is dashboard-only, a change is a commercial decision rather than a deploy. Agree who is allowed to make it and who reviews it, in the same way you would for any other pricing change.
   </Accordion>
 </AccordionGroup>
 

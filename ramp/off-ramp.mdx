@@ -226,6 +226,12 @@ For a 10 USDT payout at a rate of 1,378.46:
 
 If you show customers a net figure before they commit, subtract stamp duty yourself for payouts over the threshold.
 
+## Transaction window
+
+An off-ramp transaction that never receives its deposit is **abandoned after 24 hours**. That is generous compared with the 36-minute on-ramp window, because the customer has to make an on-chain transfer, but it still means a deposit address does not stay live indefinitely.
+
+Abandonment does not emit a webhook. Poll the transaction or reconcile with the list endpoints if you need to detect it.
+
 ## Payout reversals
 
 A bank or mobile money provider can accept a payout and reverse it later. It is uncommon, and when it happens Quidax handles it manually and sends the fiat to an alternative account you provide. Watch for `sell_transaction.failed` and reconcile against the payout status rather than assuming acceptance is final.

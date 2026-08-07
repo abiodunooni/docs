@@ -135,7 +135,7 @@ Every Ramp transaction has two legs: a fiat leg and a crypto leg. Ramp converts 
 | `failed` | The transaction could not be completed. |
 | `needs_attention` | One leg succeeded and the other did not. Quidax reviews these manually. |
 | `refunded` | Funds were returned to the customer. |
-| `abandoned` | Created but never funded. |
+| `abandoned` | Created but never funded within the window — 36 minutes on on-ramp, 24 hours on off-ramp. |
 | `cancelled` | Cancelled before completion. |
 | `swap_reversed` | A conversion was reversed. |
 
@@ -159,6 +159,21 @@ Every Ramp transaction has two legs: a fiat leg and a crypto leg. Ramp converts 
     On on-ramp, the customer must transfer exactly `amount_expected`. That figure is the transaction amount plus the processor fee and VAT. Overpayment and underpayment are both rejected by the provider, so show the exact figure and discourage rounding.
 
     On off-ramp, the customer must send the exact asset amount on the correct network. A different amount can push the transaction into `needs_attention` for manual review.
+
+    <Warning>
+      A rejected on-ramp payment produces **no webhook**. See [When a payment is rejected](#when-a-payment-is-rejected).
+    </Warning>
+  </Accordion>
+
+  <Accordion title="Transaction windows" icon="clock">
+    A transaction that is never funded is abandoned automatically:
+
+    - **On-ramp** — 36 minutes after creation.
+    - **Off-ramp** — 24 hours after creation.
+
+    Size your payment screens accordingly. On on-ramp in particular, 36 minutes is short enough that a customer who wanders off mid-payment will come back to a dead account number, so confirm only when they are ready to pay.
+
+    Abandonment does not emit a webhook. Poll the transaction, or reconcile with the list endpoints, if you need to know.
   </Accordion>
 
   <Accordion title="Name matching" icon="user-check">
@@ -190,6 +205,29 @@ Every Ramp transaction has two legs: a fiat leg and a crypto leg. Ramp converts 
   </Accordion>
 </AccordionGroup>
 
+## When a payment is rejected
+
+This is the one behaviour worth reading twice, because it generates more support traffic than anything else in Ramp.
+
+If a customer pays the **wrong amount** into the virtual account, the payment provider rejects and reverses the transfer *before it reaches Ramp*. Quidax never sees the money. The consequence:
+
+- **No webhook fires.** Not `processing`, not `failed`, nothing.
+- **The transaction does not change.** It stays `pending`.
+- **After 36 minutes it abandons**, silently.
+- **The provider returns the money to the customer**, on the payment rail's own timeline.
+
+So your customer will tell you they paid while your system shows nothing at all. That is expected behaviour, not an incident, and no amount of waiting will produce an event.
+
+<Warning>
+  Silence after a payment is the signature of a wrong-amount transfer. Before escalating, check the amount the customer actually sent against `amount_expected`.
+</Warning>
+
+**What to do.** Confirm the amount they transferred, tell them the reversal is coming from the provider rather than from you, and create a fresh transaction for the correct amount. The old one abandons on its own.
+
+**How to avoid it.** Display `amount_expected` prominently, never `amount`, and discourage rounding. Most occurrences are a customer rounding ₦5,080.63 down to ₦5,000.
+
+A **name mismatch** behaves differently. That deposit does reach Ramp, which is why it produces a refund and a `refund.details_requested` webhook rather than silence. See [Refunds](/ramp/refunds).
+
 ## Fees
 
 Fees appear on the transaction so you can reconcile against them.
@@ -205,7 +243,7 @@ Fees appear on the transaction so you can reconcile against them.
   In Nigeria, stamp duty of ₦50 applies to payouts of ₦10,000 or more. It is deducted from the converted amount after conversion, so it is not included in the quote.
 </Note>
 
-Ramp is priced as a percentage transaction fee on the principal, applied inside the quoted rate. You can add your own markup on top of it and keep the difference.
+Ramp is priced as a percentage transaction fee on the principal, applied inside the quoted rate. You can add your own markup on top of it, set in the dashboard per market and per direction, and withdraw what accrues.
 
 <Card title="Rates and markup" icon="percent" href="/ramp/rates-and-markup" horizontal>
   How a rate is built, and how to configure a markup that earns you revenue per transaction.

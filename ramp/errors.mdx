@@ -118,7 +118,15 @@ Leg statuses sit on the nested objects: `fiat_deposit.status`, `crypto_payout.st
 
 <AccordionGroup>
   <Accordion title="The customer paid the wrong amount" icon="equals">
-    The provider rejects overpayment and underpayment on the virtual account and reverses the transfer. Nothing reaches Ramp. Show `amount_expected` prominently and discourage rounding.
+    The provider rejects overpayment and underpayment on the virtual account and reverses the transfer. Nothing reaches Ramp.
+
+    That means **no webhook fires**, the transaction stays `pending` until it abandons at 36 minutes, and the provider returns the money to the customer. Your customer will report paying while your system shows nothing.
+
+    Show `amount_expected` prominently, discourage rounding, and treat post-payment silence as a wrong-amount signal rather than an incident. Full detail in [When a payment is rejected](/ramp/how-it-works#when-a-payment-is-rejected).
+  </Accordion>
+
+  <Accordion title="The customer never paid" icon="clock">
+    An unfunded transaction is abandoned automatically — 36 minutes after creation on on-ramp, 24 hours on off-ramp. No webhook is emitted, so poll or reconcile if you need to detect it.
   </Accordion>
 
   <Accordion title="Someone else paid" icon="user-xmark">
