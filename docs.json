@@ -240,9 +240,7 @@
           {
             "group": "Order Book",
             "pages": [
-              "orderbook",
-              "wallets/trading",
-              "wallets/swap"
+              "orderbook"
             ]
           }
         ]
@@ -268,8 +266,6 @@
           {
             "group": "Resources",
             "pages": [
-              "testing",
-              "api-reference",
               "changelog"
             ]
           }
