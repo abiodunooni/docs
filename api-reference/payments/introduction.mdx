@@ -1,0 +1,125 @@
+---
+title: "Introduction"
+description: "Base URL, authentication and conventions for the Payments API."
+icon: "code"
+---
+
+The Payments API is a REST API over JSON. It collects crypto payments from your customers, pays out to wallets, and converts between the currencies you hold.
+
+## Base URL
+
+```
+https://api.basqet.com/v1
+```
+
+Every path on these pages is relative to that root. There is no separate sandbox host — test and live are separated by which key you send. See [Testing](/payments/testing).
+
+## Authentication
+
+Send your key as a bearer token on every request.
+
+```bash
+curl 'https://api.basqet.com/v1/currency' \
+  -H 'Authorization: Bearer sec_live_xxxxxxxxxxxxx'
+```
+
+Which key depends on the endpoint:
+
+| Endpoint | Key |
+| --- | --- |
+| Initialize a transaction | **Public** key (`pub_...`) |
+| Verify a transaction | Either |
+| Resend a webhook event | Either |
+| Everything else | **Secret** key (`sec_...`) |
+
+<Warning>
+  The secret key is server-side only. Never ship it in browser or mobile code. The public key is the one that is safe on a client. The same secret key also signs your webhooks.
+</Warning>
+
+Get both keys from the dashboard under **Developers**. Each environment has its own pair, identifiable by prefix:
+
+| | Test | Live |
+| --- | --- | --- |
+| Public | `pub_test_…` | `pub_live_…` |
+| Secret | `sec_test_…` | `sec_live_…` |
+
+<Note>
+  Initialize a transaction takes your public key rather than your secret key. Sending a secret key does not create the transaction — the key is looked up as a public key and the call fails.
+</Note>
+
+## Response format
+
+Successful responses use a `status` and `data` envelope.
+
+```json
+{
+  "status": "success",
+  "data": {},
+  "meta": {}
+}
+```
+
+`meta` echoes back whatever you passed in at initialization, which makes it the natural place for your own order ID.
+
+<Note>
+  Payment link endpoints return their fields at the top level with a `message` rather than inside `data`. Read the response schema on each page rather than assuming one shape across the whole API.
+</Note>
+
+## HTTP status codes
+
+| Code | Meaning |
+| --- | --- |
+| `200` | Succeeded. |
+| `400` | Validation failed, or an invalid key. |
+| `401` | No key provided. |
+| `403` | The key belongs to a different merchant. |
+| `404` | The resource does not exist. |
+| `422` | Wrong transaction state, or KYB incomplete. |
+| `500` | Server error. Also currently returned for amounts below the minimum. |
+| `503` | Upstream failure generating a quote or address. Retry. |
+
+<Card title="Errors and statuses" icon="triangle-alert" href="/payments/errors" horizontal>
+  Every transaction status and the errors each endpoint returns.
+</Card>
+
+## Idempotency
+
+Conversion endpoints accept an `Idempotency-Key` header. Send one — if a request times out you cannot tell whether the conversion happened, and retrying without a key risks converting twice. With it, the retry returns the cached result.
+
+Transactions are keyed on the reference you get back from initialization, so retrying a failed initialize is safe as long as you have not already stored a reference.
+
+## Taking a payment
+
+<Steps>
+  <Step title="Initialize">
+    `POST /transaction` with the amount, currency and customer email. Returns a reference, status `INITIATED`.
+  </Step>
+
+  <Step title="Initiate">
+    `POST /transaction/{transaction_id}/pay` with the currency the customer chose. Locks the rate, returns the address and QR code, moves to `PENDING`.
+  </Step>
+
+  <Step title="Wait for the webhook">
+    Give value on `payment.received`, not on the customer returning to your site.
+  </Step>
+
+  <Step title="Verify if you need to">
+    `GET /transaction/{transaction_id}/status` confirms state directly.
+  </Step>
+</Steps>
+
+<Card title="Accepting payments" icon="code" href="/payments/pay-ins" horizontal>
+  The same flow with worked examples and error handling.
+</Card>
+
+## Reference
+
+<CardGroup cols={2}>
+  <Card title="How it works" icon="route" href="/payments/how-it-works" horizontal />
+
+  <Card title="Webhooks" icon="webhook" href="/payments/webhooks" horizontal />
+
+  <Card title="Coverage and limits" icon="globe" href="/payments/coverage" horizontal />
+
+  <Card title="Testing" icon="flask" href="/payments/testing" horizontal />
+</CardGroup>

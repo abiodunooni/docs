@@ -148,7 +148,9 @@ Leg statuses sit on the nested objects: `fiat_deposit.status`, `crypto_payout.st
   </Accordion>
 
   <Accordion title="A limit was breached" icon="gauge-high">
-    The transaction is rejected before any money moves. Ramp never partially fills. Surface the message and offer a smaller amount where you can. See [Transaction tiers](/ramp/coverage#transaction-tiers).
+    The transaction is rejected before any money moves. Ramp never partially fills. Surface the message and offer a smaller amount where you can.
+
+    Daily caps are per customer over a rolling 24-hour window, so a blocked customer regains headroom as their earlier transactions age out — not at midnight. There is no endpoint for remaining headroom; track it yourself if you want to catch this before the rejection. See [Transaction tiers](/ramp/coverage#transaction-tiers).
   </Accordion>
 </AccordionGroup>
 

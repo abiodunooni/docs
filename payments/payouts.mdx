@@ -1,0 +1,118 @@
+---
+title: "Payouts"
+description: "Send funds to wallets, individually or in bulk, using saved beneficiaries."
+icon: "paper-plane"
+---
+
+Payouts send crypto from your Basqet account to external wallet addresses. Use them to pay suppliers, contractors and salaries, to cash customers out, and to issue refunds.
+
+<Note>
+  Payouts run from the dashboard today. An API for payouts is on the way — until then, this is a dashboard workflow.
+</Note>
+
+## The payout wallet
+
+Your payout wallet is separate from your collection wallet. Money you collect from customers and money you send out are kept apart, which keeps balances and reconciliation clean.
+
+You can also fund the payout wallet directly rather than moving money across from collections:
+
+<Steps>
+  <Step title="Open Payout">
+    Click **Payout** in the dashboard sidebar, then click **Receive**.
+  </Step>
+
+  <Step title="Pick a currency">
+    Select the currency you want to receive.
+  </Step>
+
+  <Step title="Share the address">
+    Copy the generated wallet address and send it to whoever is funding the wallet.
+  </Step>
+</Steps>
+
+## Beneficiaries
+
+Save recipients once and reuse them, rather than pasting a wallet address every time. Fewer manual entries means fewer payouts sent to the wrong address — and a crypto payout to the wrong address cannot be recovered.
+
+Beneficiaries live under **Settings → Beneficiary settings**.
+
+<Tabs>
+  <Tab title="Add one">
+    Click **Add single beneficiary**, fill in the details and save.
+
+    | Field | Description |
+    | --- | --- |
+    | Alias | A name to identify the recipient |
+    | Wallet address | The recipient's wallet address |
+    | Currency | The currency that wallet is for |
+  </Tab>
+
+  <Tab title="Add many">
+    Click **Add bulk beneficiaries**, then **Download template** to get the required CSV format. Fill it in and upload it. Every valid row is added to your list.
+  </Tab>
+
+  <Tab title="Export">
+    Find the beneficiaries table, click **Export CSV**, pick a date range and download.
+  </Tab>
+</Tabs>
+
+## Sending a payout
+
+<Tabs>
+  <Tab title="Single">
+    Go to **Payout**, click **Send**, and choose **Single Transfer**.
+
+    | Field | Description |
+    | --- | --- |
+    | Currency | The crypto you are sending |
+    | Recipient | A saved beneficiary, or new recipient details |
+    | Amount | How much to send |
+
+    Review the details, tick the confirmation box and confirm.
+  </Tab>
+
+  <Tab title="Bulk">
+    Go to **Payout**, click **Send**, and choose **Bulk Transfer**. You can either select recipients from a beneficiary list you have already uploaded, or upload a new CSV containing recipients and amounts.
+
+    Recipients and amounts populate automatically. Review the confirmation page, which lists every recipient and the transaction details, then confirm.
+  </Tab>
+</Tabs>
+
+## Networks
+
+<Warning>
+  The recipient's wallet address must be on the same network as the currency you are sending. Sending USDT on BEP-20 to an address that only supports ERC-20 loses the funds permanently. There is no recovery and no reversal.
+</Warning>
+
+| Currency | Network |
+| --- | --- |
+| USDT | BEP-20 (BNB Smart Chain) |
+| USDC | BEP-20 (BNB Smart Chain) |
+| BTC | Bitcoin |
+| LTC | Litecoin |
+| ETH | BEP-20 (BNB Smart Chain) |
+| QDX | BEP-20 (BNB Smart Chain) |
+
+<Card title="Coverage and limits" icon="globe" href="/payments/coverage" horizontal>
+  Full currency and network list, including the outstanding question on ETH.
+</Card>
+
+## Using payouts for refunds
+
+Refunds are not yet a self-serve action in the dashboard, so an agreed refund is processed as a payout to the customer's wallet address.
+
+If you set `refund_address` when you initiate a transaction, that address is stored on the transaction and you have it to hand when a refund comes up.
+
+<Card title="Refunds and chargebacks" icon="rotate-left" href="/payments/how-it-works#refunds-and-chargebacks" horizontal />
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Settlements" icon="building-columns" href="/payments/settlements" horizontal />
+
+  <Card title="Conversions and rates" icon="arrow-right-arrow-left" href="/payments/conversions" horizontal />
+
+  <Card title="Coverage and limits" icon="globe" href="/payments/coverage" horizontal />
+
+  <Card title="How it works" icon="route" href="/payments/how-it-works" horizontal />
+</CardGroup>

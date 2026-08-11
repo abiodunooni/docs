@@ -1,0 +1,110 @@
+---
+title: "Coverage and limits"
+description: "Currencies, networks, minimum amounts and settlement times for Payments."
+icon: "globe"
+---
+
+Retrieve currencies from the API rather than hard-coding them. New currencies and networks then reach your integration without a release.
+
+```bash
+curl 'https://api.basqet.com/v1/currency?type=CRYPTO' \
+  -H 'Authorization: Bearer sk_test_YOUR_SECRET_KEY'
+```
+
+## Pricing currencies
+
+You price a transaction in fiat, and the customer pays the equivalent in crypto.
+
+| Currency | Code | Minimum |
+| --- | --- | --- |
+| Nigerian naira | `NGN` | 2,000 |
+| United States dollar | `USD` | 1 |
+
+<Warning>
+  The Initialize Transaction API accepts `NGN` and `USD`. Minimums are also published for `EUR` and `GBP`, but those are not currently listed as accepted pricing currencies — confirm with your Quidax representative before building against them.
+</Warning>
+
+## Payment currencies
+
+What your customers can pay with.
+
+| Currency | Code | Network |
+| --- | --- | --- |
+| Tether | `USDT` | BEP-20 (BNB Smart Chain) |
+| USD Coin | `USDC` | BEP-20 (BNB Smart Chain) |
+| Bitcoin | `BTC` | Bitcoin |
+| Litecoin | `LTC` | Litecoin |
+| Ethereum | `ETH` | BEP-20 (BNB Smart Chain) |
+| Quidax Token | `QDX` | BEP-20 (BNB Smart Chain) |
+
+<Warning>
+  **ETH is listed on BEP-20, not Ethereum mainnet.** Confirm what this means for your integration before you show it to customers — a customer who sends ETH from Ethereum mainnet to a BEP-20 address can lose their funds permanently. This entry is pending confirmation.
+</Warning>
+
+The same currencies and networks are supported for payouts. Sending to an address on a different network than the one shown loses the funds — there is no recovery.
+
+## Minimum amounts
+
+Minimums are enforced against the fiat currency the transaction is priced in, not the crypto the customer pays with.
+
+| Currency | Minimum |
+| --- | --- |
+| `NGN` | 2,000 |
+| `USD` | 1 |
+
+They apply when you initialize a transaction and when you create a fixed-amount payment link. For links where the customer enters their own amount, the minimum is checked when the transaction is initialized, so validate the amount in your own interface first.
+
+<Note>
+  An amount below the minimum currently returns a `500` rather than a validation error. A clearer message is on the way. Until then, check the amount against the minimum before you call the API.
+</Note>
+
+## Settlement times
+
+| Currency | Processing time |
+| --- | --- |
+| NGN | Instant |
+| USD | To be confirmed |
+| EUR | To be confirmed |
+| GBP | To be confirmed |
+| Crypto | To be confirmed |
+
+<Info>
+  Settlement times outside NGN are being confirmed and will be published here. Ask your Quidax representative for the current figures for the currencies you settle in.
+</Info>
+
+Times depend on bank processing and blockchain network conditions.
+
+## Settlement fees
+
+Every settlement carries a fee that varies by currency. You choose who bears it:
+
+| Option | Effect |
+| --- | --- |
+| Merchant pays | The fee comes out of your settlement amount. |
+| Customer pays | The fee is added to the amount collected at checkout. |
+
+<Tip>
+  Settling in a stablecoin carries a gas cost of roughly 1 USDT. If you quote customers exact dollar amounts, account for it — settling a 4 USD payment in USDT does not land 4 USDT in your wallet.
+</Tip>
+
+## Restrictions
+
+Payments is subject to the same country and business restrictions as every Quidax product.
+
+<CardGroup cols={2}>
+  <Card title="Prohibited countries" icon="ban" href="/get-started/coverage#prohibited-countries" horizontal />
+
+  <Card title="Restricted activity" icon="shield-check" href="/get-started/licences#restricted-activity" horizontal />
+</CardGroup>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="How it works" icon="route" href="/payments/how-it-works" horizontal />
+
+  <Card title="Quickstart" icon="rocket" href="/payments/quickstart" horizontal />
+
+  <Card title="Settlements" icon="building-columns" href="/payments/settlements" horizontal />
+
+  <Card title="Quidax coverage" icon="map" href="/get-started/coverage" horizontal />
+</CardGroup>

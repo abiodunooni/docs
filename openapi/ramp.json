@@ -847,7 +847,7 @@
           "Rates and limits"
         ],
         "summary": "Get on-ramp limits",
-        "description": "Returns the minimum and maximum amounts a customer can spend in a given fiat currency. Check this before showing an amount input so your validation always matches the live limits.",
+        "description": "Returns the minimum and maximum amounts a customer can spend in a given fiat currency. Check this before showing an amount input so your validation always matches the live limits. Returns the cap only — there is no endpoint for a customer's consumed or remaining limit, so track consumption yourself if you need to show remaining headroom.",
         "operationId": "get-buy-limits",
         "parameters": [
           {
@@ -890,6 +890,7 @@
                             },
                             "interval": {
                               "type": "string",
+                              "description": "The window `max_value` is measured over. `daily` means a rolling 24-hour window per customer, not a calendar day — there is no fixed reset time or timezone. Headroom returns as individual transactions pass the 24-hour mark.",
                               "example": "daily"
                             }
                           }
@@ -926,7 +927,7 @@
           "Rates and limits"
         ],
         "summary": "Get off-ramp limits",
-        "description": "Returns the minimum and maximum amounts a customer can sell in a given digital asset.",
+        "description": "Returns the minimum and maximum amounts a customer can sell in a given digital asset. `max_value` is a per-customer cap over the `interval` returned alongside it; `daily` means a rolling 24-hour window, not a calendar day. Returns the cap only — there is no endpoint for a customer's consumed or remaining limit.",
         "operationId": "get-sell-limits",
         "parameters": [
           {

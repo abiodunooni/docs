@@ -1,0 +1,147 @@
+---
+title: "Testing"
+description: "Simulate every payment outcome in test mode before you take real money."
+icon: "flask"
+---
+
+Test wallets do not accept real blockchain transfers, so you cannot test by sending crypto. Instead you mark a transaction with the outcome you want, and Basqet behaves exactly as it would if that outcome had happened on-chain — including firing the webhook.
+
+<Note>
+  Test and live are fully isolated. Different keys, different data, different webhooks. Test mode needs no KYB, so you can build before verification completes.
+</Note>
+
+## What you can simulate
+
+| Outcome | Represents | What it exercises |
+| --- | --- | --- |
+| Successful | Customer paid in full | Webhook delivery, verification, balance updates, fulfilment |
+| Overpaid | Customer sent too much | Overpayment handling, reconciliation, credit or refund behaviour |
+| Underpaid | Customer sent too little | Partial payment handling, top-up flows, webhook behaviour |
+| Abandoned | Customer never paid | Expiry, order cancellation, releasing reserved stock |
+
+## Simulating from the payment page
+
+In test mode, a pay-in transaction generates a payment page with a test address, a QR code and an expiry timer — the same as live. What's different is a set of buttons for choosing the outcome.
+
+<Steps>
+  <Step title="Create a payment link">
+    From the dashboard or the API.
+  </Step>
+
+  <Step title="Open it and pick a currency">
+    Enter the payment details as a customer would.
+  </Step>
+
+  <Step title="Choose an outcome">
+    On the test payment page, click **Mark as Paid**, **Mark as Overpaid**, **Mark as Underpaid** or **Mark as Abandoned**.
+  </Step>
+</Steps>
+
+The status updates immediately and the matching webhook fires. Your application receives the same signals it would in live mode.
+
+<Note>
+  These buttons only exist in test mode. Real wallet addresses only exist in live mode.
+</Note>
+
+## Simulating through the API
+
+Better for automated tests, since it needs no browser.
+
+| | |
+| --- | --- |
+| **Method** | `POST` |
+| **Path** | `/v1/transaction/:transaction_id/trigger` |
+| **Auth** | Secret key |
+
+```bash
+curl -X POST 'https://api.basqet.com/v1/transaction/YOUR_TRANSACTION_ID/trigger' \
+  -H 'Authorization: Bearer sec_test_YOUR_SECRET_KEY' \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json' \
+  -d '{ "status": "successful" }'
+```
+
+| Outcome | Body |
+| --- | --- |
+| Successful | `{"status": "successful"}` |
+| Overpaid | `{"status": "overpaid"}` |
+| Underpaid | `{"status": "underpaid"}` |
+| Abandoned | `{"status": "abandoned"}` |
+
+The `transaction_id` comes from initializing a transaction in test mode.
+
+<Warning>
+  **This endpoint's exact shape is being confirmed.** It has been described both as a `POST` carrying a JSON body, as shown above, and as a `GET` taking `?status=` as a query parameter — with the path given variously with and without the `/transaction` segment. Check with your Quidax representative before wiring it into an automated test suite.
+</Warning>
+
+## A full test run
+
+<Steps>
+  <Step title="Initialize a transaction">
+    In test mode, with your test keys.
+  </Step>
+
+  <Step title="Initiate it">
+    Pick a currency so it moves to `PENDING` and gets an address.
+  </Step>
+
+  <Step title="Trigger an outcome">
+    Via the API or the payment page buttons.
+  </Step>
+
+  <Step title="Catch the webhook">
+    Confirm it arrives, the signature verifies, and you return `200`.
+  </Step>
+
+  <Step title="Verify independently">
+    Call `GET /v1/transaction/:id/status` and confirm it agrees with the webhook.
+  </Step>
+
+  <Step title="Check your own system">
+    Confirm your side did the right thing — fulfilled, held, or cancelled.
+  </Step>
+</Steps>
+
+Repeat for all four outcomes before switching to live.
+
+## What to cover before going live
+
+<AccordionGroup>
+  <Accordion title="Every transaction state" icon="list-check">
+    `INITIATED`, `PENDING`, `SUCCESSFUL`, `OVERPAID`, `UNDERPAID` and `ABANDONED` — each one handled, and each one reflected correctly in your interface.
+  </Accordion>
+
+  <Accordion title="Webhook signature verification" icon="shield-check">
+    Confirm a valid signature passes and a tampered payload is rejected. Watch for the lowercase header name.
+
+    <Card title="Webhooks" icon="webhook" href="/payments/webhooks#verifying-a-request" horizontal />
+  </Accordion>
+
+  <Accordion title="Duplicate webhooks" icon="fingerprint">
+    Replay the same event and confirm you do not give value twice. Use the retry endpoint to send it again.
+  </Accordion>
+
+  <Accordion title="Amounts below the minimum" icon="triangle-alert">
+    Submit an amount under the minimum and confirm you handle the rejection. It currently returns a `500` rather than a validation error, so make sure that does not surface to your customer as a generic failure.
+  </Accordion>
+
+  <Accordion title="Abandonment" icon="clock">
+    Confirm you release reserved stock or seats when `payment.abandoned` arrives, and that you are not relying on your own timer.
+  </Accordion>
+</AccordionGroup>
+
+<Card title="Go-live checklist" icon="rocket" href="/payments/quickstart#before-you-go-live" horizontal>
+  KYB, webhooks, keys and settlement configuration.
+</Card>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Webhooks" icon="webhook" href="/payments/webhooks" horizontal />
+
+  <Card title="Errors and statuses" icon="triangle-alert" href="/payments/errors" horizontal />
+
+  <Card title="Quickstart" icon="rocket" href="/payments/quickstart" horizontal />
+
+  <Card title="Accepting payments" icon="code" href="/payments/pay-ins" horizontal />
+</CardGroup>

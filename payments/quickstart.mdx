@@ -1,0 +1,167 @@
+---
+title: "Quickstart"
+description: "Get your keys, make your first call, and take one payment end to end."
+icon: "rocket"
+---
+
+This takes you from a new account to a confirmed payment. Everything here runs in test mode, so no real money moves.
+
+<Steps>
+  <Step title="Create your account">
+    Sign up for a Basqet merchant account.
+
+    You can build in test mode immediately. KYB verification is only required to switch to live mode and process real payments, so it does not block you from starting.
+  </Step>
+
+  <Step title="Get your API keys">
+    In the dashboard, go to **Developers** and find the **API keys** section. Copy your public key and your secret key.
+
+    Each environment has its own pair, and you can tell them apart by the prefix:
+
+    | Key | Test | Live |
+    | --- | --- | --- |
+    | Public | `pub_test_…` | `pub_live_…` |
+    | Secret | `sec_test_…` | `sec_live_…` |
+
+    <Warning>
+      The secret key belongs on your server only. Never put it in client-side code, a public repository or your logs. The public key is the one that is safe to expose.
+    </Warning>
+  </Step>
+
+  <Step title="Make your first request">
+    Fetch the list of supported currencies. It needs nothing set up beyond a valid key, so it is the quickest way to confirm you can reach the API.
+
+    ```bash
+    curl 'https://api.basqet.com/v1/currency' \
+      -H 'Authorization: Bearer sk_test_YOUR_SECRET_KEY'
+    ```
+
+    ```json
+    {
+      "status": "success",
+      "message": "Currencies fetched successfully",
+      "data": [
+        {
+          "id": 3,
+          "name": "Tether",
+          "slug": "USDT",
+          "type": "CRYPTO"
+        }
+      ]
+    }
+    ```
+
+    Note the `id` values. You need them in step 5 to say which currency the customer is paying with.
+  </Step>
+
+  <Step title="Initialize a transaction">
+    Create the record of what the customer owes. This uses your **public** key.
+
+    ```bash
+    curl -X POST 'https://api.basqet.com/v1/transaction' \
+      -H 'Authorization: Bearer pub_test_YOUR_PUBLIC_KEY' \
+      -H 'Content-Type: application/json' \
+      -d '{
+        "customer": {
+          "name": "Test User",
+          "email": "test-user@example.com"
+        },
+        "currency": "NGN",
+        "amount": "2000",
+        "description": "Order #1024",
+        "meta": { "order_id": "1024" }
+      }'
+    ```
+
+    The response comes back with `"status": "INITIATED"` and a `reference`. Keep the reference — every later step uses it.
+
+    Anything you put in `meta` is echoed back to you in the response and in webhooks, which makes it the natural place for your own order ID.
+  </Step>
+
+  <Step title="Initiate the payment">
+    Now say which currency the customer is paying with. This uses your **secret** key.
+
+    ```bash
+    curl -X POST 'https://api.basqet.com/v1/transaction/YOUR_REFERENCE/pay' \
+      -H 'Authorization: Bearer sec_test_YOUR_SECRET_KEY' \
+      -H 'Content-Type: application/json' \
+      -d '{ "currency_id": 3 }'
+    ```
+
+    The transaction moves to `PENDING` and the response carries what your customer needs:
+
+    - `payment_amount` — the exact amount of crypto to send
+    - `payment_address` — where to send it
+    - `qrCode` — a base64 QR code for the address
+
+    The rate is locked at this point, which is why you should only call this once the customer has actually chosen a currency.
+  </Step>
+
+  <Step title="Simulate the payment">
+    In test mode you can move the transaction to any outcome without sending real crypto, and the matching webhook fires just as it would in production.
+
+    <Card title="Testing" icon="flask" href="/payments/testing" horizontal>
+      How to trigger successful, underpaid, overpaid and abandoned outcomes.
+    </Card>
+  </Step>
+
+  <Step title="Handle the webhook">
+    Set your webhook URL in the dashboard, then verify the signature and respond `200` before doing any other work.
+
+    Give value when `payment.received` arrives — not when the customer returns to your site.
+
+    <Card title="Webhooks" icon="webhook" href="/payments/webhooks" horizontal />
+  </Step>
+</Steps>
+
+## Test and live
+
+The two environments are completely separate. Different keys, different data, different webhooks — nothing carries over between them.
+
+| | Test | Live |
+| --- | --- | --- |
+| Moves real funds | No | Yes |
+| Needs KYB approval | No | Yes |
+| Webhook endpoints | Configured separately | Configured separately |
+
+Switch between them with the toggle at the top right of the dashboard. Live mode unlocks once KYB is approved.
+
+<Warning>
+  Webhooks do not carry over. Register your endpoint again in live mode and verify signature handling there before you take a real payment.
+</Warning>
+
+## Before you go live
+
+<AccordionGroup>
+  <Accordion title="KYB approved" icon="id-card">
+    All documents submitted and your business profile complete. Without it you cannot switch to live mode.
+  </Accordion>
+
+  <Accordion title="Every outcome tested" icon="flask">
+    Successful, underpaid, overpaid and abandoned payments, each with the webhook handled correctly.
+  </Accordion>
+
+  <Accordion title="Webhooks configured in live" icon="webhook">
+    Endpoint publicly reachable, signature verified, responding `200`, processing events idempotently.
+  </Accordion>
+
+  <Accordion title="Live keys swapped in" icon="key">
+    Test keys replaced everywhere in your configuration, and the secret key kept off the client.
+  </Accordion>
+
+  <Accordion title="Settlement configured" icon="building-columns">
+    Settlement currency chosen and a default settlement account set, otherwise automatic settlement cannot run.
+  </Accordion>
+</AccordionGroup>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Accepting payments" icon="code" href="/payments/pay-ins" horizontal />
+
+  <Card title="SDKs and checkout" icon="window" href="/payments/sdks" horizontal />
+
+  <Card title="Webhooks" icon="webhook" href="/payments/webhooks" horizontal />
+
+  <Card title="Settlements" icon="building-columns" href="/payments/settlements" horizontal />
+</CardGroup>

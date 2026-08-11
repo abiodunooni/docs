@@ -1,0 +1,163 @@
+---
+title: "Payment links"
+description: "Collect payments with a shareable link, from the dashboard or the API."
+icon: "link"
+---
+
+A payment link is a Basqet-hosted checkout page you can share anywhere — WhatsApp, social media, email, SMS or a button on your site. The customer opens it, enters their email, picks a currency and pays. No integration required.
+
+| Use it for | |
+| --- | --- |
+| Invoicing | Send a link per invoice instead of building a checkout. |
+| Social commerce | Sell through channels that have no checkout of their own. |
+| Getting started | Take payments before your API integration is ready. |
+
+## Static and dynamic links
+
+| Type | Amount | Use for |
+| --- | --- | --- |
+| Static | Fixed when you create the link | Invoices, set-price products |
+| Dynamic | Entered by the customer at checkout | Donations, top-ups, variable billing |
+
+<Warning>
+  **Payment links are reusable.** Static or dynamic, a link can be paid through many times, and each use creates a new transaction. The link stays active until you delete it.
+
+  If you need a single-use payment that cannot be paid twice, initialize a transaction directly instead.
+</Warning>
+
+## Creating a link in the dashboard
+
+<Steps>
+  <Step title="Open Payment Links">
+    Go to **Payment Links** in the dashboard and click **Add Payment Link**.
+  </Step>
+
+  <Step title="Fill in the details">
+    | Field | What it does |
+    | --- | --- |
+    | Payment name | Identifies the payment in your dashboard. |
+    | Amount | What the customer pays. Omit for a dynamic link. |
+    | Currency | The fiat currency the item is priced in. Basqet converts to whatever the customer chooses to pay with. |
+  </Step>
+
+  <Step title="Create and share">
+    Click **Create Link**. Hover over the link in the list and click **Copy Link** to share it.
+  </Step>
+</Steps>
+
+You can view, copy and delete links from the same page. Payments made through them appear under **Transactions**.
+
+## What the customer sees
+
+<Steps>
+  <Step title="They enter their email">
+    This is how payments made through the link are attributed to a customer.
+  </Step>
+
+  <Step title="They pick a currency">
+    From the currencies you support.
+  </Step>
+
+  <Step title="They pay">
+    Basqet calculates the exact equivalent amount, generates a wallet address, and the customer sends the funds.
+  </Step>
+
+  <Step title="The status updates">
+    Once confirmed on-chain, the transaction updates and your webhook fires.
+  </Step>
+</Steps>
+
+## Creating links through the API
+
+Generate links on demand from your own systems instead of creating them by hand.
+
+### Create
+
+| | |
+| --- | --- |
+| **Method** | `POST` |
+| **Path** | `/v1/payment-links` |
+| **Auth** | Secret key |
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `title` | string | Yes | 2–100 characters. Display name for the link. |
+| `link_type` | string | Yes | `static` or `dynamic`. |
+| `currency` | string | Yes | `USD`, `NGN`, `GBP` or `EUR`. Uppercase. |
+| `amount` | string | Conditional | Required for `static`. Omit or send `null` for `dynamic`. |
+| `description` | string | No | Up to 255 characters. |
+| `metadata` | object | No | Your own JSON. Returned as-is. |
+| `pass_fee_to_customer` | boolean | No | Passes the processing fee to the customer. Defaults to `false`. |
+| `pass_settlement_fee_to_customer` | boolean | No | Passes the settlement fee to the customer. Defaults to `false`. |
+
+```bash
+curl -X POST 'https://api.basqet.com/v1/payment-links' \
+  -H 'Authorization: Bearer sec_live_xxxxxxxxxxxxx' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "title": "Invoice #1024",
+    "link_type": "static",
+    "currency": "USD",
+    "amount": "150.00",
+    "description": "Payment for design services",
+    "metadata": { "order_id": "order_1024" }
+  }'
+```
+
+```json
+{
+  "message": "Payment Link created",
+  "id": "bq_pl_aBcDeFgHiJkLmNo",
+  "title": "Invoice #1024",
+  "link_type": "static",
+  "currency": "USD",
+  "amount": 150.0,
+  "payment_url": "https://pay.basqet.com/pl_aBcDeFgHiJkLmNo",
+  "metadata": { "order_id": "order_1024" },
+  "created_at": "2026-04-22T10:30:00.000Z",
+  "last_used": null,
+  "deleted_at": null
+}
+```
+
+Share `payment_url`. For a dynamic link, send `link_type: "dynamic"` and leave `amount` out.
+
+<Note>
+  Payment links accept `GBP` and `EUR`, but the Initialize Transaction API accepts only `NGN` and `USD`. If you price in GBP or EUR, links are currently the only route. Confirm which currencies are enabled on your account during onboarding.
+</Note>
+
+### Manage
+
+| Action | Method | Path |
+| --- | --- | --- |
+| List | `GET` | `/v1/payment-links` |
+| Get one | `GET` | `/v1/payment-links/:id` |
+| Update | `PATCH` | `/v1/payment-links/:id` |
+| Delete | `DELETE` | `/v1/payment-links/:id` |
+
+All four use your secret key. `last_used` on a link tells you when it was last paid through, and `deleted_at` is set rather than the record disappearing.
+
+### Errors
+
+| Code | Error | What to do |
+| --- | --- | --- |
+| `400` | `missing_required_field` | Send `title`, `link_type` and `currency`. |
+| `400` | `invalid_link_type` | Must be exactly `static` or `dynamic`. |
+| `400` | `missing_amount` | `amount` is required when `link_type` is `static`. |
+| `400` | `invalid_amount` | Must be a number greater than `0`. |
+| `400` | `invalid_currency` | Check the currency is supported. |
+| `400` | `invalid_metadata` | `metadata` must be a valid JSON object. |
+| `404` | `merchant_user_not_found` | No merchant matches that secret key. |
+| `422` | Varies | Complete KYB before creating live-mode links. |
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Accepting payments" icon="code" href="/payments/pay-ins" horizontal />
+
+  <Card title="Webhooks" icon="webhook" href="/payments/webhooks" horizontal />
+
+  <Card title="Testing" icon="flask" href="/payments/testing" horizontal />
+
+  <Card title="Coverage and limits" icon="globe" href="/payments/coverage" horizontal />
+</CardGroup>

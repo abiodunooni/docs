@@ -19,6 +19,10 @@ Retrieve currencies, assets and limits from the API rather than hard-coding them
 NGN and GHS are live on both the widget and the API. ZAR, XAF and XOF are in progress — talk to your Quidax representative about timelines and early access.
 
 <Note>
+  A supported market does not mean every customer can use it. We do not work with people or businesses in prohibited countries, or with US or Chinese persons. See [Prohibited countries](/get-started/coverage#prohibited-countries) and [Restricted activity](/get-started/licences#restricted-activity).
+</Note>
+
+<Note>
   Need a market that is not listed? New corridor requests go through a feasibility review covering regulatory access, provider availability, expected volume and treasury cost. Corridors have been added in as little as four weeks where volume justifies it. Raise it with your Quidax representative.
 </Note>
 
@@ -79,7 +83,23 @@ curl 'https://ramp-be.quidax.io/api/v1/merchants/purchase_limits/buy?currency_sy
 
 ## Transaction tiers
 
-Limits are set per user and determined by how much verification has been completed. Caps are enforced per corridor, so reaching a daily cap in one market does not affect another.
+Customer limits apply **per customer, per day** — the ₦5,000,000 NGN buy cap and the 7,000 USDC sell cap are each what a single end customer can transact in a day, not a pool shared across your customer base. One customer reaching their cap does not consume headroom for the rest. The tier a customer sits in is determined by how much verification that customer has completed.
+
+Caps are enforced per corridor, so reaching a cap in one market does not affect another. On off-ramp the per-customer cap is 7,000 USDC per day; call [Get off-ramp limits](/api-reference/ramp/rates-and-limits/get-off-ramp-limits) for the live figure on each asset.
+
+The **API** tabs below describe account-level tiers for the business transacting on its own account. Those sit alongside the per-customer caps rather than replacing them, so check both when sizing throughput.
+
+### What "daily" means
+
+`daily` is a **rolling 24-hour window**, not a calendar day. There is no fixed reset time and no timezone to reason about.
+
+A customer who buys ₦5,000,000 at 15:00 has no headroom left until 15:00 the following day, when that spend ages out of the window. Because the window rolls continuously, headroom returns transaction by transaction as each one passes the 24-hour mark, rather than all at once at midnight.
+
+### Tracking consumption
+
+There is no endpoint that returns a customer's consumed or remaining limit. [Get on-ramp limits](/api-reference/ramp/rates-and-limits/get-on-ramp-limits) and [Get off-ramp limits](/api-reference/ramp/rates-and-limits/get-off-ramp-limits) return the cap itself, not how much of it is left.
+
+If you want to show a customer their remaining headroom, or block them before Ramp rejects them, track their confirmed transactions on your side over the same rolling 24-hour window.
 
 <Tabs>
   <Tab title="Widget">
@@ -113,7 +133,7 @@ Limits are set per user and determined by how much verification has been complet
   </Tab>
 
   <Tab title="API, aggregator">
-    For platforms serving sub-merchants. Limits are enforced per user, so sub-merchants are subject to the same limits as the aggregator.
+    For platforms serving sub-merchants. Sub-merchants are subject to the same limits as the aggregator. The per-customer caps above apply underneath these, to each sub-merchant's end customers.
 
     | Tier | Single | Daily | Monthly | Requirement |
     | --- | --- | --- | --- | --- |
@@ -124,12 +144,14 @@ Limits are set per user and determined by how much verification has been complet
 </Tabs>
 
 <Note>
-  Limit increases are reviewed against your processed volume. Moving to a new tier involves a compliance refresh, including updated source-of-funds documentation. Ask your merchant success manager to start the review.
+  Both customer caps and account tiers can be raised, and both go through review. Increases are assessed against processed volume and require additional documentation — for an account tier, a compliance refresh including updated source-of-funds evidence; for a customer, the verification listed against the higher tier. Ask your merchant success manager to start the review.
 </Note>
 
 ### Handling a limit breach
 
 A transaction that would exceed a limit is rejected before any money moves. Ramp never partially fills. Surface the message to your customer and, where you can, offer a smaller amount.
+
+Because the window rolls, a customer who is blocked now may have headroom again within hours without doing anything. If you tell them when to come back, base it on 24 hours from their earlier transactions, not on midnight.
 
 ## Settlement times
 

@@ -1,0 +1,68 @@
+---
+title: "SDKs and checkout"
+description: "Official libraries for the backend and the hosted checkout modal."
+icon: "window"
+---
+
+Two official packages cover the two halves of an integration: one for your server, one for your checkout page.
+
+<CardGroup cols={2}>
+  <Card title="basqet-node" icon="server" href="https://www.npmjs.com/package/payments-node">
+    Server-side library. Initialize transactions, fetch currencies and verify payments from your backend.
+  </Card>
+
+  <Card title="basqet-checkout" icon="window" href="https://www.npmjs.com/package/payments-checkout">
+    Client-side library. Embed the payment modal in your site so customers pay without leaving checkout.
+  </Card>
+</CardGroup>
+
+Both are typed, and each ships its own installation and usage documentation on npm.
+
+## Which to use
+
+| | Checkout SDK | Direct API |
+| --- | --- | --- |
+| Who builds the payment screen | Basqet | You |
+| Currency picker, address, QR code | Handled for you | You render them |
+| Effort | Embed the modal | Two REST calls plus your own interface |
+| Control over the experience | Standard checkout | Complete |
+
+<Tip>
+  Use the checkout modal unless you have a specific reason not to. It handles the currency picker, the address display, the QR code and the countdown — all the parts customers get wrong — and you still receive the same webhooks.
+</Tip>
+
+## How the modal fits together
+
+<Steps>
+  <Step title="Initialize on your server">
+    Call `POST /v1/transaction` from your backend with the amount and the customer's email. Never do this from the browser, since it would expose your keys.
+  </Step>
+
+  <Step title="Open the modal">
+    Pass the transaction reference to `basqet-checkout` on the client. The customer picks a currency and pays inside the modal.
+  </Step>
+
+  <Step title="Act on the webhook">
+    Give value when `payment.received` arrives on your server. The modal closing is not confirmation that the customer paid.
+  </Step>
+</Steps>
+
+<Warning>
+  Your secret key belongs on the server only. The public key is the one that can safely reach the browser.
+</Warning>
+
+<Info>
+  Detailed installation and configuration for both packages lives on npm. Fuller worked examples are being added here — ask your Quidax representative if you need one in the meantime.
+</Info>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Accepting payments" icon="code" href="/payments/pay-ins" horizontal />
+
+  <Card title="Quickstart" icon="rocket" href="/payments/quickstart" horizontal />
+
+  <Card title="Webhooks" icon="webhook" href="/payments/webhooks" horizontal />
+
+  <Card title="Payment links" icon="link" href="/payments/payment-links" horizontal />
+</CardGroup>

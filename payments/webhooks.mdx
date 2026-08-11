@@ -1,0 +1,192 @@
+---
+title: "Webhooks"
+description: "Receive payment outcomes in real time, verify they came from Basqet, and process them safely."
+icon: "webhook"
+---
+
+A payment moves through several states before it settles, and the final one is what matters. Webhooks are how you learn it. Basqet sends an HTTP `POST` to your server as each status changes.
+
+<Warning>
+  Give value on the webhook, never on your customer being redirected back to your site. A customer who closes the tab after paying still paid, and one who returns without paying has not.
+</Warning>
+
+## Setting your URL
+
+Set your webhook URL under **Developer Settings** in the dashboard. It must be publicly reachable and unauthenticated — Basqet cannot log in to your server.
+
+<Warning>
+  Webhooks are environment-specific. A URL registered in test mode receives test events only, and nothing carries over to live. Register your endpoint again in live mode and verify signature handling there before taking a real payment.
+</Warning>
+
+## Verifying a request
+
+Anyone can `POST` to a public URL. Verify the signature before you act on a payload, or you are one forged request away from shipping goods nobody paid for.
+
+Every genuine request carries a `basqetSignature` header: an **HMAC SHA512** of the payload, generated with your secret key. Compute the same hash over the body you received and compare.
+
+```javascript
+const crypto = require('crypto');
+const secret = process.env.BASQET_SECRET_KEY;
+
+app.post('/webhooks/payments', (req, res) => {
+  const hash = crypto
+    .createHmac('sha512', secret)
+    .update(JSON.stringify(req.body))
+    .digest('hex');
+
+  // Node lowercases incoming header names
+  if (hash !== req.headers['basqetsignature']) {
+    return res.sendStatus(401);
+  }
+
+  res.sendStatus(200); // acknowledge first
+  processEvent(req.body); // then do the work
+});
+```
+
+<Warning>
+  Node lowercases incoming header names, so read `req.headers['basqetsignature']`, not `req.headers['basqetSignature']`. The camel-case version is always `undefined`, which means the comparison silently fails and you process nothing.
+</Warning>
+
+## Responding
+
+Return `200` as soon as you receive the request. Basqet ignores everything else about your response — only the status code matters.
+
+Acknowledge **before** you do any real work. If your handler writes to a database, calls another service or sends an email before responding, a slow moment turns into a timeout, and a timeout triggers a retry of an event you already processed.
+
+## Events
+
+| Event | Fires when |
+| --- | --- |
+| `payment.initiated` | The transaction has been initialized. |
+| `payment.pending` | An address has been issued and payment is awaited. |
+| `payment.received` | Payment has been confirmed. |
+| `payment.abandoned` | The transaction expired without payment. |
+| `wallet.updated` | A wallet balance changed. |
+
+## Payloads
+
+<Tabs>
+  <Tab title="Transaction">
+    ```json
+    {
+      "event": "payment.received",
+      "data": {
+        "transaction": {
+          "reference": "bq_RkaUV0Zy3PGpQsT8c",
+          "merchant_name": "Bar BQ Express",
+          "payment_currency": 3,
+          "payment_currency_name": "Bitcoin",
+          "payment_currency_slug": "BTC",
+          "status": "SUCCESSFUL",
+          "customer_email": "sample@email.com",
+          "customer_name": "John Doe",
+          "payment_amount": 1,
+          "amount_paid": 1,
+          "description": "Payment for Lamborghini",
+          "is_live": false,
+          "created_at": "2026-02-09T16:18:20.000Z",
+          "meta": {}
+        }
+      }
+    }
+    ```
+
+    | Field | Description |
+    | --- | --- |
+    | `reference` | Basqet transaction reference. Your key for everything. |
+    | `status` | `INITIATED`, `PENDING`, `SUCCESSFUL` or `ABANDONED`. |
+    | `payment_amount` | What the customer was asked to send. |
+    | `amount_paid` | What actually arrived. Compare the two. |
+    | `payment_currency_slug` | What they paid with, for example `BTC`. |
+    | `customer_email` | The email supplied at initialization. |
+    | `is_live` | `false` for test transactions. |
+    | `meta` | Whatever you passed in at initialization. |
+
+    <Tip>
+      `amount_paid` against `payment_amount` is how you spot an over or underpayment without waiting for a separate signal.
+    </Tip>
+  </Tab>
+
+  <Tab title="Wallet">
+    ```json
+    {
+      "event": "wallet.updated",
+      "data": {
+        "wallet": {
+          "transaction_reference": "bq_RkaUV0Zy3PGpQsT8c",
+          "amount": 10.1178,
+          "available_balance": 6.8399,
+          "ledger_balance": 0,
+          "currency": "USDC",
+          "name": "USD Coin",
+          "type": "CRYPTO",
+          "is_live": false
+        }
+      }
+    }
+    ```
+
+    | Field | Description |
+    | --- | --- |
+    | `transaction_reference` | What caused the balance change. |
+    | `amount` | How much was added. |
+    | `available_balance` | Balance you can spend. |
+    | `ledger_balance` | Ledger balance. |
+    | `currency` | Which wallet changed, for example `USDC`. |
+
+    A wallet conversion usually produces two of these — one for the debit, one for the credit — sharing a `transaction_reference`.
+  </Tab>
+</Tabs>
+
+## Retries and idempotency
+
+If Basqet does not receive a `200`, or your endpoint times out, the event is sent again. That means **you will occasionally receive the same event twice**, and you must handle it.
+
+Record every event you process, keyed on the transaction reference and event type. Check that record before giving value. Without this, one retry can ship an order twice or credit an account twice.
+
+You can also replay an event yourself:
+
+| | |
+| --- | --- |
+| **Method** | `GET` |
+| **Path** | `/v1/transaction/:transaction_id/webhook` |
+| **Auth** | Public or secret key |
+
+Useful when your endpoint was down and you want the event resent rather than reconstructing state by hand.
+
+## Checklist
+
+<AccordionGroup>
+  <Accordion title="Verify every signature" icon="shield-check">
+    HMAC SHA512 with your secret key, compared against `basqetsignature`. Reject anything that does not match.
+  </Accordion>
+
+  <Accordion title="Respond 200 immediately" icon="bolt">
+    Acknowledge first, process after. Slow handlers cause timeouts, and timeouts cause duplicates.
+  </Accordion>
+
+  <Accordion title="Process idempotently" icon="fingerprint">
+    Track what you have already handled. Assume every event can arrive more than once.
+  </Accordion>
+
+  <Accordion title="Register in both environments" icon="arrows-rotate">
+    Test and live are separate. Configure and verify each one.
+  </Accordion>
+
+  <Accordion title="Reconcile with verify" icon="list-check">
+    Use `GET /v1/transaction/:id/status` when a webhook is delayed or you need to confirm state directly.
+  </Accordion>
+</AccordionGroup>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Testing" icon="flask" href="/payments/testing" horizontal />
+
+  <Card title="Errors and statuses" icon="triangle-alert" href="/payments/errors" horizontal />
+
+  <Card title="Accepting payments" icon="code" href="/payments/pay-ins" horizontal />
+
+  <Card title="How it works" icon="route" href="/payments/how-it-works" horizontal />
+</CardGroup>

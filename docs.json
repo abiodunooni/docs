@@ -146,9 +146,31 @@
         "tab": "Payment",
         "groups": [
           {
-            "group": "Basqet",
+            "group": "Overview",
             "pages": [
-              "basqet"
+              "payments",
+              "payments/how-it-works",
+              "payments/coverage"
+            ]
+          },
+          {
+            "group": "Integrate",
+            "pages": [
+              "payments/quickstart",
+              "payments/sdks",
+              "payments/pay-ins",
+              "payments/payment-links",
+              "payments/payouts",
+              "payments/settlements",
+              "payments/conversions",
+              "payments/webhooks"
+            ]
+          },
+          {
+            "group": "Launch",
+            "pages": [
+              "payments/testing",
+              "payments/errors"
             ]
           }
         ]
@@ -250,6 +272,52 @@
                 "group": "Banks",
                 "pages": [
                   "api-reference/ramp/banks/list-supported-institutions"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Payments",
+            "pages": [
+              "api-reference/payments/introduction",
+              {
+                "group": "Transactions",
+                "pages": [
+                  "api-reference/payments/transactions/initialize-a-transaction",
+                  "api-reference/payments/transactions/initiate-a-payment",
+                  "api-reference/payments/transactions/verify-a-transaction"
+                ]
+              },
+              {
+                "group": "Payment links",
+                "pages": [
+                  "api-reference/payments/payment-links/create-a-payment-link",
+                  "api-reference/payments/payment-links/list-payment-links",
+                  "api-reference/payments/payment-links/get-a-payment-link",
+                  "api-reference/payments/payment-links/update-a-payment-link",
+                  "api-reference/payments/payment-links/delete-a-payment-link"
+                ]
+              },
+              {
+                "group": "Conversions and rates",
+                "pages": [
+                  "api-reference/payments/conversions-and-rates/get-an-exchange-rate",
+                  "api-reference/payments/conversions-and-rates/create-a-conversion-quote",
+                  "api-reference/payments/conversions-and-rates/execute-a-wallet-conversion",
+                  "api-reference/payments/conversions-and-rates/list-wallet-conversions"
+                ]
+              },
+              {
+                "group": "Testing",
+                "pages": [
+                  "api-reference/payments/testing/update-a-test-transaction-status",
+                  "api-reference/payments/testing/resend-a-webhook-event"
+                ]
+              },
+              {
+                "group": "Reference",
+                "pages": [
+                  "api-reference/payments/reference/list-supported-currencies"
                 ]
               }
             ]

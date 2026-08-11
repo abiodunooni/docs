@@ -1,0 +1,128 @@
+---
+title: "How it works"
+description: "The payment lifecycle, every transaction status, and what happens when a payment goes wrong."
+icon: "route"
+---
+
+A Basqet payment is priced in fiat and paid in crypto. You tell Basqet what the customer owes in NGN or USD, the customer chooses a coin, and Basqet locks a rate, generates an address and watches the chain until the money arrives.
+
+## The lifecycle
+
+<Steps>
+  <Step title="Initialize the transaction">
+    `POST /v1/transaction` with the customer's email, the amount and the pricing currency.
+
+    You get back a reference and a status of `INITIATED`. No address exists yet, and no rate has been locked — this is just a record of what the customer owes.
+  </Step>
+
+  <Step title="Initiate the payment">
+    `POST /v1/transaction/:transaction_id/pay` with the currency the customer chose.
+
+    Basqet converts the fiat amount at the current rate, generates a wallet address, returns a QR code, and moves the transaction to `PENDING`. The rate is fixed at this point.
+  </Step>
+
+  <Step title="The customer sends the crypto">
+    They send `payment_amount` of the chosen currency to `payment_address`. Basqet monitors the address and confirms the transfer on-chain.
+  </Step>
+
+  <Step title="Basqet tells you the outcome">
+    A webhook fires as soon as the outcome is known — paid in full, underpaid, overpaid, or abandoned because nothing arrived in time.
+  </Step>
+
+  <Step title="Funds reach your balance">
+    A completed payment credits your Basqet balance, converted to your settlement currency if you have that switched on. From there it settles to a bank account or a wallet.
+
+    <Card title="Settlements" icon="building-columns" href="/payments/settlements" horizontal />
+  </Step>
+</Steps>
+
+<Tip>
+  Initialize and initiate are separate on purpose. Initialize as soon as you know the amount, and initiate only once the customer has picked a currency — that way the rate is locked as late as possible, when they are actually about to pay.
+</Tip>
+
+## Transaction statuses
+
+| Status | What it means | What to do |
+| --- | --- | --- |
+| `INITIATED` | The transaction exists and the amount is set. No address, no rate. | Show the currency picker. Nothing is owed yet. |
+| `PENDING` | An address and amount have been issued, and the rate is locked. Awaiting the transfer. | Show the address, amount and QR code. Wait for the webhook. |
+| `PROCESSING` | A transfer has been seen and is being confirmed. | Show the customer that payment is being confirmed. Wait. |
+| `SUCCESSFUL` | The correct amount arrived and was confirmed. | Give value. |
+| `FAILED` | The payment did not complete. | Do not give value. Contact support with the reference if the customer says they paid. |
+| `UNDERPAID` | Less than the required amount arrived. | See [Underpayments](#when-the-amount-is-wrong). Do not give value unless you have chosen to accept underpayments. |
+| `OVERPAID` | More than the required amount arrived. | Give value. The excess is credited or refunded depending on your setting. |
+| `ABANDONED` | Nothing arrived before the window closed. | Release any reserved stock or seats. The customer must start again. |
+
+<Warning>
+  Give value on the webhook, never on your customer being redirected back to your site. A customer who closes the tab after paying still paid, and one who returns without paying has not.
+</Warning>
+
+## When a payment is abandoned
+
+A `PENDING` transaction that receives nothing expires after **60 minutes** and moves to `ABANDONED`. This is automatic and system-triggered — no customer action is involved, and you do not need to poll for it. Basqet sends a `payment.abandoned` webhook when it happens.
+
+<Note>
+  The 60-minute window can change. Because Basqet notifies you of every status change, you do not need to track the deadline yourself — treat the webhook as the trigger rather than running your own timer.
+</Note>
+
+Abandonment means the customer never sent anything. A transaction where money arrived late is handled as a payment, not an abandonment — contact support with the reference if funds turn up after the window has closed.
+
+## When the amount is wrong
+
+The customer is quoted an exact amount of crypto. Wallet fees, provider fees and rounding all mean the amount that arrives can differ from the amount quoted.
+
+<AccordionGroup>
+  <Accordion title="Underpayments" icon="arrow-down">
+    Less arrived than was required.
+
+    **By default the payment is refunded to the customer and nothing is credited to you.** You can change this in the dashboard under Settings → Business Settings → Dispute Settings, by enabling **Allow transactions with underpayments to be credited**. With it on, underpaid transactions credit your balance in full for the amount that actually arrived.
+
+    Most underpayments have the same cause: the customer's wallet or exchange deducted its own withdrawal fee from the amount sent. Telling customers to check that their provider's fee is not coming out of the total is the single most effective thing you can do to reduce them.
+  </Accordion>
+
+  <Accordion title="Overpayments" icon="arrow-up">
+    More arrived than was required.
+
+    **By default the full amount is credited to you.** You can instead enable **Automatically refund overpayments to customers** under Settings → Business Settings → Dispute Settings. With it on, the excess is refunded and the customer receives an email asking where to send it.
+  </Accordion>
+</AccordionGroup>
+
+<Info>
+  Reversals for over and underpayments are currently handled manually. Send the customer's wallet address to support and the reversal is issued from there. A published turnaround time is still being confirmed.
+</Info>
+
+## Refunds and chargebacks
+
+**There are no chargebacks.** Crypto payments are final once confirmed on-chain, so there is no mechanism for a customer's bank or wallet provider to claw a payment back. This is a meaningful difference from card payments, and it is worth reflecting in how you handle disputes.
+
+Refunds are not yet available as a self-serve action in the dashboard. Where a refund is agreed, you process it as a payout from your dashboard to the customer's wallet address.
+
+<Card title="Payouts" icon="paper-plane" href="/payments/payouts" horizontal>
+  How to send funds to a wallet or bank account.
+</Card>
+
+## Webhook events
+
+| Event | Fires when |
+| --- | --- |
+| `payment.initiated` | The transaction has been initialized. |
+| `payment.pending` | An address has been issued and payment is awaited. |
+| `payment.received` | Payment has been confirmed. |
+| `payment.abandoned` | The transaction expired without payment. |
+| `wallet.updated` | A wallet balance changed. |
+
+<Card title="Webhooks" icon="webhook" href="/payments/webhooks" horizontal>
+  Payload shapes, signature verification and retries.
+</Card>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/payments/quickstart" horizontal />
+
+  <Card title="Accepting payments" icon="code" href="/payments/pay-ins" horizontal />
+
+  <Card title="Coverage and limits" icon="globe" href="/payments/coverage" horizontal />
+
+  <Card title="Errors and statuses" icon="triangle-alert" href="/payments/errors" horizontal />
+</CardGroup>

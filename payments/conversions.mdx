@@ -1,0 +1,151 @@
+---
+title: "Conversions and rates"
+description: "Preview a rate, or move balances between your Basqet wallet currencies."
+icon: "arrow-right-arrow-left"
+---
+
+Two related APIs, doing different jobs. Pick the wrong one and you either move money you meant to quote, or quote money you meant to move.
+
+| | What it does | Use it when |
+| --- | --- | --- |
+| **Exchange rates** | Returns a live rate and equivalent amount | You only need a preview. Nothing moves. |
+| **Wallet conversions** | Debits one wallet and credits another | You want to actually change your balances. |
+
+## Exchange rates
+
+Fetch a real-time rate between two supported currencies. Use it to show customers an estimate before payment, to price a checkout, or to drive an internal dashboard.
+
+| | |
+| --- | --- |
+| **Method** | `POST` |
+| **Path** | `/v1/exchange-rates` |
+| **Auth** | Secret key |
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `base_currency` | string | Yes | The currency you are converting from. |
+| `quote_currency` | string | Yes | The currency you are converting to. |
+| `amount` | number or string | Yes | Amount in `base_currency`. Positive. |
+
+Send an `Idempotency-Key` header to make a timed-out request safe to retry — reusing the key within the quote window replays the same response.
+
+```bash
+curl -X POST 'https://api.basqet.com/v1/exchange-rates' \
+  -H 'Authorization: Bearer sec_live_xxxxxxxxxxxxx' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "base_currency": "USD",
+    "quote_currency": "NGN",
+    "amount": 100
+  }'
+```
+
+You get back a `rate_id`, the `rate`, the `base_amount`, the `quote_amount` and an `expires_at`. The mental model is `quote_amount = base_amount × rate`.
+
+Supported slugs include `NGN`, `USD`, `GBP`, `EUR`, `USDT`, `USDC`, `BTC`, `ETH`, `LTC` and `QDX`. Quoting a currency against itself returns a rate of `1`.
+
+<Warning>
+  Rate quotes are previews, not guaranteed pricing. Refresh when the quote expires or when the customer changes the amount, and never treat a stored rate as still valid.
+</Warning>
+
+<Note>
+  Public keys are not accepted here. Use your secret key, which means calling this from your server rather than the browser.
+</Note>
+
+## Wallet conversions
+
+Moves real money between your own Basqet wallets. Debits the source, credits the destination, and records the movement so you can reconcile it later.
+
+Use it to rebalance, to prepare a currency ahead of payouts, to reduce exposure to a currency you are holding, or to track treasury movements against your own references.
+
+Supported currencies are `NGN`, `USDT`, `USDC`, `BTC`, `ETH`, `LTC` and `QDX`. Source and destination must differ.
+
+### 1. Get a quote
+
+| | |
+| --- | --- |
+| **Method** | `POST` |
+| **Path** | `/v1/wallets/conversions/quotes` |
+| **Auth** | Secret key |
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `from_currency` | string | Yes | Wallet to debit. |
+| `to_currency` | string | Yes | Wallet to credit. Must differ from `from_currency`. |
+| `amount` | number | Yes | Amount to convert from the source wallet. |
+
+The quote tells you what leaves, what arrives, the rate, and when it expires.
+
+<Warning>
+  **Quotes last about 10 seconds.** Execute immediately. A quote can only be used once, and cannot be reused after a successful conversion.
+</Warning>
+
+### 2. Execute it
+
+| | |
+| --- | --- |
+| **Method** | `POST` |
+| **Path** | `/v1/wallets/conversions` |
+| **Auth** | Secret key |
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `quote_id` | string | Yes | The `cq_`-prefixed ID from the quote. |
+| `reference` | string | No | Your own reference. Up to 255 characters, unique to your account. |
+
+```bash
+curl -X POST 'https://api.basqet.com/v1/wallets/conversions' \
+  -H 'Authorization: Bearer sec_live_xxxxxxxxxxxxx' \
+  -H 'Content-Type: application/json' \
+  -H 'Idempotency-Key: your-unique-key' \
+  -d '{
+    "quote_id": "cq_aBcDeFgHiJkLmNo",
+    "reference": "treasury-op-1024"
+  }'
+```
+
+<Tip>
+  Always send `Idempotency-Key`. If your request times out you cannot tell whether the conversion happened, and retrying without the key risks converting twice. With it, the retry returns the cached result instead.
+</Tip>
+
+Store the `conversion_id`, `rate_id`, `reference`, `from_amount`, `to_amount` and `rate_used`. That is what you need for reconciliation later.
+
+### 3. List them back
+
+`GET /v1/wallets/conversions` returns your conversion history, with `limit` (1–100, default 50), `offset` and `reference` as query parameters. Filtering by `reference` is the quickest way to answer "did this treasury operation go through".
+
+### Things worth knowing
+
+- Basqet processes **one conversion at a time** per account, which protects your balances from race conditions but means conversions queue rather than run in parallel.
+- Quotes and conversions never cross between test and live.
+- A successful conversion usually produces two `wallet.updated` webhooks — one for the debit, one for the credit. Match them to the conversion using `transaction_reference`.
+
+## Which one do I want?
+
+<AccordionGroup>
+  <Accordion title="I want to show a customer what something costs in their currency" icon="eye">
+    Exchange rates. Nothing moves, and you can call it as often as you need.
+  </Accordion>
+
+  <Accordion title="I want to stop holding naira and hold USDT instead" icon="arrow-right-arrow-left">
+    Wallet conversions. Quote, then execute within the window.
+  </Accordion>
+
+  <Accordion title="I want everything I collect to arrive as one currency" icon="building-columns">
+    Neither — that is a settlement setting, applied automatically as payments arrive.
+
+    <Card title="Settlements" icon="building-columns" href="/payments/settlements" horizontal />
+  </Accordion>
+</AccordionGroup>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Settlements" icon="building-columns" href="/payments/settlements" horizontal />
+
+  <Card title="Payouts" icon="paper-plane" href="/payments/payouts" horizontal />
+
+  <Card title="Webhooks" icon="webhook" href="/payments/webhooks" horizontal />
+
+  <Card title="Coverage and limits" icon="globe" href="/payments/coverage" horizontal />
+</CardGroup>

@@ -1,0 +1,144 @@
+---
+title: "Errors and statuses"
+description: "Every transaction status, the errors each endpoint returns, and what to do about them."
+icon: "triangle-alert"
+---
+
+## Transaction statuses
+
+| Status | Meaning | What to do |
+| --- | --- | --- |
+| `INITIATED` | The transaction exists. No address, no rate. | Show the currency picker. |
+| `PENDING` | Address issued, rate locked, awaiting the transfer. | Show the address, amount and QR code. |
+| `PROCESSING` | A transfer has been seen and is being confirmed. | Tell the customer it is confirming. Wait. |
+| `SUCCESSFUL` | The correct amount arrived. | Give value. |
+| `OVERPAID` | More arrived than required. | Give value. The excess is credited or refunded per your setting. |
+| `UNDERPAID` | Less arrived than required. | Do not give value unless you accept underpayments. |
+| `ABANDONED` | Nothing arrived within 60 minutes. | Release reserved stock. The customer must start again. |
+| `FAILED` | The payment did not complete. | Do not give value. Contact support with the reference. |
+
+<Tip>
+  Branch on the status, not on the message. Messages are written for humans and get reworded; status values are stable.
+</Tip>
+
+## HTTP errors
+
+| Code | Meaning | What to do |
+| --- | --- | --- |
+| `400` | Validation failed, or an invalid key | Check required fields and the key prefix. |
+| `401` | No key provided | Include the `Authorization` header. |
+| `403` | Not permitted | The key belongs to a different merchant than the one that created the transaction. |
+| `404` | Not found | Bad transaction ID, unsupported currency, or an inactive account. |
+| `422` | Wrong state, or KYB incomplete | Complete KYB for live mode, or check the transaction is in the state the call expects. |
+| `500` | Server error | Retry, then contact support. Also currently returned for amounts below the minimum. |
+| `503` | Upstream failure | The rate quote or address could not be generated. Retry. |
+
+## By endpoint
+
+<AccordionGroup>
+  <Accordion title="Initialize transaction" icon="plus">
+    | Code | Cause | What to do |
+    | --- | --- | --- |
+    | `400` | Validation error | Send `customer.email`, `amount` and `currency`. The email must be valid and the amount a numeric string. Also returned if you send both `public_key` and `payment_link`. |
+    | `404` | Invalid public key | Check the key or link slug, that the account is active, and that the fiat currency is supported. |
+    | `422` | KYB status | Complete KYB before initializing live transactions. |
+    | `500` | Server error | Retry, then contact support. |
+
+    <Warning>
+      This endpoint takes your **public** key. Sending a secret key does not create the transaction — the key is looked up as a public key and fails.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="Initiate transaction" icon="wallet">
+    | Code | Cause | What to do |
+    | --- | --- | --- |
+    | `400` | Missing or invalid fields | `currency_id` must be present and numeric. Check the `refund_address` format. |
+    | `404` | Varies | Invalid `transaction_id`, unsupported `currency_id`, or the merchant's processor is not configured. |
+    | `422` | Not initiated | The transaction must still be `INITIATED`. Also returned if the account is inactive. |
+    | `500` | Server error | Retry, then contact support. |
+    | `503` | Upstream error | The price quote or address could not be generated. Retry. |
+  </Accordion>
+
+  <Accordion title="Verify transaction" icon="magnifying-glass">
+    | Code | Cause | What to do |
+    | --- | --- | --- |
+    | `400` | Invalid key | The `Authorization` header needs a valid `pub_` or `sec_` key. |
+    | `401` | No key provided | Include the header. |
+    | `403` | Not permitted | The key belongs to a different merchant than the transaction. |
+    | `404` | Transaction does not exist | Check the reference in the path. |
+    | `500` | Server error | Retry. |
+  </Accordion>
+
+  <Accordion title="Payment links" icon="link">
+    | Code | Error | What to do |
+    | --- | --- | --- |
+    | `400` | `missing_required_field` | Send `title`, `link_type` and `currency`. |
+    | `400` | `invalid_link_type` | Exactly `static` or `dynamic`. |
+    | `400` | `missing_amount` | Required when `link_type` is `static`. |
+    | `400` | `invalid_amount` | Must be greater than `0`. |
+    | `400` | `invalid_currency` | Check the currency is supported. |
+    | `400` | `invalid_metadata` | Must be a valid JSON object. |
+    | `404` | `merchant_user_not_found` | No merchant matches that secret key. |
+    | `422` | Varies | Complete KYB before creating live-mode links. |
+  </Accordion>
+</AccordionGroup>
+
+## Common situations
+
+<AccordionGroup>
+  <Accordion title="A payment came in short" icon="arrow-down">
+    Almost always the customer's wallet or exchange deducting its own withdrawal fee from the amount sent.
+
+    By default underpayments are refunded and nothing is credited to you. You can accept them instead under **Settings → Business Settings → Dispute Settings**.
+
+    The fix that actually works is preventative: tell customers at checkout to check their provider's fee is not coming out of the total.
+  </Accordion>
+
+  <Accordion title="A payment came in over" icon="arrow-up">
+    By default the full amount is credited to you. You can enable automatic refunds of the excess instead, in the same settings section. With that on, the customer receives an email asking where to send it.
+  </Accordion>
+
+  <Accordion title="A transaction went to abandoned" icon="clock">
+    Nothing arrived within 60 minutes of the transaction being initiated. This is automatic and system-triggered.
+
+    If a customer insists they paid, contact support with the reference — money that arrives after the window is handled as a payment, not an abandonment.
+  </Accordion>
+
+  <Accordion title="A customer wants a refund" icon="rotate-left">
+    There are no chargebacks. Crypto payments are final once confirmed, so no bank or wallet provider can reverse one.
+
+    Refunds are not yet self-serve in the dashboard. Process an agreed refund as a payout to the customer's wallet address. Setting `refund_address` when you initiate the transaction saves you chasing it later.
+
+    <Card title="Payouts" icon="paper-plane" href="/payments/payouts" horizontal />
+  </Accordion>
+
+  <Accordion title="Funds were sent on the wrong network" icon="link-slash">
+    Sending an asset to an address on a different network loses the funds. There is no recovery and no reversal — this is a property of the blockchain, not a Basqet policy.
+
+    Validate the network in your interface before showing an address.
+  </Accordion>
+
+  <Accordion title="A 500 with no useful detail" icon="bug">
+    The known cause is an amount below the minimum for the currency — 2,000 for NGN, 1 for USD. A clearer validation message is on the way.
+
+    Check the amount against the minimum before you call the API. If the amount is fine, retry and then contact support with the reference and timestamp.
+  </Accordion>
+</AccordionGroup>
+
+## Getting help
+
+Include the transaction reference, the timestamp with timezone, the request you sent and the response you got back. That is usually enough to resolve an issue without a second round trip.
+
+<Card title="Support" icon="life-ring" href="/support" horizontal />
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Webhooks" icon="webhook" href="/payments/webhooks" horizontal />
+
+  <Card title="Testing" icon="flask" href="/payments/testing" horizontal />
+
+  <Card title="How it works" icon="route" href="/payments/how-it-works" horizontal />
+
+  <Card title="Accepting payments" icon="code" href="/payments/pay-ins" horizontal />
+</CardGroup>

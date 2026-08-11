@@ -1,0 +1,172 @@
+---
+title: "Payments"
+description: "Accept crypto payments, pay out to wallets and banks, and settle in the currency you choose."
+icon: "credit-card"
+---
+
+Payments, powered by Basqet, lets you collect money from customers in crypto and settle it as crypto or local currency. Integrate once, and you get address generation, on-chain monitoring, conversion and settlement without running your own wallet or blockchain infrastructure.
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/payments/quickstart">
+    Make your first API call and take one payment end to end.
+  </Card>
+
+  <Card title="API reference" icon="code" href="/api-reference/payments/introduction">
+    Every endpoint, with request and response schemas.
+  </Card>
+</CardGroup>
+
+<Card title="How it works" icon="route" href="/payments/how-it-works" horizontal>
+  The transaction lifecycle, every status, and the rules behind each step.
+</Card>
+
+## What you can build
+
+<Columns cols={2}>
+  <Card title="Crypto checkout" icon="cart-shopping" horizontal>
+    Price in fiat, let customers pay in crypto, and receive a single currency.
+  </Card>
+
+  <Card title="Invoicing and collections" icon="file-invoice" horizontal>
+    Share a payment link, no integration required on your side.
+  </Card>
+
+  <Card title="Payouts" icon="paper-plane" horizontal>
+    Pay vendors, partners and users individually or in bulk from a payout wallet.
+  </Card>
+
+  <Card title="Treasury in stablecoins" icon="vault" horizontal>
+    Convert everything you collect into USDT or USDC and hold a single position.
+  </Card>
+</Columns>
+
+## Choose a channel
+
+Three ways to collect. They share one merchant account and one set of keys, so you can run more than one at a time.
+
+<Tabs>
+  <Tab title="Checkout SDK">
+    A hosted payment modal you embed in your site or app. The customer picks a currency, sees an address and a QR code, and pays without leaving your checkout.
+
+    **Best for** getting to market quickly with a standard checkout.
+
+    **Effort** low. Drop in `basqet-checkout` and open the modal.
+
+    <Card title="SDKs and checkout" icon="window" href="/payments/sdks" horizontal />
+  </Tab>
+
+  <Tab title="Payment links">
+    Shareable links that collect payment with no code at all. Create them in the dashboard or through the API, as a fixed amount or an amount the customer enters.
+
+    **Best for** invoicing, social commerce and teams without a developer.
+
+    **Effort** none for the dashboard, one API call if you want to generate them.
+
+    <Card title="Payment links" icon="link" href="/payments/payment-links" horizontal />
+  </Tab>
+
+  <Tab title="API">
+    Build the payment experience yourself. Initialize a transaction, initiate it against a chosen currency, then show your customer the address and amount.
+
+    **Best for** custom checkouts, embedded wallets and bespoke reconciliation.
+
+    **Effort** medium. Two REST calls plus a webhook handler.
+
+    <Card title="Accepting payments" icon="code" href="/payments/pay-ins" horizontal />
+  </Tab>
+</Tabs>
+
+## At a glance
+
+| | |
+| --- | --- |
+| **Pay-in currencies** | USDT, USDC, BTC, ETH, LTC, QDX |
+| **Pricing currencies** | NGN, USD |
+| **Payouts** | Crypto wallets and bank accounts |
+| **Settlement** | Crypto or local currency, converted automatically or kept as paid |
+| **Base URL** | `https://api.basqet.com/v1` |
+| **SDKs** | [`basqet-node`](https://www.npmjs.com/package/payments-node), [`basqet-checkout`](https://www.npmjs.com/package/payments-checkout) |
+
+<Note>
+  Fiat pay-ins are on the roadmap. Today customers pay in crypto, and you choose whether to receive crypto or local currency.
+</Note>
+
+<Card title="Coverage and limits" icon="globe" href="/payments/coverage" horizontal>
+  Currencies, networks, minimum amounts and settlement times.
+</Card>
+
+## How a payment works
+
+<Steps>
+  <Step title="Initialize">
+    You create the transaction with the customer's email, an amount and a pricing currency. It comes back as `INITIATED` with a reference.
+  </Step>
+
+  <Step title="Initiate">
+    The customer picks what to pay with. Basqet locks the rate, generates a wallet address and a QR code, and the transaction moves to `PENDING`.
+  </Step>
+
+  <Step title="Customer pays">
+    They send the exact amount to the address. Basqet watches the chain and confirms it.
+  </Step>
+
+  <Step title="You get told">
+    A webhook fires with the outcome — paid, underpaid, overpaid or abandoned. Give value on the webhook, not on the customer returning to your site.
+  </Step>
+
+  <Step title="Settle">
+    Funds land in your Basqet balance. Settle them to a bank account or a wallet, automatically or on request.
+  </Step>
+</Steps>
+
+<Card title="How it works" icon="route" href="/payments/how-it-works" horizontal>
+  Full lifecycle, every status, and what happens when a payment goes wrong.
+</Card>
+
+## Start building
+
+<Steps>
+  <Step title="Create your account">
+    Sign up and complete KYB. You can build in test mode straight away — KYB is only needed to switch to live.
+  </Step>
+
+  <Step title="Get your keys">
+    Copy your public and secret keys from the dashboard under Developers. Each environment has its own pair.
+  </Step>
+
+  <Step title="Take one payment">
+    Follow the quickstart to run a single transaction from initialize to settled.
+
+    <Card title="Quickstart" icon="rocket" href="/payments/quickstart" horizontal />
+  </Step>
+
+  <Step title="Handle webhooks">
+    Verify the signature, respond `200` immediately, and process events idempotently.
+
+    <Card title="Webhooks" icon="webhook" href="/payments/webhooks" horizontal />
+  </Step>
+
+  <Step title="Test and launch">
+    Simulate every outcome in test mode, then work through the go-live checklist.
+
+    <Card title="Testing" icon="flask" href="/payments/testing" horizontal />
+  </Step>
+</Steps>
+
+## Reference
+
+<CardGroup cols={2}>
+  <Card title="Coverage and limits" icon="globe" href="/payments/coverage" horizontal />
+
+  <Card title="Payouts" icon="paper-plane" href="/payments/payouts" horizontal />
+
+  <Card title="Settlements" icon="building-columns" href="/payments/settlements" horizontal />
+
+  <Card title="Conversions and rates" icon="arrow-right-arrow-left" href="/payments/conversions" horizontal />
+
+  <Card title="Webhooks" icon="webhook" href="/payments/webhooks" horizontal />
+
+  <Card title="Errors and statuses" icon="triangle-alert" href="/payments/errors" horizontal />
+
+  <Card title="API reference" icon="code" href="/api-reference/payments/introduction" horizontal />
+</CardGroup>

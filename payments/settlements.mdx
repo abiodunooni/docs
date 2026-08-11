@@ -1,0 +1,124 @@
+---
+title: "Settlements"
+description: "Move money from your Basqet balance to a bank account or wallet, and choose what currency you hold."
+icon: "building-columns"
+---
+
+Settlement moves funds from your Basqet balance to an account you control — a bank account or an external crypto wallet.
+
+| Type | Destination |
+| --- | --- |
+| Fiat settlement | Your bank account |
+| Crypto settlement | An external wallet |
+
+Set up a settlement account before you take your first live payment. Automatic settlement cannot run without a default account configured.
+
+## Choosing what you hold
+
+Customers pay in whatever currency they choose, so you decide what happens to those inflows before they settle.
+
+<Tabs>
+  <Tab title="Convert to one currency">
+    Everything you collect converts to a single currency as it arrives.
+
+    Three customers pay in USDT, BTC and BTC. With your settlement currency set to NGN, all three land as naira. You hold one currency and reconcile against one balance regardless of how people paid.
+
+    Turn it on under **Settings → Settlement Settings → Convert payments received to a currency**, then pick the currency.
+  </Tab>
+
+  <Tab title="Keep them as paid">
+    Leave conversion off and payments stay in the currency the customer used.
+
+    Your balance shows multiple currencies, and you request a settlement per currency. This suits merchants who would rather hold the assets than convert them automatically.
+  </Tab>
+</Tabs>
+
+<Tip>
+  Converting to a stablecoin is the common choice for businesses that price in dollars but do not want naira exposure. Converting to NGN is the common choice for businesses whose costs are local.
+</Tip>
+
+## Automatic and manual settlement
+
+**NGN settles automatically.** With conversion to NGN switched on and a default settlement account set, incoming payments convert and credit your bank account without you asking. No request needed.
+
+**Everything else is settled on request.** To withdraw:
+
+<Steps>
+  <Step title="Open Settlement">
+    Go to **Settlement** in the dashboard and click **Request Settlement**.
+  </Step>
+
+  <Step title="Pick the destination">
+    Select the settlement account or wallet address.
+  </Step>
+
+  <Step title="Enter an amount">
+    Type an amount, or choose the maximum.
+  </Step>
+
+  <Step title="Confirm">
+    Click **Request Settlement**. Funds move to the selected account.
+  </Step>
+</Steps>
+
+## Settlement accounts
+
+Managed under **Settings → Settlement Settings → Settlement Accounts**. Click **Add Settlement Account** and choose crypto or fiat.
+
+<Tabs>
+  <Tab title="Crypto">
+    | Field | Description |
+    | --- | --- |
+    | Currency | The cryptocurrency to settle in |
+    | Wallet address | Where funds are sent |
+
+    <Warning>
+      The address must be on the same network as the currency. A mismatch loses the funds permanently.
+    </Warning>
+  </Tab>
+
+  <Tab title="Fiat">
+    Choose the account type — naira (NGN), domiciliary (USD), euro (EUR) or sterling (GBP).
+
+    For NGN accounts, provide your bank name and account number. Other currencies may ask for more.
+  </Tab>
+</Tabs>
+
+With more than one account configured, set one as default from the three-dot menu next to it. The default is where settlements go, and automatic NGN settlement requires one. The same menu deletes an account you no longer need.
+
+## Timing
+
+| Currency | Processing time |
+| --- | --- |
+| NGN | Instant |
+| USD, EUR, GBP | To be confirmed |
+| Crypto | To be confirmed |
+
+<Info>
+  Times outside NGN are being confirmed and will be published here. Ask your Quidax representative for current figures. Actual timing also depends on bank processing and network conditions.
+</Info>
+
+## Fees
+
+Every settlement carries a fee that varies by currency. You choose who pays it:
+
+| Option | Effect |
+| --- | --- |
+| Merchant pays | Deducted from your settlement amount |
+| Customer pays | Added to the amount collected at checkout |
+
+<Warning>
+  Settling in a stablecoin costs roughly 1 USDT in gas. A 4 USD payment settled in USDT does not arrive as exactly 4 USDT. If you quote customers precise dollar figures, build this in — it applies to stablecoin settlements only.
+</Warning>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Conversions and rates" icon="arrow-right-arrow-left" href="/payments/conversions" horizontal />
+
+  <Card title="Payouts" icon="paper-plane" href="/payments/payouts" horizontal />
+
+  <Card title="Coverage and limits" icon="globe" href="/payments/coverage" horizontal />
+
+  <Card title="How it works" icon="route" href="/payments/how-it-works" horizontal />
+</CardGroup>

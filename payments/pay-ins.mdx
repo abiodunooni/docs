@@ -1,0 +1,216 @@
+---
+title: "Accepting payments"
+description: "Create, initiate and verify a payment directly against the API."
+icon: "code"
+---
+
+Integrating directly gives you full control of the checkout. You price the transaction, your customer picks a currency in your own interface, and Basqet returns the address and amount they need to send.
+
+Creating a payment takes two calls. They are separate so the exchange rate is locked as late as possible.
+
+## 1. Initialize the transaction
+
+Creates the record of what the customer owes. No address exists yet and no rate is locked.
+
+| | |
+| --- | --- |
+| **Method** | `POST` |
+| **Path** | `/v1/transaction` |
+| **Auth** | Public key |
+
+### Body
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `customer` | object | Yes | The customer's details. |
+| `customer.email` | string | Yes | Must be a valid email. Identifies the payer. |
+| `customer.name` | string | No | The customer's full name. |
+| `currency` | string | Yes | Fiat currency the payment is priced in. `NGN` or `USD`. |
+| `amount` | string | Yes | Amount as a numeric string, for example `"2000"`. |
+| `description` | string | No | Shown on the transaction record. |
+| `meta` | object | No | Your own data. Echoed back in responses and webhooks. |
+| `public_key` | string | No | Required only if you do not send the key in the `Authorization` header. |
+| `payment_link` | string | No | A payment link slug, prefixed `pl_`. Cannot be sent with `public_key`. |
+
+```bash
+curl -X POST 'https://api.basqet.com/v1/transaction' \
+  -H 'Authorization: Bearer pub_live_xxxxxxxxxxxxx' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "customer": {
+      "name": "Test User",
+      "email": "test-user@example.com"
+    },
+    "currency": "USD",
+    "amount": "1000.00",
+    "description": "Test Transaction #001",
+    "meta": { "cart_id": "999" }
+  }'
+```
+
+```json
+{
+  "status": "success",
+  "data": {
+    "id": "BASQET_TXN_REF_12345",
+    "reference": "BASQET_TXN_REF_12345",
+    "amount_paid": null,
+    "status": "INITIATED",
+    "description": "Invoice #1024",
+    "initialized_amount": 1500,
+    "payment_amount": null,
+    "payment_address": null,
+    "is_live": true,
+    "merchant": { "id": 10, "name": "Acme Store" }
+  },
+  "meta": { "order_id": "order_1024" }
+}
+```
+
+Store the `reference`. Every later call uses it.
+
+<Warning>
+  This endpoint takes your **public** key, not your secret key. Sending a secret key does not create the transaction.
+</Warning>
+
+<Tip>
+  Put your own order or cart ID in `meta`. It comes back on every webhook for the transaction, which makes reconciliation straightforward without keeping your own lookup table.
+</Tip>
+
+## 2. Initiate the payment
+
+Assigns a currency, locks the rate, and generates the address.
+
+| | |
+| --- | --- |
+| **Method** | `POST` |
+| **Path** | `/v1/transaction/:transaction_id/pay` |
+| **Auth** | Secret key |
+
+### Body
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `currency_id` | string | Yes | The currency the customer is paying with. |
+| `refund_address` | string | No | Stored on the transaction for use if a refund is needed. |
+
+Currency IDs come from `GET /v1/currency`.
+
+| Currency | ID |
+| --- | --- |
+| Tether (USDT) | `3` |
+| Bitcoin (BTC) | `4` |
+| Quidax Token (QDX) | `5` |
+| Ethereum (ETH) | `6` |
+| Litecoin (LTC) | `7` |
+
+<Warning>
+  No ID is published for USDC even though it is a supported payment currency. Fetch the live list from `GET /v1/currency` rather than hard-coding these values.
+</Warning>
+
+```bash
+curl -X POST 'https://api.basqet.com/v1/transaction/BASQET_TXN_REF_12345/pay' \
+  -H 'Authorization: Bearer sec_live_xxxxxxxxxxxxx' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "currency_id": 3,
+    "refund_address": "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113"
+  }'
+```
+
+```json
+{
+  "status": "success",
+  "data": {
+    "qrCode": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...",
+    "reference": "BASQET_TXN_REF_12345",
+    "status": "PENDING",
+    "initialized_amount": 1500,
+    "initialized_currency": "USD",
+    "payment_amount": 0.002357,
+    "payment_address": "bc1qexampleaddress",
+    "payment_currency": "BTC",
+    "amount_paid": null,
+    "is_live": true
+  },
+  "meta": {}
+}
+```
+
+Show the customer three things: `payment_amount`, `payment_address` and the `qrCode`.
+
+<Warning>
+  The rate is locked here, and the transaction expires 60 minutes later. Call this when the customer is ready to pay, not when they land on your checkout page.
+</Warning>
+
+Setting `refund_address` at this point is worth doing. Refunds are handled manually, and having the address already on the transaction saves a round trip with support later.
+
+## 3. Verify the transaction
+
+Webhooks are the primary way you learn an outcome. Use this to check state directly — when a webhook is delayed, when a customer refreshes your page, or to reconcile.
+
+| | |
+| --- | --- |
+| **Method** | `GET` |
+| **Path** | `/v1/transaction/:transaction_id/status` |
+| **Auth** | Public or secret key |
+
+```bash
+curl 'https://api.basqet.com/v1/transaction/BASQET_TXN_REF_12345/status' \
+  -H 'Authorization: Bearer sec_live_xxxxxxxxxxxxx'
+```
+
+```json
+{
+  "status": "success",
+  "data": { "status": "SUCCESSFUL" },
+  "meta": {}
+}
+```
+
+Possible values are `INITIATED`, `PROCESSING`, `PENDING`, `SUCCESSFUL`, `ABANDONED`, `OVERPAID`, `UNDERPAID` and `FAILED`.
+
+<Warning>
+  Verify supplements webhooks, it does not replace them. Give value on `payment.received`, not on a customer returning to your site — someone who closes the tab after paying still paid.
+</Warning>
+
+## Handling the wrong amount
+
+Customers frequently send slightly less than quoted because their wallet or exchange deducts a withdrawal fee from the amount. Both outcomes are configured in the dashboard under **Settings → Business Settings → Dispute Settings**.
+
+| Outcome | Default | Alternative |
+| --- | --- | --- |
+| Underpaid | Refunded to the customer, nothing credited to you | Enable **Allow transactions with underpayments to be credited** |
+| Overpaid | Full amount credited to you | Enable **Automatically refund overpayments to customers** |
+
+<Tip>
+  Add a line to your checkout telling customers to check that their provider's fee is not being taken out of the amount they send. This is the single most effective way to cut underpaid transactions and the support load that comes with them.
+</Tip>
+
+<Card title="How it works" icon="route" href="/payments/how-it-works#when-the-amount-is-wrong" horizontal>
+  Full detail on over and underpayments, refunds and chargebacks.
+</Card>
+
+## Errors
+
+| Code | Cause | What to do |
+| --- | --- | --- |
+| `400` | Validation failed | Check `customer.email`, `amount` and `currency` are present and well formed. Also returned if you send both `public_key` and `payment_link`. |
+| `404` | Invalid public key | Check the key, that the account is active, and that the currency is supported. |
+| `422` | KYB incomplete, or the transaction is not in the right state | Complete KYB for live mode. For initiate, confirm the transaction is still `INITIATED`. |
+| `500` | Server error | Retry, then contact support. Also currently returned when the amount is below the minimum. |
+| `503` | Upstream error generating the quote or address | Retry the request. |
+
+<Card title="Errors and statuses" icon="triangle-alert" href="/payments/errors" horizontal />
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Webhooks" icon="webhook" href="/payments/webhooks" horizontal />
+
+  <Card title="Payment links" icon="link" href="/payments/payment-links" horizontal />
+
+  <Card title="Testing" icon="flask" href="/payments/testing" horizontal />
+
+  <Card title="Settlements" icon="building-columns" href="/payments/settlements" horizontal />
+</CardGroup>
