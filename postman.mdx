@@ -1,3 +1,103 @@
 ---
-title: "postman"
+title: "Postman collections"
+description: "Download a ready-to-run collection for each Quidax API."
+icon: "cube"
 ---
+
+Every endpoint, with example responses, folders and pre-filled request bodies. Import a collection, set two variables, and start sending.
+
+<CardGroup cols={3}>
+  <Card title="Ramp" icon="arrow-right-arrow-left" href="/postman/ramp.postman_collection.json">
+    23 requests
+  </Card>
+
+  <Card title="Payments" icon="credit-card" href="/postman/payments.postman_collection.json">
+    15 requests
+  </Card>
+
+  <Card title="Wallets" icon="wallet" href="/postman/wallets.postman_collection.json">
+    38 requests
+  </Card>
+</CardGroup>
+
+## Setting up
+
+<Steps>
+  <Step title="Import">
+    In Postman, **Import → File**, and select the downloaded `.json`. Folders, examples and auth come with it.
+  </Step>
+
+  <Step title="Set your key">
+    Open the collection, go to **Variables**, and set `secretKey` to your key for that product. Auth is configured at collection level, so every request inherits it.
+
+    | Collection | Variable | Format |
+    | --- | --- | --- |
+    | Ramp | `secretKey` | `sk_live_…`, sent as `x-private-key` |
+    | Payments | `secretKey` | `sec_live_…`, sent as a bearer token |
+    | Wallets | `secretKey` | Sent as a bearer token |
+  </Step>
+
+  <Step title="Check the base URL">
+    `baseUrl` is pre-set to production for each collection. Leave it unless you have been given a different host.
+  </Step>
+
+  <Step title="Fill in path variables">
+    Requests with `:user_id`, `:transaction_id` and similar expose them under the **Path Variables** table on each request. In the Wallets collection `user_id` defaults to `me`, so most requests run as-is.
+  </Step>
+</Steps>
+
+<Warning>
+  Set the variable as a **current value**, not an initial value, so your key is not written into the collection file if you export or share it.
+</Warning>
+
+## Things worth knowing
+
+<AccordionGroup>
+  <Accordion title="Payments Initialize needs the public key" icon="key">
+    Collection auth applies your **secret** key to every request, but `Initialize a transaction` expects the **public** key — it will fail until you override it.
+
+    On that request, open **Authorization**, set the type to **Bearer Token**, and paste your `pub_live_…` key. Everything else in the collection keeps using the secret.
+  </Accordion>
+
+  <Accordion title="These hit production" icon="triangle-exclamation">
+    Every `baseUrl` points at a live host. Ramp and Wallets have **no sandbox**, so a successful `POST` moves real money.
+
+    Payments has a separate test environment — set `secretKey` to a `sec_test_…` key and you are safe to experiment.
+
+    <Card title="Testing" icon="flask" href="/testing" horizontal />
+  </Accordion>
+
+  <Accordion title="Query parameters start disabled" icon="sliders">
+    Optional query parameters are included but unticked, so you can see what exists without sending empty values. Tick the ones you want.
+  </Accordion>
+
+  <Accordion title="Examples are illustrative" icon="code">
+    Saved responses come from the API specifications, not from live calls. Treat them as shape references rather than current values — rates, fees and balances will differ.
+  </Accordion>
+</AccordionGroup>
+
+## Prefer OpenAPI?
+
+The specifications behind these collections are published too, and import directly into Postman, Insomnia or a client generator.
+
+| Product | Specification |
+| --- | --- |
+| Ramp | [`/openapi/ramp.json`](/openapi/ramp.json) |
+| Payments | [`/openapi/payments.json`](/openapi/payments.json) |
+| Wallets | [`/openapi/wallets.json`](/openapi/wallets.json) |
+
+<Note>
+  The collections are generated from these specifications, so they stay in step. If something looks wrong in a collection, the specification is the source of truth.
+</Note>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/developer-tools/authentication" horizontal />
+
+  <Card title="Errors and rate limits" icon="gauge-high" href="/developer-tools/errors-and-limits" horizontal />
+
+  <Card title="API reference" icon="code" href="/api-reference" horizontal />
+
+  <Card title="SDKs and tools" icon="cube" href="/developer-tools/sdks" horizontal />
+</CardGroup>

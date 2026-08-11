@@ -65,17 +65,21 @@ A few things are worth getting right once, in a shared layer, rather than per ca
 
 ## Exploring the APIs
 
-Every endpoint in the API reference has a request builder with schemas and examples, which is usually faster than importing a collection.
+Every endpoint in the API reference has a request builder with schemas and examples, which is usually the fastest way to try something once.
 
-<CardGroup cols={2}>
+<CardGroup cols={3}>
   <Card title="Ramp API" icon="code" href="/api-reference/ramp/introduction" horizontal />
 
   <Card title="Payments API" icon="code" href="/api-reference/payments/introduction" horizontal />
+
+  <Card title="Wallets API" icon="code" href="/api-reference/wallets/introduction" horizontal />
 </CardGroup>
 
-<Note>
-  There is no published Postman collection. The OpenAPI definitions behind the reference pages can be imported into Postman or Insomnia directly if you prefer working there.
-</Note>
+For repeated work, download a Postman collection instead — all three products ship one, with folders, example responses and auth already configured.
+
+<Card title="Postman collections" icon="cube" href="/postman" horizontal>
+  Ramp, Payments and Wallets, ready to import.
+</Card>
 
 ## Next
 

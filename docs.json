@@ -263,7 +263,8 @@
               "developer-tools/authentication",
               "developer-tools/webhooks",
               "developer-tools/errors-and-limits",
-              "developer-tools/sdks"
+              "developer-tools/sdks",
+              "postman"
             ]
           },
           {
