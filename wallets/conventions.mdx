@@ -130,14 +130,15 @@ Paginated responses carry these headers:
   </Tab>
 </Tabs>
 
-## Minimum order values
+## Minimum order value
 
-| Currency | Minimum |
-| --- | --- |
-| NGN | 1,000 |
-| USDT | 0.90 |
+The minimum tradeable amount is the equivalent of **$1**, expressed in whichever currency the pair is quoted in. A `usdtngn` order is checked against the naira equivalent of a dollar, a `btcusdt` order against a dollar.
 
-Anything below throws an error, so validate in your own interface before submitting.
+Anything below is rejected, so validate in your own interface before submitting.
+
+<Note>
+  Because the threshold is a dollar equivalent rather than a fixed figure per currency, the naira number moves with the rate. Compute it from a live rate rather than hard-coding a value that will drift.
+</Note>
 
 ## Precision
 

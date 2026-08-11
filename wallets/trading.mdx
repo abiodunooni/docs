@@ -42,12 +42,7 @@ Only limit orders can meaningfully be cancelled — a market order executes imme
 
 Two rules reject orders more often than anything else.
 
-**Minimum order value**
-
-| Currency | Minimum |
-| --- | --- |
-| NGN | 1,000 |
-| USDT | 0.90 |
+**Minimum order value** — the equivalent of **$1**, in whichever currency the pair is quoted in. Because it is a dollar equivalent rather than a fixed per-currency figure, compute it from a live rate rather than hard-coding one.
 
 **Precision.** Each pair caps the decimal places allowed for volume and price. For `BTC/USDT`, BTC volume takes 5 decimals, USDT volume 2, and price 2. Submitting more precision fails.
 

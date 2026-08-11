@@ -39,7 +39,7 @@ Run a trading product without building custody, an order book or blockchain infr
   <Step title="Orders">
     `POST /users/{user_id}/orders`.
 
-    **Round to the pair's precision and check the minimum** (₦1,000 or $0.90) before submitting. These two rules cause most rejections.
+    **Round to the pair's precision and check the minimum** — the equivalent of $1 — before submitting. These two rules cause most rejections.
 
     **Expect** `order.done`. An order can fill across several trades — reconcile against `GET /users/{user_id}/trades`.
   </Step>
