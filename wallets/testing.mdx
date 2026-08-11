@@ -88,10 +88,10 @@ Run this end to end before opening the flow to any real cohort.
 Several failure paths cost nothing to exercise, and they are where most launch issues hide.
 
 <AccordionGroup>
-  <Accordion title="Validation errors" icon="triangle-alert">
+  <Accordion title="Validation errors" icon="triangle-exclamation">
     Submit a bad currency, a malformed amount, a missing reference, and a non-existent sub-account. Confirm you read `data.code` rather than parsing `message`.
 
-    <Card title="Error codes" icon="triangle-alert" href="/wallets/errors#error-codes" horizontal />
+    <Card title="Error codes" icon="triangle-exclamation" href="/wallets/errors#error-codes" horizontal />
   </Accordion>
 
   <Accordion title="Authentication failures" icon="key">
@@ -152,7 +152,7 @@ Several failure paths cost nothing to exercise, and they are where most launch i
 ## Next
 
 <CardGroup cols={2}>
-  <Card title="Errors and statuses" icon="triangle-alert" href="/wallets/errors" horizontal />
+  <Card title="Errors and statuses" icon="triangle-exclamation" href="/wallets/errors" horizontal />
 
   <Card title="Webhooks" icon="webhook" href="/wallets/webhooks" horizontal />
 

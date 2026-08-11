@@ -38,7 +38,44 @@ You build the product and own the customer. Quidax provides the accounts, custod
   <Step title="Credit deposits at ACCEPTED, never earlier">
     **Expect** `deposit.transaction.confirmation`, then `deposit.successful`.
 
-    Re-query `GET /users/{user_id}/deposits/{deposit_id}` and credit only when `status` is `ACCEPTED`. A deposit confirmed on-chain can still be held or fail AML screening.
+    Re-query and credit only when `status` is `ACCEPTED`. A deposit confirmed on-chain can still be held or fail AML screening.
+
+    ```typescript
+    interface Deposit {
+      id: string;
+      currency: string;
+      amount: string;
+      status: string;           // lowercase in payloads, uppercase in the tables
+      wallet: { user: { id: string; reference: string | null } };
+    }
+
+    export async function onDepositWebhook(event: { data: Deposit }) {
+      // 1. The webhook says something happened. The API says what is true now.
+      const deposit = await quidax<Deposit>(
+        `/users/${event.data.wallet.user.id}/deposits/${event.data.id}`,
+      );
+
+      if (deposit.status.toUpperCase() !== "ACCEPTED") return;
+
+      // 2. Credit exactly once, keyed on the deposit id.
+      await db.transaction(async (tx) => {
+        const claimed = await tx.insertIfAbsent("processed_deposits", {
+          deposit_id: deposit.id,
+        });
+        if (!claimed) return;                       // already handled
+
+        await tx.creditLedger({
+          userRef: deposit.wallet.user.reference,
+          currency: deposit.currency,
+          amount: deposit.amount,                   // keep as a string
+        });
+      });
+    }
+    ```
+
+    <Warning>
+      The idempotency claim and the ledger credit must be in **one transaction**. Insert-then-credit across two calls leaves a window where a retry credits twice.
+    </Warning>
   </Step>
 
   <Step title="Show prices">
@@ -50,7 +87,41 @@ You build the product and own the customer. Quidax provides the accounts, custod
   <Step title="Place orders">
     `POST /users/{user_id}/orders`
 
-    **Round to the pair's precision first**, and check the minimum (₦1,000 or $0.90). These two rules cause most rejections.
+    **Round to the pair's precision first**, and check the minimum. These two rules cause most rejections.
+
+    ```typescript
+    const PRECISION: Record<string, { volume: number; price: number }> = {
+      btcusdt: { volume: 5, price: 2 },
+      ethusdt: { volume: 4, price: 2 },
+      usdtngn: { volume: 2, price: 2 },
+    };
+
+    function floorTo(value: string, dp: number): string {
+      // floor, never round up — rounding up can exceed the user's balance
+      const [i, f = ""] = value.split(".");
+      return dp === 0 ? i : `${i}.${f.padEnd(dp, "0").slice(0, dp)}`;
+    }
+
+    export async function placeOrder(userId: string, o: {
+      market: string;
+      side: "buy" | "sell";
+      ord_type: "limit" | "market";
+      volume: string;
+      price?: string;
+    }) {
+      const p = PRECISION[o.market];
+      if (!p) throw new Error(`Unknown precision for ${o.market}`);
+
+      return quidax(`/users/${userId}/orders`, {
+        method: "POST",
+        body: JSON.stringify({
+          ...o,
+          volume: floorTo(o.volume, p.volume),
+          price: o.price ? floorTo(o.price, p.price) : undefined,
+        }),
+      });
+    }
+    ```
 
     **Expect** `order.done` when it executes. An order can fill across several trades — reconcile against `GET /users/{user_id}/trades`, not the order alone.
 

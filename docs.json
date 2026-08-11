@@ -159,7 +159,8 @@
             "group": "Launch",
             "pages": [
               "ramp/testing",
-              "ramp/errors"
+              "ramp/errors",
+              "ramp/security"
             ]
           }
         ]
@@ -193,7 +194,8 @@
             "group": "Launch",
             "pages": [
               "payments/testing",
-              "payments/errors"
+              "payments/errors",
+              "payments/security"
             ]
           }
         ]
@@ -229,7 +231,8 @@
             "pages": [
               "wallets/testing",
               "wallets/errors",
-              "wallets/conventions"
+              "wallets/conventions",
+              "wallets/security"
             ]
           }
         ]

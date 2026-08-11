@@ -1,249 +1,339 @@
 ---
 title: "Payouts"
-description: "Pay one recipient or thousands, from the dashboard with a CSV or programmatically through the Wallets API."
+description: "Pay recipients from the Basqet dashboard with a CSV, or programmatically through the Wallets API."
 icon: "paper-plane"
 ---
 
-Payments collects money. Sending it out is a separate job, and there are two ways to do it:
+Payouts run on two different systems, and which one you use decides everything about how you build.
 
-| | Dashboard | Wallets API |
+| | Basqet dashboard | Wallets API |
 | --- | --- | --- |
+| Where | Basqet dashboard | `openapi.quidax.io` |
+| Bulk | CSV upload | Your own loop |
+| Approval | Built into the flow | You build it |
 | Effort | None | An integration |
-| Bulk | CSV upload | Loop over recipients |
-| Scheduling | Manual | Whatever you build |
-| Best for | Occasional or ad-hoc payouts | Automated, recurring or high-volume |
+| Best for | Occasional, finance-led runs | Automated, recurring, high volume |
 
 <Note>
-  Payments has no payouts API of its own. Programmatic payouts run on the [Wallets API](/wallets), which uses the same Quidax account and one secret key.
+  There is no payouts API in Basqet. Everything programmatic runs on the [Wallets API](/wallets), which uses a different host, a different key and a different auth header from the rest of Payments.
 </Note>
 
-## The payout wallet
+## From the Basqet dashboard
 
-Your payout wallet is separate from your collection wallet, so money coming in and money going out stay apart.
+Your payout wallet is separate from your collection wallet. Fund it by settling collections into it, or receive directly: **Payout → Receive**, pick a currency, share the address.
 
-Fund it by settling collections into it, or receive into it directly: **Payout → Receive**, pick a currency, and share the generated address.
+<Tabs>
+  <Tab title="One recipient">
+    **Payout → Send → Single Transfer.** Choose the currency, pick a saved beneficiary or enter new details, enter the amount, review, tick the confirmation box and confirm.
+  </Tab>
 
-## Paying out from the dashboard
+  <Tab title="CSV batch">
+    <Steps>
+      <Step title="Load beneficiaries">
+        **Settings → Beneficiary settings → Add bulk beneficiaries.** Download the template first — columns must match it exactly.
 
-### One recipient
+        | Column | Contents |
+        | --- | --- |
+        | Alias | A name to identify the recipient |
+        | Wallet address | Where funds go |
+        | Currency | The currency that address is for |
 
-<Steps>
-  <Step title="Open Payout → Send → Single Transfer">
-    Choose the currency, pick a saved beneficiary or enter new details, and enter the amount.
-  </Step>
+        Invalid rows are skipped rather than failing the upload, so check the resulting count against your file.
+      </Step>
 
-  <Step title="Review and confirm">
-    Check the details, tick the confirmation box, confirm.
-  </Step>
-</Steps>
+      <Step title="Upload the run">
+        **Payout → Send → Bulk Transfer.** Select saved beneficiaries, or upload a CSV with recipients and amounts.
+      </Step>
 
-### Many recipients, with a CSV
+      <Step title="Check the confirmation page">
+        Recipient count and total, against your source file. This is the last point at which a shifted column is recoverable.
+      </Step>
 
-<Steps>
-  <Step title="Prepare your beneficiaries">
-    **Settings → Beneficiary settings → Add bulk beneficiaries.** Click **Download template** first — the columns must match it exactly.
+      <Step title="Confirm" />
+    </Steps>
 
-    | Column | Contents |
-    | --- | --- |
-    | Alias | A name to identify the recipient |
-    | Wallet address | Where funds go |
-    | Currency | The currency that address is for |
+    <Tip>
+      Run a two-recipient batch with trivial amounts before a two-hundred-recipient one. It costs almost nothing and proves your file format end to end.
+    </Tip>
+  </Tab>
+</Tabs>
 
-    Upload the file. Every valid row is added; invalid rows are skipped, so check the count afterwards.
-  </Step>
+## Through the Wallets API
 
-  <Step title="Open Payout → Send → Bulk Transfer">
-    Either select recipients from a list you already uploaded, or upload a new CSV containing recipients **and amounts**.
-  </Step>
+One endpoint, and `fund_uid` decides the rail.
 
-  <Step title="Review the confirmation page">
-    Every recipient and amount is listed. This is your last chance to catch a bad row — crypto payouts cannot be reversed.
-  </Step>
-
-  <Step title="Confirm">
-    The batch is submitted.
-  </Step>
-</Steps>
+| `fund_uid` | Rail | Cost |
+| --- | --- | --- |
+| Blockchain address | On-chain | Network fee |
+| Quidax account ID | Internal transfer | **Free, instant** |
 
 <Warning>
-  Check the recipient count and total on the confirmation page against your source file. A CSV with a shifted column or a stray row will pay the wrong people the wrong amounts, and there is no recall.
+  **Naira payouts are not available through the Wallets API.** Paying out to a Nigerian bank account is a dashboard action. For programmatic local currency payouts, use [Ramp off-ramp](/ramp/off-ramp).
 </Warning>
 
-<Tip>
-  Run a first batch with two recipients and trivial amounts before running one with two hundred. It costs almost nothing and proves your file format end to end.
-</Tip>
+### Types
 
-## Paying out through the Wallets API
+```typescript
+// Crypto only — naira payouts are dashboard-only, see the warning above.
+type Currency = "usdt" | "usdc" | "btc" | "eth" | "trx" | "ltc";
 
-Same account, same key, one endpoint. What you put in `fund_uid` decides the rail.
+interface WithdrawalRequest {
+  currency: Currency;
+  amount: string;              // decimal string, never a float
+  fund_uid: string;            // blockchain address, or a Quidax account id
+  reference: string;           // yours, unique, generated before the call
+  fund_uid2?: string;          // destination tag, for chains that need one
+  network?: string;            // required for multi-network assets
+  narration?: string;
+  transaction_note?: string;
+}
 
-| `fund_uid` contains | Result |
-| --- | --- |
-| A blockchain address | On-chain payout |
-| A Quidax account ID | Internal transfer — instant and free |
-| A bank account number | Fiat payout, with `fund_uid2` as the bank code |
+interface Withdrawal {
+  id: string;
+  reference: string;
+  type: "internal_transfer" | string;
+  currency: Currency;
+  amount: string;
+  fee: string;
+  total: string;               // what actually left the wallet
+  txId: string | null;         // null for internal transfers
+  status: "processing" | "done" | "rejected";
+  reason: string | null;
+}
+
+interface Envelope<T> {
+  status: "success" | "error";
+  message: string;
+  data: T | { code: string; message: string };
+}
+```
+
+<Warning>
+  Amounts are **decimal strings**, not numbers. Parsing `"0.0000000037183942"` into a JavaScript `number` loses precision silently. Keep them as strings end to end, and use a decimal library if you need arithmetic.
+</Warning>
 
 ### A single payout
 
-<Steps>
-  <Step title="Check the balance and the network">
-    ```bash
-    curl 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me/wallets/usdt' \
-      -H "Authorization: Bearer $QUIDAX_SECRET_KEY"
-    ```
+```typescript
+const BASE = "https://openapi.quidax.io/exchange-open-api/api/v1";
 
-    **Spendable balance is `balance` alone** — `locked` and `staked` are committed. In the `networks` array, confirm your network has `withdraws_enabled: true`.
-  </Step>
+async function quidax<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, {
+    ...init,
+    headers: {
+      accept: "application/json",
+      "content-type": "application/json",
+      authorization: `Bearer ${process.env.QUIDAX_SECRET_KEY}`,
+      ...init.headers,
+    },
+  });
 
-  <Step title="Generate and store a reference">
-    Before you call. If the request times out, this is the only way to find out what happened.
-  </Step>
+  const body = (await res.json()) as Envelope<T>;
 
-  <Step title="Submit">
-    ```bash
-    curl -X POST 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me/withdraws' \
-      -H 'accept: application/json' \
-      -H 'content-type: application/json' \
-      -H "Authorization: Bearer $QUIDAX_SECRET_KEY" \
-      -d '{
-        "currency": "usdt",
-        "amount": "250",
-        "fund_uid": "<wallet_address>",
-        "network": "trc20",
-        "reference": "payout-1024",
-        "narration": "October payout"
-      }'
-    ```
+  if (body.status === "error") {
+    const err = body.data as { code: string; message: string };
+    throw new QuidaxError(err.code, err.message, res.status);
+  }
+  return body.data as T;
+}
 
-    **You get back** a withdrawal with `status: processing`.
+class QuidaxError extends Error {
+  constructor(
+    readonly code: string,
+    message: string,
+    readonly httpStatus: number,
+  ) {
+    super(message);
+  }
+  /** The withdrawal genuinely does not exist — safe to submit. */
+  get isNotFound() { return this.code === "110112"; }
+}
+```
 
-    **Always send `network`.** Omitting it uses the currency default, and a mismatch loses the funds.
-  </Step>
+Check the balance and the network before you send:
 
-  <Step title="Wait for the outcome">
-    **Expect** `withdraw.successful` or `withdraw.rejected`. A rejection carries a `reason` — read it before retrying, because most rejections repeat.
-  </Step>
+```typescript
+interface Wallet {
+  balance: string;
+  locked: string;
+  staked: string;
+  default_network: string | null;
+  networks: Array<{
+    id: string;
+    name: string;
+    deposits_enabled: boolean;
+    withdraws_enabled: boolean;
+  }>;
+}
 
-  <Step title="Reconcile">
-    ```bash
-    curl 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me/withdraws/reference/payout-1024' \
-      -H "Authorization: Bearer $QUIDAX_SECRET_KEY"
-    ```
+async function assertCanWithdraw(currency: Currency, network: string) {
+  const wallet = await quidax<Wallet>(`/users/me/wallets/${currency}`);
 
-    `total` is what actually left the wallet, after `fee`.
-  </Step>
-</Steps>
-
-### A batch, without a CSV
-
-There is no bulk endpoint. A batch is a loop, and the loop needs to be resumable.
-
-<Steps>
-  <Step title="Build the batch in your own store">
-    One row per recipient, each with a **pre-generated unique reference** and a state of `pending`. Persist this before you call anything.
-
-    A good reference encodes the batch: `payout-2026-04-batch7-0042`.
-  </Step>
-
-  <Step title="Check the total against your balance">
-    Sum the batch and compare against `balance` plus expected fees. Running dry halfway through leaves you reconciling a partial batch.
-  </Step>
-
-  <Step title="Submit one at a time, inside the rate limit">
-    300 requests per minute. Roughly one every 250ms leaves headroom for retries.
-
-    Mark each row `submitted` **before** the call and record the response after it. A row you submitted but have no response for is the dangerous case, and the next step handles it.
-  </Step>
-
-  <Step title="Resolve anything uncertain by reference">
-    For every row still `submitted` with no confirmed outcome:
-
-    ```bash
-    curl 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me/withdraws/reference/<reference>' \
-      -H "Authorization: Bearer $QUIDAX_SECRET_KEY"
-    ```
-
-    | Response | Meaning | Action |
-    | --- | --- | --- |
-    | A withdrawal | It landed | Record it. **Do not resubmit.** |
-    | `110112` | It never landed | Safe to resubmit with the same reference. |
-  </Step>
-
-  <Step title="Reconcile on the webhooks">
-    Mark rows complete on `withdraw.successful`, failed on `withdraw.rejected`. Process idempotently — the same event can arrive twice.
-  </Step>
-</Steps>
+  const net = wallet.networks.find((n) => n.id === network);
+  if (!net?.withdraws_enabled) {
+    throw new Error(`Withdrawals are disabled for ${currency} on ${network}`);
+  }
+  return wallet;
+}
+```
 
 <Warning>
-  Never retry a payout with a **new** reference. If the original landed, you have paid twice, and an on-chain payout cannot be recalled. The reference is what makes a retry safe.
+  Spendable balance is `balance` **alone**. `locked` is committed to open orders and pending withdrawals, `staked` is unavailable. Summing them will oversell the position.
 </Warning>
 
-<Tip>
-  Route internal recipients — anyone who also holds an account with you — by account ID rather than address. Instant, free, and no possibility of a wrong-network loss.
-</Tip>
+Then submit:
+
+```typescript
+async function createWithdrawal(req: WithdrawalRequest): Promise<Withdrawal> {
+  await assertCanWithdraw(req.currency, req.network!);
+  return quidax<Withdrawal>("/users/me/withdraws", {
+    method: "POST",
+    body: JSON.stringify(req),
+  });
+}
+```
+
+<Warning>
+  Always pass `network` for a multi-network asset. Omitting it falls back to the currency default, and a mismatch with the recipient's wallet loses the funds permanently.
+</Warning>
+
+### Resolving an uncertain outcome
+
+The case that matters: you submitted, and you do not know whether it landed.
+
+```typescript
+async function resolve(reference: string): Promise<Withdrawal | null> {
+  try {
+    return await quidax<Withdrawal>(`/users/me/withdraws/reference/${reference}`);
+  } catch (e) {
+    if (e instanceof QuidaxError && e.isNotFound) return null; // never landed
+    throw e;                                                   // unknown — do NOT resubmit
+  }
+}
+```
+
+<Warning>
+  Only `110112` means it is safe to resubmit. Any other error means you still do not know, and resubmitting risks paying twice. Re-raise and let a human look.
+</Warning>
+
+### A resumable batch
+
+There is no bulk endpoint. A batch is a loop, and the loop has to survive being interrupted.
+
+```typescript
+type RowState = "pending" | "submitted" | "done" | "failed";
+
+interface PayoutRow {
+  id: string;
+  reference: string;       // deterministic: `${batchId}-${index}`
+  address: string;
+  amount: string;
+  currency: Currency;
+  network: string;
+  state: RowState;
+}
+
+const RATE_LIMIT_MS = 250;   // ~240/min, inside the 300/min cap
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+async function runBatch(rows: PayoutRow[], db: Store) {
+  // 1. Fail fast if the whole batch cannot be funded.
+  const wallet = await assertCanWithdraw(rows[0].currency, rows[0].network);
+  const total = rows.reduce((s, r) => s + Number(r.amount), 0);
+  if (total > Number(wallet.balance)) {
+    throw new Error(`Batch total ${total} exceeds balance ${wallet.balance}`);
+  }
+
+  for (const row of rows) {
+    if (row.state === "done" || row.state === "failed") continue;
+
+    // 2. Anything already submitted is resolved, never resubmitted blindly.
+    if (row.state === "submitted") {
+      const existing = await resolve(row.reference);
+      if (existing) {
+        await db.update(row.id, { state: "done" });
+        continue;
+      }
+    }
+
+    // 3. Mark BEFORE the call, so a crash mid-flight is recoverable.
+    await db.update(row.id, { state: "submitted" });
+
+    try {
+      await createWithdrawal({
+        currency: row.currency,
+        amount: row.amount,
+        fund_uid: row.address,
+        network: row.network,
+        reference: row.reference,
+      });
+      await db.update(row.id, { state: "done" });
+    } catch (e) {
+      if (e instanceof QuidaxError && e.isNotFound) {
+        await db.update(row.id, { state: "pending" }); // safe to retry next run
+      } else {
+        await db.update(row.id, { state: "failed", reason: String(e) });
+      }
+    }
+
+    await sleep(RATE_LIMIT_MS);
+  }
+}
+```
+
+The three properties that make this safe:
+
+1. **Deterministic references.** `${batchId}-${index}` means re-running the same batch cannot double-pay — the second attempt resolves each reference and finds it already landed.
+2. **Mark before the call.** A crash between the request and the response leaves the row `submitted`, which the next run resolves rather than resubmits.
+3. **Never invent a new reference.** A failed lookup that is not `110112` means "unknown", and unknown must never become "retry".
+
+<Warning>
+  Random per-run references defeat all of this. A re-uploaded file pays everyone a second time, and an on-chain payout cannot be recalled.
+</Warning>
 
 ### Ingesting a CSV yourself
 
-If your finance team works in spreadsheets but you want the API to run the batch:
+Validate the whole file before submitting anything. Half a payroll is worse than none.
 
-<Steps>
-  <Step title="Parse and validate before submitting anything">
-    Reject the whole file if any row fails. Half a payroll run is worse than none.
+```typescript
+function validateBatch(rows: PayoutRow[], wallet: Wallet): string[] {
+  const errors: string[] = [];
+  const seen = new Set<string>();
 
-    | Check | Why |
-    | --- | --- |
-    | Address is present and well-formed for the network | Wrong addresses are unrecoverable |
-    | Currency is supported and `withdraws_enabled` on that network | Otherwise every row fails |
-    | Amount is a positive number within sane bounds | Catches a shifted column |
-    | No duplicate recipient rows | Catches a copy-paste error |
-    | Total is within your balance | Catches running dry mid-batch |
-  </Step>
+  for (const [i, r] of rows.entries()) {
+    if (!r.address?.trim())            errors.push(`row ${i}: missing address`);
+    if (!(Number(r.amount) > 0))       errors.push(`row ${i}: invalid amount`);
+    if (seen.has(r.address))           errors.push(`row ${i}: duplicate recipient`);
+    seen.add(r.address);
+  }
 
-  <Step title="Assign a reference per row">
-    Deterministically, from the batch ID and row number, so re-uploading the same file cannot double-pay.
-  </Step>
+  const total = rows.reduce((s, r) => s + Number(r.amount), 0);
+  if (total > Number(wallet.balance)) {
+    errors.push(`total ${total} exceeds balance ${wallet.balance}`);
+  }
+  return errors;
+}
+```
 
-  <Step title="Show a confirmation before submitting">
-    Recipient count, total per currency, and the largest single payout. Require a human to approve it.
-  </Step>
+Then show a human the recipient count, the total per currency, and the largest single payout — and require an explicit approval before `runBatch` is allowed to start.
 
-  <Step title="Run the loop above">
-    Submit, resolve by reference, reconcile on webhooks.
-  </Step>
-</Steps>
+### Reconciling
 
-<Warning>
-  A deterministic reference is what makes an accidental double upload harmless. Generating a random reference per run means the second upload pays everyone again.
-</Warning>
+Mark rows complete on `withdraw.successful` and failed on `withdraw.rejected`, keyed on `reference` and processed idempotently.
+
+<Card title="Webhooks" icon="webhook" href="/wallets/webhooks" horizontal />
+
+<Tip>
+  Route internal recipients — anyone who also holds a Quidax account with you — by account ID rather than address. Instant, free, and no possibility of a wrong-network loss.
+</Tip>
 
 ## Refunds
 
-Refunds are not self-serve in the dashboard. An agreed refund is processed as a payout to the customer's wallet address.
+Refunds are not self-serve in the Basqet dashboard. An agreed refund is processed as a payout to the customer's wallet.
 
-Setting `refund_address` when you initiate a transaction stores it on that transaction, so you have it when a refund comes up.
+Set `refund_address` when you initiate a transaction, so the destination is captured at payment time rather than negotiated in a support thread.
 
 <Card title="Refunds and chargebacks" icon="rotate-left" href="/payments/how-it-works#refunds-and-chargebacks" horizontal />
-
-## Networks
-
-<Warning>
-  The recipient's address must be on the same network as the currency you send. USDT on BEP-20 sent to an ERC-20-only address is lost permanently.
-</Warning>
-
-| Currency | Network |
-| --- | --- |
-| USDT | BEP-20 (BNB Smart Chain) |
-| USDC | BEP-20 (BNB Smart Chain) |
-| BTC | Bitcoin |
-| LTC | Litecoin |
-| ETH | BEP-20 (BNB Smart Chain) |
-| QDX | BEP-20 (BNB Smart Chain) |
-
-<Note>
-  The Wallets API supports a wider set of assets and networks than the Payments payout list above. If you are paying out programmatically, read the live `networks` array on the wallet rather than this table.
-
-  <Card title="Coverage and limits" icon="globe" href="/wallets/coverage" horizontal />
-</Note>
 
 ## Next
 
@@ -252,7 +342,7 @@ Setting `refund_address` when you initiate a transaction stores it on that trans
 
   <Card title="Withdrawals" icon="paper-plane" href="/wallets/withdrawals" horizontal />
 
-  <Card title="Settlements" icon="building-columns" href="/payments/settlements" horizontal />
+  <Card title="Security" icon="shield-check" href="/payments/security" horizontal />
 
-  <Card title="How it works" icon="route" href="/payments/how-it-works" horizontal />
+  <Card title="Settlements" icon="building-columns" href="/payments/settlements" horizontal />
 </CardGroup>

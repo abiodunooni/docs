@@ -1,0 +1,119 @@
+---
+title: "Security"
+description: "Key handling, webhook verification, and the failure modes that matter on a fiat rail."
+icon: "shield-check"
+---
+
+Ramp issues two keys with different jobs.
+
+| Key | Where it belongs | What it does |
+| --- | --- | --- |
+| Public (`pub_…`) | Safe on a client | Initialises the widget |
+| Private (`sk_…`) | **Server only** | Every API call, and signs your webhooks |
+
+<Warning>
+  Ramp authenticates with a custom `x-private-key` header, not bearer auth. Copying an `Authorization` pattern from another product returns `Invalid private key`.
+</Warning>
+
+```bash
+curl 'https://ramp-be.quidax.io/api/v1/merchants/purchase_limits/buy?currency_symbol=ngn' \
+  -H 'accept: application/json' \
+  -H "x-private-key: $RAMP_SECRET_KEY"
+```
+
+Generate keys in the merchant dashboard under **Settings → Preferences → API Keys**. The private key never belongs in browser or mobile code, a repository, or your logs.
+
+## Verifying webhooks
+
+Your webhook URL is public. Verify `X-Ramp-Signature` before acting on any payload — without it, anyone who finds the URL can tell you a transaction settled.
+
+```typescript
+import crypto from "node:crypto";
+
+export function verifyRampSignature(rawBody: string, header?: string): boolean {
+  if (!header) return false;
+
+  const expected = crypto
+    .createHmac("sha512", process.env.RAMP_SECRET_KEY!)
+    .update(rawBody)
+    .digest("hex");
+
+  const a = Buffer.from(expected, "utf8");
+  const b = Buffer.from(header, "utf8");
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+```
+
+<Tip>
+  Sign over the **raw** body. Re-serialising with `JSON.stringify` can reorder keys or change whitespace, and the signature will not match.
+</Tip>
+
+Return `2xx` promptly, then process. Handle repeated events idempotently — `processing` in particular can arrive more than once.
+
+## Credit exactly once, on the right event
+
+The single most consequential rule in a Ramp integration.
+
+| Event | Credit the customer? |
+| --- | --- |
+| `processing` | **No.** Funds received, conversion not finished. |
+| `buy_transaction.successful` with `data.status: completed` | **Yes.** |
+| `needs_attention` | **No.** One leg failed, under manual review. |
+
+<Warning>
+  Crediting on `processing` means crediting a transaction that can still land in `needs_attention`. Because Ramp settles real money, that difference is a real loss rather than a reconciliation note.
+</Warning>
+
+## Failure modes worth designing for
+
+<AccordionGroup>
+  <Accordion title="The customer pays the wrong amount" icon="equals">
+    The provider rejects it and reverses the transfer before Ramp ever sees it. **No webhook fires.** The transaction sits `pending` until it abandons, and your customer reports paying while your system shows nothing.
+
+    Display `amount_expected` prominently and never the base `amount` when they differ. Treat post-payment silence as a wrong-amount signal, not an incident.
+  </Accordion>
+
+  <Accordion title="Someone else pays" icon="user-xmark">
+    The paying account must belong to the customer named on the transaction. A mismatch is rejected and refunded — which is the anti-money-laundering control working, not a bug.
+  </Accordion>
+
+  <Accordion title="A payout reverses after acceptance" icon="rotate-left">
+    A bank or mobile money provider can accept and later reverse. Watch for `sell_transaction.failed` and reconcile against payout status rather than assuming acceptance is final.
+  </Accordion>
+
+  <Accordion title="Limits are per customer, per rolling day" icon="gauge-high">
+    Not per merchant. There is no endpoint for remaining headroom, so track consumption yourself if you want to warn a customer before Ramp rejects them.
+  </Accordion>
+</AccordionGroup>
+
+## Who verifies the customer
+
+This is a security and licensing decision, not a technical one.
+
+| | Widget | API |
+| --- | --- | --- |
+| Identity and sanctions screening | Quidax, once, inside the flow | You, under your own licence |
+| Ongoing monitoring | Quidax | Quidax, at transaction level |
+| Evidence reviewed at onboarding | — | Your verification process |
+
+If your licence does not cover customer verification, the widget is both the faster and the safer route.
+
+## Compliance
+
+<CardGroup cols={2}>
+  <Card title="Prohibited countries" icon="ban" href="/get-started/coverage#prohibited-countries" horizontal />
+
+  <Card title="Licences and compliance" icon="scale-balanced" href="/get-started/licences" horizontal />
+</CardGroup>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Webhooks" icon="webhook" href="/ramp/webhooks" horizontal />
+
+  <Card title="Testing" icon="flask" href="/ramp/testing" horizontal />
+
+  <Card title="Errors and statuses" icon="triangle-exclamation" href="/ramp/errors" horizontal />
+
+  <Card title="How it works" icon="route" href="/ramp/how-it-works" horizontal />
+</CardGroup>

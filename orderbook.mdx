@@ -1,113 +1,196 @@
 ---
 title: "Order Book"
-description: "Live market prices, deep liquidity and order execution for trading products."
+description: "Trade on Quidax's order book from the dashboard, with live prices and deep liquidity."
 icon: "chart-candlestick"
 ---
 
-Place buy and sell orders against Quidax's order book, and read the market data behind it. Order Book runs on the same API and the same account as [Wallets](/wallets) — one secret key covers both.
+Order Book is where you buy and sell on Quidax directly. You place orders against the live book, see the depth behind every price, and settle into the wallets you already hold.
+
+<Note>
+  Order Book is a **dashboard feature**. Sign in, pick a market, place an order — there is nothing to integrate.
+
+  If you want to trade programmatically, or trade on behalf of your users, that is the [Wallets API](/wallets/trading).
+</Note>
 
 <CardGroup cols={2}>
-  <Card title="Trading guide" icon="chart-candlestick" href="/wallets/trading">
-    Orders, market data and trades, with endpoints and expected behaviour.
+  <Card title="Trading API" icon="code" href="/wallets/trading">
+    Place orders programmatically, for yourself or your sub-accounts.
   </Card>
 
-  <Card title="Wallets quickstart" icon="rocket" href="/wallets/quickstart">
-    Get a key and make your first call.
+  <Card title="Swap" icon="arrow-right-arrow-left" href="/wallets/swap">
+    Convert one currency to another at a quoted rate, no order book involved.
   </Card>
 </CardGroup>
 
-## What you can do
+## Order types
 
-<Columns cols={2}>
-  <Card title="Place orders" icon="arrow-right-arrow-left" horizontal>
-    Limit orders at your price, or market orders filled immediately.
-  </Card>
+<Tabs>
+  <Tab title="Market order">
+    Fills immediately at the best price available on the book.
 
-  <Card title="Read prices" icon="chart-line" horizontal>
-    Tickers, order book, depth and OHLC data.
-  </Card>
+    **Use it when** getting the trade done matters more than the exact price — a small size, a liquid pair, or a position you need to close now.
 
-  <Card title="Trade for your users" icon="users" horizontal>
-    Execute on behalf of any sub-account under your merchant account.
-  </Card>
+    **The trade-off** is that you take whatever the book offers. On a thin pair, a large market order walks up the book and fills progressively worse as it consumes each price level.
 
-  <Card title="Reconcile fills" icon="list-check" horizontal>
-    An order can fill across several trades. Reconcile against trades, not orders.
-  </Card>
-</Columns>
+    <Warning>
+      A market order carries no price guarantee. Check the depth before sending a large one — the last traded price tells you nothing about what your order will actually average.
+    </Warning>
+  </Tab>
 
-## At a glance
+  <Tab title="Limit order">
+    Rests on the book at the price you set, and fills only when the market reaches it.
 
-| | |
-| --- | --- |
-| **Base URL** | `https://openapi.quidax.io/exchange-open-api/api/v1` |
-| **Auth** | `Authorization: Bearer <secret_key>` |
-| **Order types** | Limit and market |
-| **Minimum order** | ₦1,000 or $0.90 |
-| **Rate limit** | 300 requests per minute |
+    **Use it when** the price matters more than the timing — you are willing to wait, or you want to set a target and leave it.
 
-## Orders
+    **The trade-off** is that it may never fill. A limit order sits until the market comes to it, you cancel it, or it is filled partially and the remainder keeps resting.
 
-| Action | Method | Path |
+    A limit buy below the current price, or a limit sell above it, adds liquidity to the book rather than taking it — which is what makes you a maker.
+  </Tab>
+</Tabs>
+
+## Makers and takers
+
+Every trade has two sides, and which one you are on determines what you pay.
+
+| | You are a **maker** | You are a **taker** |
 | --- | --- | --- |
-| Create an order | `POST` | `/users/{user_id}/orders` |
-| Fetch all orders | `GET` | `/users/{user_id}/orders` |
-| Fetch one order | `GET` | `/users/{user_id}/orders/{order_id}` |
-| Cancel an order | `POST` | `/users/{user_id}/orders/{order_id}/cancel` |
+| What you did | Placed an order that rested on the book | Placed an order that filled against an existing one |
+| Effect on the book | Added liquidity | Removed liquidity |
+| Typical order | Limit, priced away from the market | Market, or a limit that crosses the spread |
+| Fee | Lower | Higher |
 
-| Status | Meaning |
-| --- | --- |
-| `WAIT` | Queued for execution. |
-| `DONE` | Executed. |
-| `CANCEL` | Cancelled. |
-
-<Warning>
-  A market order carries no price guarantee. On a thin pair it can fill materially away from the last traded price — if you quote a rate to a user before placing one, you carry the difference.
-</Warning>
-
-## Market data
-
-| Action | Method | Path |
-| --- | --- | --- |
-| List all markets | `GET` | `/markets` |
-| Markets summary | `GET` | `/markets/summary` |
-| List market tickers | `GET` | `/markets/tickers` |
-| One market ticker | `GET` | `/markets/tickers/{market}` |
-| Order book | `GET` | `/markets/{currency}/order_book` |
-| Depth | `GET` | `/markets/{currency}/depth` |
-| K-line (OHLC) | `GET` | `/markets/{market}/k` |
-| Recent trades | `GET` | `/trades/{market_pair}` |
+A limit order is not automatically a maker order. If you place a limit buy **above** the best ask, it crosses the spread and fills immediately against resting orders — that makes you a taker, at taker fees.
 
 <Tip>
-  Use tickers to display a price. Order book and depth are much heavier responses — reach for them when building a trading view or calculating slippage, not for a headline number.
+  If you are trading regularly and price is not urgent, resting limit orders inside the spread earns you the maker fee on every fill. Over a month of volume that difference is usually larger than the spread you gave up waiting.
 </Tip>
 
-## Two rules that cause most rejections
+Your exact maker and taker fees depend on your commercial tier and monthly volume.
 
-**Minimum order value** — ₦1,000 or $0.90. Below it, orders are rejected.
+<Card title="How we price" icon="tag" href="/get-started/pricing" horizontal />
+
+## Markets
+
+Prices are quoted against three bases: naira, USDT, and a set of local currencies for stablecoin pairs.
+
+<Tabs>
+  <Tab title="NGN">
+    Assets you can trade directly against naira.
+
+    | Asset | Code | Market |
+    | --- | --- | --- |
+    | Bitcoin | `btc` | `btcngn` |
+    | Tether | `usdt` | `usdtngn` |
+    | Ethereum | `eth` | `ethngn` |
+    | Tether Gold | `xaut` | `xautngn` |
+    | USD Coin | `usdc` | `usdcngn` |
+    | Tron | `trx` | `trxngn` |
+    | Dash | `dash` | `dashngn` |
+    | Litecoin | `ltc` | `ltcngn` |
+    | Ripple | `xrp` | `xrpngn` |
+    | Solana | `sol` | `solngn` |
+    | Quidax Token | `qdx` | `qdxngn` |
+    | Compliant Naira | `cngn` | `cngnngn` |
+    | AxCNH | `axcnh` | `axcnhngn` |
+  </Tab>
+
+  <Tab title="USDT">
+    The deepest set. Assets quoted against Tether.
+
+    | Asset | Code | Asset | Code |
+    | --- | --- | --- | --- |
+    | Bitcoin | `btc` | Shiba Inu | `shib` |
+    | Ethereum | `eth` | Stellar | `xlm` |
+    | Tether Gold | `xaut` | PancakeSwap | `cake` |
+    | Tron | `trx` | Cardano | `ada` |
+    | USD Coin | `usdc` | Bitcoin Cash | `bch` |
+    | Binance Coin | `bnb` | Floki | `floki` |
+    | Dogecoin | `doge` | Solana | `sol` |
+    | USAT | `usat` | Conflux | `cfx` |
+    | Litecoin | `ltc` | Pepe | `pepe` |
+    | Chainlink | `link` | Bonk | `bonk` |
+    | Polygon | `pol` | Gram | `gram` |
+    | Ripple | `xrp` | XYO | `xyo` |
+    | Polkadot | `dot` | Sui | `sui` |
+    | Aave | `aave` | Lisk | `lsk` |
+    | Dash | `dash` | AxCNH | `axcnh` |
+    | Quidax Token | `qdx` | Hyperliquid | `hype` |
+  </Tab>
+
+  <Tab title="Local currency">
+    USDT quoted against local currencies.
+
+    | Market | Currency |
+    | --- | --- |
+    | `usdtghs` | Ghanaian cedi |
+    | `usdtcngn` | Compliant Naira |
+    | `usdtxof` | West African CFA franc |
+    | `usdtzar` | South African rand |
+    | `usdtkes` | Kenyan shilling |
+    | `usdtxaf` | Central African CFA franc |
+  </Tab>
+</Tabs>
+
+<Tip>
+  **Use Tron (TRX) when you are moving USDT around.** Network fees on TRC-20 are a fraction of the equivalent on Ethereum, and for funding or withdrawing a trading balance the difference compounds quickly.
+</Tip>
+
+## Funding and cashing out in naira
+
+<Warning>
+  **Naira deposits and withdrawals are dashboard-only.** There is no API for moving NGN in or out of your Quidax account — fund your trading balance and cash out from the dashboard.
+</Warning>
+
+For programmatic local currency movement, use [Ramp](/ramp): on-ramp converts naira to stablecoin, off-ramp pays stablecoin out to a bank account or mobile money.
+
+| You want | Use |
+| --- | --- |
+| Naira into your trading balance | Dashboard deposit |
+| Naira out of your trading balance | Dashboard withdrawal |
+| Naira in or out, programmatically | [Ramp](/ramp) |
+| Crypto in or out, programmatically | [Wallets API](/wallets/withdrawals) |
+
+## Minimums and precision
+
+Two rules cause most rejected orders.
+
+**Minimum order value** — ₦1,000, or $0.90 against USDT.
 
 **Precision** — each pair caps the decimal places allowed on volume and price independently. For `BTC/USDT`, BTC volume takes 5 decimals, USDT volume 2, and price 2.
 
 <Card title="Precision by pair" icon="ruler" href="/wallets/conventions#precision" horizontal>
-  The full table, and why not to treat it as permanent.
+  The full table.
 </Card>
 
-Round in your own code rather than passing raw user input through. A rejection after a customer has confirmed is a much worse experience than a rounded amount shown up front.
+## Order states
 
-## Swap instead?
+| Status | Meaning |
+| --- | --- |
+| `WAIT` | Resting on the book, waiting to fill. |
+| `DONE` | Fully executed. |
+| `CANCEL` | Cancelled before completing. |
 
-For a plain "convert X to Y" experience, [Swap](/wallets/swap) is the better tool — quote, show, confirm, with no partial fills and no order book to reason about.
+An order can fill across several trades — a large limit order may be matched by many smaller counterparties. `DONE` means the whole order completed, not that it was a single trade.
 
-Use orders when you want control over price and execution.
+## Order book or swap?
+
+| | Order Book | [Swap](/wallets/swap) |
+| --- | --- | --- |
+| You control the price | Yes, with limit orders | No, you accept a quote |
+| Partial fills | Possible | Never |
+| Speed | Immediate, or waits | Immediate |
+| Best for | Size, price sensitivity, active trading | A simple one-off conversion |
+
+If you just want to turn one currency into another and get on with your day, use Swap.
 
 ## Next
 
 <CardGroup cols={2}>
-  <Card title="Trading guide" icon="chart-candlestick" href="/wallets/trading" horizontal />
+  <Card title="Trading API" icon="code" href="/wallets/trading" horizontal />
 
-  <Card title="Build your own exchange" icon="code" href="/use-cases/build-crypto-exchange" horizontal />
+  <Card title="Build your own exchange" icon="chart-candlestick" href="/use-cases/build-crypto-exchange" horizontal />
 
   <Card title="Coverage and limits" icon="globe" href="/wallets/coverage" horizontal />
 
-  <Card title="Testing" icon="flask" href="/wallets/testing" horizontal />
+  <Card title="How we price" icon="tag" href="/get-started/pricing" horizontal />
 </CardGroup>

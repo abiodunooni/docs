@@ -4,7 +4,11 @@ description: "Receive crypto and fiat into user wallets, and know when funds are
 icon: "arrow-down"
 ---
 
-A deposit is money arriving into one of your wallets — crypto sent to an address you generated, or fiat paid in. Quidax monitors the chain, confirms the transaction and credits the wallet.
+A deposit is crypto arriving at an address you generated. Quidax monitors the chain, confirms the transaction and credits the wallet.
+
+<Warning>
+  **Naira deposits are dashboard-only.** There is no API for funding an account with NGN. To move local currency in programmatically, use [Ramp on-ramp](/ramp/on-ramp), which converts naira to stablecoin and settles it to a wallet you nominate.
+</Warning>
 
 ## Fetching deposits
 

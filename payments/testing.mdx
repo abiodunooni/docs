@@ -121,7 +121,7 @@ Repeat for all four outcomes before switching to live.
     Replay the same event and confirm you do not give value twice. Use the retry endpoint to send it again.
   </Accordion>
 
-  <Accordion title="Amounts below the minimum" icon="triangle-alert">
+  <Accordion title="Amounts below the minimum" icon="triangle-exclamation">
     Submit an amount under the minimum and confirm you handle the rejection. It currently returns a `500` rather than a validation error, so make sure that does not surface to your customer as a generic failure.
   </Accordion>
 
@@ -139,7 +139,7 @@ Repeat for all four outcomes before switching to live.
 <CardGroup cols={2}>
   <Card title="Webhooks" icon="webhook" href="/payments/webhooks" horizontal />
 
-  <Card title="Errors and statuses" icon="triangle-alert" href="/payments/errors" horizontal />
+  <Card title="Errors and statuses" icon="triangle-exclamation" href="/payments/errors" horizontal />
 
   <Card title="Quickstart" icon="rocket" href="/payments/quickstart" horizontal />
 

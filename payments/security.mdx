@@ -1,0 +1,116 @@
+---
+title: "Security"
+description: "Key handling, webhook verification, and the fraud model when payments cannot be reversed."
+icon: "shield-check"
+---
+
+Payments has two keys with different jobs, and getting them the wrong way round is the most common mistake in the integration.
+
+| Key | Where it belongs | What it does |
+| --- | --- | --- |
+| Public (`pub_…`) | Safe on a client | Initializes transactions |
+| Secret (`sec_…`) | **Server only** | Everything else |
+
+<Warning>
+  The secret key can create payouts, payment links and conversions. Never ship it in browser or mobile code, never commit it, never log it.
+</Warning>
+
+## Environments
+
+Test and live are fully isolated — separate keys, data and webhooks, with nothing carrying over. The prefix tells you which you are holding:
+
+| | Test | Live |
+| --- | --- | --- |
+| Public | `pub_test_…` | `pub_live_…` |
+| Secret | `sec_test_…` | `sec_live_…` |
+
+<Tip>
+  Assert on the prefix at boot. A service that starts with a `_test_` key in production, or a `_live_` key in staging, should refuse to start rather than discover the problem through a real payment.
+</Tip>
+
+## Verifying webhooks
+
+Your webhook URL is public and unauthenticated. Without signature verification, anyone who finds it can tell you a payment succeeded — and you will ship the goods.
+
+Every genuine request carries `basqetSignature`: an **HMAC SHA512** of the body, keyed with your secret key.
+
+```typescript
+import crypto from "node:crypto";
+
+export function verifyBasqetSignature(rawBody: string, header?: string): boolean {
+  if (!header) return false;
+
+  const expected = crypto
+    .createHmac("sha512", process.env.BASQET_SECRET_KEY!)
+    .update(rawBody)
+    .digest("hex");
+
+  const a = Buffer.from(expected, "utf8");
+  const b = Buffer.from(header, "utf8");
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+```
+
+<Warning>
+  Read the header as `basqetsignature` in lowercase. Node lowercases incoming header names, so the camel-case form is always `undefined` — the check fails silently and you process nothing.
+</Warning>
+
+<Tip>
+  Sign over the **raw** body, not a re-serialised object. `JSON.stringify(req.body)` can reorder keys or change whitespace, and the signature will not match. Capture the raw buffer before your JSON body parser runs.
+</Tip>
+
+## The fraud model is different
+
+There are no chargebacks. Once a payment confirms on-chain it is final, and no bank or wallet provider can claw it back.
+
+**What that removes:** friendly fraud, stolen-card disputes, and the whole acquirer chargeback process.
+
+**What it adds:** you are the last line of defence. There is no acquirer reviewing transactions on your behalf, and no reversal if you ship against a payment that was never real.
+
+<AccordionGroup>
+  <Accordion title="Fulfil on the webhook, never on a redirect" icon="link">
+    A redirect back to your site proves nothing — it can be forged by anyone with the URL. The signed webhook is the only trustworthy signal.
+  </Accordion>
+
+  <Accordion title="Verify the amount, not just the event" icon="scale-unbalanced">
+    Compare `amount_paid` against `payment_amount` before giving value. An `UNDERPAID` transaction still fires a webhook.
+  </Accordion>
+
+  <Accordion title="Process idempotently" icon="fingerprint">
+    Key on the transaction reference. A replayed webhook must not ship a second order.
+  </Accordion>
+
+  <Accordion title="Re-query before high-value fulfilment" icon="magnifying-glass">
+    The webhook says something happened; the API says what is true now. For anything expensive, confirm with `GET /v1/transaction/{id}/status`.
+  </Accordion>
+</AccordionGroup>
+
+## Refunds are outbound payments
+
+Because refunds are processed as payouts to a customer's wallet, a refund flow is a money-movement flow — and needs the controls of one.
+
+<Warning>
+  Never send a refund to an address supplied in a support conversation without verifying it against the `refund_address` stored on the original transaction. Refund social engineering is the most likely attack on a crypto payments integration.
+</Warning>
+
+Set `refund_address` when you initiate a transaction, so the destination is captured at payment time rather than negotiated later.
+
+## Compliance
+
+<CardGroup cols={2}>
+  <Card title="Prohibited countries" icon="ban" href="/get-started/coverage#prohibited-countries" horizontal />
+
+  <Card title="Licences and compliance" icon="scale-balanced" href="/get-started/licences" horizontal />
+</CardGroup>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Webhooks" icon="webhook" href="/payments/webhooks" horizontal />
+
+  <Card title="Testing" icon="flask" href="/payments/testing" horizontal />
+
+  <Card title="Errors and statuses" icon="triangle-exclamation" href="/payments/errors" horizontal />
+
+  <Card title="How it works" icon="route" href="/payments/how-it-works" horizontal />
+</CardGroup>

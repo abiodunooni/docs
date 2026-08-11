@@ -4,13 +4,18 @@ description: "Send crypto on-chain, move funds between accounts, and pay out to 
 icon: "paper-plane"
 ---
 
-One endpoint covers three different jobs, and which one you get depends on what you put in `fund_uid`:
+One endpoint covers two jobs, and which one you get depends on what you put in `fund_uid`:
 
 | `fund_uid` contains | Result |
 | --- | --- |
 | A blockchain address | On-chain withdrawal |
 | An account ID | Internal transfer, instant and free |
-| A bank account number | Fiat payout to a bank |
+
+<Warning>
+  **Naira withdrawals are not available through the API.** Paying out to a Nigerian bank account is currently a dashboard-only action.
+
+  For programmatic local currency payouts, use [Ramp off-ramp](/ramp/off-ramp), which converts stablecoin and delivers to a bank account or mobile money.
+</Warning>
 
 <Warning>
   Verify the destination before you submit. Once an on-chain withdrawal is sent, funds cannot be recovered if the address was wrong. There is no reversal.
@@ -29,9 +34,9 @@ One endpoint covers three different jobs, and which one you get depends on what 
 | --- | --- | --- | --- |
 | `currency` | string | Yes | Currency to withdraw, for example `btc`, `usdt`, `ngn`. |
 | `amount` | string | Yes | Value to send to the recipient. |
-| `fund_uid` | string | Yes | Blockchain address, account ID, or bank account number. |
+| `fund_uid` | string | Yes | Blockchain address, or a Quidax account ID for an internal transfer. |
 | `reference` | string | Yes | Your unique reference for this withdrawal. |
-| `fund_uid2` | string | No | Destination tag, or bank code for NGN payouts. |
+| `fund_uid2` | string | No | Destination tag, for chains that need one. |
 | `network` | string | No | Blockchain network. Required for multi-network assets. |
 | `transaction_note` | string | No | Note for the recipient. |
 | `narration` | string | No | Narration for the recipient. |
@@ -77,25 +82,19 @@ One endpoint covers three different jobs, and which one you get depends on what 
     <Card title="Sub-accounts" icon="users" href="/wallets/sub-accounts#moving-funds-between-accounts" horizontal />
   </Tab>
 
-  <Tab title="Bank payout">
-    For NGN, `fund_uid` is the **account number** and `fund_uid2` is the **bank code**.
+  <Tab title="Naira payout">
+    **Not available through the API.** Naira withdrawals to a bank account are a dashboard-only action today.
 
-    ```bash
-    curl -X POST 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me/withdraws' \
-      -H 'accept: application/json' \
-      -H 'content-type: application/json' \
-      -H "Authorization: Bearer $QUIDAX_SECRET_KEY" \
-      -d '{
-        "currency": "ngn",
-        "amount": "1000",
-        "fund_uid": "0000000000",
-        "fund_uid2": "0000",
-        "reference": "<your_unique_reference>",
-        "narration": "Payout"
-      }'
-    ```
+    Two routes if you need this programmatically:
 
-    The response includes `fee` and `stamp_duty_fee` alongside the amount, so you can reconcile what actually left the account.
+    | Approach | How |
+    | --- | --- |
+    | Convert and pay out | [Ramp off-ramp](/ramp/off-ramp) — stablecoin in, naira into a bank account or mobile money |
+    | Keep it manual | Sweep to your parent account and pay out from the dashboard |
+
+    <Card title="Ramp off-ramp" icon="arrow-up" href="/ramp/off-ramp" horizontal>
+      Local currency payouts with name checks, payout accounts and settlement webhooks.
+    </Card>
   </Tab>
 </Tabs>
 
@@ -161,7 +160,7 @@ curl 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me/withdraws/refe
 
 | Field | What it tells you |
 | --- | --- |
-| `type` | How it was routed — `internal_transfer`, `bank_account` or an on-chain type. |
+| `type` | How it was routed — `internal_transfer`, an on-chain type, or `bank_account` for a payout made from the dashboard. |
 | `amount` / `fee` / `total` | What was sent, what it cost, and what left the wallet. |
 | `txId` | The blockchain transaction hash. `null` for internal transfers. |
 | `status` | `done`, `processing` or `rejected`, lowercase here. |

@@ -20,7 +20,7 @@ curl 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me' \
   </Step>
 
   <Step title="Create the key">
-    Enter an IP address if you want to restrict the key, provide your authentication code, and click **Create**.
+    Add the IP addresses you want the key to work from, provide your authentication code, and click **Create**.
   </Step>
 
   <Step title="Store it">
@@ -28,9 +28,26 @@ curl 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me' \
   </Step>
 </Steps>
 
+## IP whitelisting
+
+A key can be bound to **up to 10 IP addresses**. Requests from anywhere else are rejected, so a leaked key is useless to anyone who is not already inside your infrastructure.
+
 <Tip>
-  Restricting a key to your server's IP address is the single cheapest security measure available here. A leaked key that only works from one address is far less damaging than one that works from anywhere.
+  This is the single cheapest security control available here, and ten addresses is enough for almost any real deployment — a few application servers, a NAT gateway, a bastion host, and room for a blue/green cutover.
 </Tip>
+
+Plan the ten before you create the key:
+
+| Include | Why |
+| --- | --- |
+| Every production egress IP | Your servers may leave through more than one |
+| Your NAT gateway or load balancer | Often the actual source, not the instance |
+| Staging, if it calls the live API | Otherwise staging breaks silently |
+| One spare | Room to cut over without downtime |
+
+<Warning>
+  Autoscaling behind a dynamic IP pool will exhaust ten addresses quickly. Route outbound traffic through a fixed NAT gateway and whitelist that, rather than trying to track instance IPs.
+</Warning>
 
 <Warning>
   The secret key is server-side only. It grants full access to your account and every sub-account under it, including withdrawals. Never ship it in browser or mobile code, never commit it, and never log it.

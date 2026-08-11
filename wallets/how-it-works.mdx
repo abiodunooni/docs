@@ -95,7 +95,8 @@ Withdrawals all use one endpoint. What you put in `fund_uid` decides the rail.
     | --- | --- |
     | Blockchain address | On-chain |
     | Account ID | Internal, instant, no fee |
-    | Bank account number | Fiat payout, with `fund_uid2` as the bank code |
+
+    **Naira payouts are not available here.** They are dashboard-only — use [Ramp off-ramp](/ramp/off-ramp) for programmatic local currency.
 
     **You get back** a withdrawal with `status: processing`.
   </Step>
@@ -146,7 +147,7 @@ Swap quotes and order fills both change balances, and both emit `wallet.updated`
   Statuses are uppercase in these tables and lowercase in webhook payloads. Compare case-insensitively.
 </Note>
 
-<Card title="Errors and statuses" icon="triangle-alert" href="/wallets/errors" horizontal>
+<Card title="Errors and statuses" icon="triangle-exclamation" href="/wallets/errors" horizontal>
   Every status, every error code, and what to do about each.
 </Card>
 
