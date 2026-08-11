@@ -1,0 +1,191 @@
+---
+title: "Use cases"
+description: "What teams build on Wallets, and the architecture each one implies."
+icon: "lightbulb"
+---
+
+## Common patterns
+
+<CardGroup cols={2}>
+  <Card title="Crypto exchanges" icon="chart-candlestick">
+    Sub-accounts per user, addresses for deposits, order book for execution, withdrawals out.
+  </Card>
+
+  <Card title="Neobanks and consumer apps" icon="mobile">
+    A crypto balance alongside a fiat one, funded on-chain and convertible in-app.
+  </Card>
+
+  <Card title="Payroll and mass payouts" icon="users">
+    A funded treasury account paying many recipients, on-chain or internally.
+  </Card>
+
+  <Card title="Remittance" icon="money-bill-transfer">
+    Collect in one market, move value as stablecoin, pay out in another.
+  </Card>
+
+  <Card title="Gaming and betting" icon="dice">
+    Deposits credit a player balance, winnings pay out to a wallet or bank.
+  </Card>
+
+  <Card title="Treasury and OTC desks" icon="vault">
+    Hold multiple currencies, convert on your own schedule, sweep to a single position.
+  </Card>
+</CardGroup>
+
+## Worked examples
+
+### Custodial balances for your users
+
+Each customer gets a sub-account. You hold their funds, they see a balance in your product.
+
+<Steps>
+  <Step title="Create a sub-account per user">
+    `POST /users` with your own `reference` set to your internal user ID.
+  </Step>
+
+  <Step title="Generate addresses on demand">
+    `POST /users/{user_id}/wallets/{currency}/addresses?network=...`
+
+    Generate lazily, when a user first asks to deposit that currency. Generating for every user in every currency up front will hit the 20-per-second limit for no benefit.
+  </Step>
+
+  <Step title="Credit on ACCEPTED">
+    Listen for `deposit.successful`, re-query, and credit only at `ACCEPTED`.
+  </Step>
+
+  <Step title="Sweep to treasury">
+    Internal transfers to your parent account are instant and free. Sweep on a schedule rather than per deposit.
+  </Step>
+</Steps>
+
+<Warning>
+  Holding customer funds is a regulated activity in most markets. Confirm your licensing position during onboarding before you build this.
+</Warning>
+
+### Mass payouts
+
+A funded treasury account paying many recipients.
+
+<Steps>
+  <Step title="Fund the parent account">
+    On-chain, or by sweeping in from sub-accounts.
+  </Step>
+
+  <Step title="Check the balance and the network">
+    `GET /users/me/wallets/{currency}` — read `balance`, and confirm `withdraws_enabled` on the network you intend to use.
+  </Step>
+
+  <Step title="Generate a reference per recipient">
+    Before you call, and store it. This is what makes the batch resumable.
+  </Step>
+
+  <Step title="Submit sequentially">
+    `POST /users/me/withdraws` per recipient, at a rate inside 300 per minute.
+  </Step>
+
+  <Step title="Reconcile by reference">
+    `GET /users/me/withdraws/reference/{reference}` for anything you did not get a clean response for. `110112` means it never landed.
+  </Step>
+</Steps>
+
+<Tip>
+  Route internal recipients — anyone who also has an account with you — by account ID rather than address. Instant, free, and no chance of a wrong-network loss.
+</Tip>
+
+<Card title="Building payouts" icon="paper-plane" href="/payments/payouts" horizontal>
+  The full payout build, including CSV batches.
+</Card>
+
+### Remittance corridors
+
+Collect in one market, settle in another, using stablecoin as the bridge.
+
+<Steps>
+  <Step title="Collect">
+    Local currency in through [Ramp](/ramp), or crypto in through a Wallets address.
+  </Step>
+
+  <Step title="Hold value as stablecoin">
+    Convert with [Swap](/wallets/swap) so the position does not move with the local currency while it is in flight.
+  </Step>
+
+  <Step title="Pay out">
+    Local currency out through Ramp off-ramp, or crypto out through a Wallets withdrawal.
+  </Step>
+</Steps>
+
+<Note>
+  Each corridor settles in its own local currency. Aggregating across currencies would place FX risk on Quidax on your behalf — settle to stablecoin and convert on your own treasury side instead.
+</Note>
+
+### Trading on behalf of users
+
+<Steps>
+  <Step title="Fund the sub-account">
+    Deposit, or an internal transfer from your treasury.
+  </Step>
+
+  <Step title="Round to the pair's precision">
+    Before submitting. Orders below the minimum value or with too many decimals are rejected.
+  </Step>
+
+  <Step title="Place the order">
+    `POST /users/{user_id}/orders`. Limit when the user set a price, market when they want it filled now.
+  </Step>
+
+  <Step title="Reconcile fills">
+    An order can fill across several trades. `GET /users/{user_id}/trades` is what you reconcile against, not the order alone.
+  </Step>
+</Steps>
+
+<Warning>
+  A market order carries no price guarantee. If you quote a rate to a user before placing one, you carry the difference on a thin pair.
+</Warning>
+
+## Architectural decisions
+
+### One sub-account per user, or one shared account?
+
+| | Sub-account per user | One shared account |
+| --- | --- | --- |
+| Deposit attribution | Automatic, by address | You reconcile manually |
+| Per-user balances | Held by Quidax | You maintain a ledger |
+| Sweeping | Internal transfer, free | Not needed |
+| Complexity | Lower | Higher, and easy to get wrong |
+
+Use sub-accounts unless you have a specific reason not to. Attribution is the hard part of a shared-account model, and getting it wrong means crediting the wrong customer.
+
+### Where does your ledger live?
+
+Quidax holds balances, but your product still needs its own ledger — for pending states, fees you add, and anything Quidax does not know about. Treat Quidax as the source of truth for what settled, and your ledger as the source of truth for what you told your customer.
+
+Reconcile the two on a schedule. A missed webhook then surfaces within hours instead of at month end.
+
+### Sweeping strategy
+
+| Approach | Trade-off |
+| --- | --- |
+| Sweep every deposit | Simple. More API calls, and no benefit since internal transfers are free either way. |
+| Sweep on a schedule | Fewer calls, balances sit in sub-accounts between runs. |
+| Never sweep | Simplest. Your treasury position is spread across accounts and harder to read. |
+
+## What Wallets does not do
+
+- **No sandbox.** You test against production. See [Testing](/wallets/testing).
+- **No address validation endpoint.** Validate client-side and test-send.
+- **No webhook replay.** Retries stop after 24 hours, permanently.
+- **No per-sub-account credentials.** One key reaches the whole tree.
+- **No fiat pay-ins.** Fiat comes in through [Ramp](/ramp) or [Payments](/payments).
+- **Not every asset can be received.** Several are trade-only.
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="How it works" icon="route" href="/wallets/how-it-works" horizontal />
+
+  <Card title="Coverage and limits" icon="globe" href="/wallets/coverage" horizontal />
+
+  <Card title="Quickstart" icon="rocket" href="/wallets/quickstart" horizontal />
+
+  <Card title="Schedule a demo" icon="calendar" href="/get-started/schedule-a-demo" horizontal />
+</CardGroup>

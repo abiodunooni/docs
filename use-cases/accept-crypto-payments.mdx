@@ -1,0 +1,116 @@
+---
+title: "Accept crypto payments for products and services"
+description: "Price in fiat, let customers pay in crypto, and settle in the currency you choose."
+icon: "hand-holding-dollar"
+---
+
+Your customer sees a price in naira or dollars. They pay in USDT, BTC or whatever else they hold. You receive one currency, converted on the way in.
+
+No cards, no acquirer, no chargebacks.
+
+**Product:** [Payments](/payments).
+
+## Pick a channel
+
+| | Checkout SDK | Payment links | API |
+| --- | --- | --- | --- |
+| Effort | Embed a modal | None | Two calls plus webhooks |
+| Who builds the payment screen | Basqet | Basqet | You |
+| Single-use payments | Yes | **No — links are reusable** | Yes |
+| Best for | Most storefronts | Invoicing, social selling | Custom checkouts |
+
+Start with the checkout modal unless you have a reason not to. It handles the currency picker, address, QR code and countdown, and you get the same webhooks.
+
+## Build it
+
+<Steps>
+  <Step title="Initialize at checkout">
+    `POST /v1/transaction` with the amount, fiat currency and the customer's email. Uses your **public** key.
+
+    **You get back** `status: INITIATED` and a reference. Nothing is owed yet, no rate locked.
+
+    Put your order ID in `meta` — it comes back on every webhook, which saves you a lookup table.
+
+    **Check first:** the amount must clear the minimum (₦2,000 or $1). Below it you currently get a `500`, not a validation error.
+  </Step>
+
+  <Step title="Initiate when the customer picks a currency">
+    `POST /v1/transaction/{id}/pay` with `currency_id`. Uses your **secret** key.
+
+    **You get back** `payment_amount`, `payment_address` and `qrCode`. Status moves to `PENDING`.
+
+    **The rate locks here and the 60-minute expiry starts.** Call it when they are ready to pay, not on page load.
+  </Step>
+
+  <Step title="Display three things">
+    The exact amount, the address, and the QR code.
+
+    Add a line telling customers to check their wallet's withdrawal fee is not coming out of the total. This single sentence prevents more underpayments than any setting.
+  </Step>
+
+  <Step title="Fulfil on the webhook">
+    **Expect** `payment.received`. Fulfil then.
+
+    Never fulfil on the customer returning to your site — someone who closes the tab after paying still paid, and someone who returns without paying has not.
+
+    <Card title="Webhooks" icon="webhook" href="/payments/webhooks" horizontal />
+  </Step>
+
+  <Step title="Decide the awkward outcomes before launch">
+    | Outcome | Default | Where to change it |
+    | --- | --- | --- |
+    | Underpaid | Refunded, nothing credited to you | Settings → Business → Dispute Settings |
+    | Overpaid | Credited to you in full | Same |
+    | Abandoned | Expires after 60 minutes | Not configurable |
+
+    Release reserved stock on `payment.abandoned`.
+  </Step>
+
+  <Step title="Choose what you hold">
+    Convert everything to one currency as it arrives, or keep payments as paid and settle per currency.
+
+    <Card title="Settlements" icon="building-columns" href="/payments/settlements" horizontal />
+  </Step>
+</Steps>
+
+## What is different from cards
+
+<AccordionGroup>
+  <Accordion title="There are no chargebacks" icon="shield-check">
+    Crypto payments are final once confirmed on-chain. No bank or wallet provider can claw one back.
+
+    This removes a whole category of fraud loss, but it also means disputes are resolved by you, not by an acquirer.
+  </Accordion>
+
+  <Accordion title="Refunds are a payout, not a reversal" icon="rotate-left">
+    Refunds are not self-serve in the dashboard. An agreed refund is sent as a payout to the customer's wallet.
+
+    Set `refund_address` when you initiate the transaction so you have somewhere to send it.
+  </Accordion>
+
+  <Accordion title="The amount can arrive wrong" icon="scale-unbalanced">
+    Customers routinely send slightly less than quoted because their wallet deducts a fee. Underpayments are normal, not exceptional — decide how you handle them before you launch.
+  </Accordion>
+
+  <Accordion title="Settlement is not exact in stablecoin" icon="gas-pump">
+    Settling in USDT or USDC carries roughly 1 USDT in gas. A 4 USD payment does not land as 4 USDT.
+  </Accordion>
+</AccordionGroup>
+
+## Before you launch
+
+<Card title="Testing" icon="flask" href="/payments/testing" horizontal>
+  Simulate successful, underpaid, overpaid and abandoned outcomes without sending real crypto.
+</Card>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Payments" icon="credit-card" href="/payments" horizontal />
+
+  <Card title="Payments quickstart" icon="rocket" href="/payments/quickstart" horizontal />
+
+  <Card title="Payment links" icon="link" href="/payments/payment-links" horizontal />
+
+  <Card title="Schedule a demo" icon="calendar" href="/get-started/schedule-a-demo" horizontal />
+</CardGroup>

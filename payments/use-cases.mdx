@@ -1,0 +1,181 @@
+---
+title: "Use cases"
+description: "What teams build with Payments, and the architecture each one implies."
+icon: "lightbulb"
+---
+
+## Common patterns
+
+<CardGroup cols={2}>
+  <Card title="Ecommerce checkout" icon="cart-shopping">
+    Price in fiat, let customers pay in crypto, settle in one currency.
+  </Card>
+
+  <Card title="Digital goods and SaaS" icon="cloud">
+    Global customers paying without cards, chargebacks or acquirer friction.
+  </Card>
+
+  <Card title="Invoicing" icon="file-invoice">
+    Payment links per invoice, no integration required.
+  </Card>
+
+  <Card title="Marketplaces" icon="store">
+    Collect from buyers, pay sellers out in bulk.
+  </Card>
+
+  <Card title="Creator and social commerce" icon="share-nodes">
+    Shareable links for audiences that never reach a checkout page.
+  </Card>
+
+  <Card title="Treasury in stablecoins" icon="vault">
+    Convert everything collected into USDT or USDC and hold one position.
+  </Card>
+</CardGroup>
+
+## Worked examples
+
+### Crypto checkout on your own storefront
+
+Your customer picks a product priced in fiat and pays in crypto.
+
+<Steps>
+  <Step title="Initialize when the customer reaches checkout">
+    `POST /v1/transaction` with the amount, the fiat currency and their email.
+
+    **You get back** `status: INITIATED` and a reference. Nothing is owed yet and no rate is locked.
+
+    Put your order ID in `meta` — it comes back on every webhook.
+  </Step>
+
+  <Step title="Initiate when they choose a currency">
+    `POST /v1/transaction/{id}/pay` with `currency_id`.
+
+    **You get back** `payment_amount`, `payment_address` and a `qrCode`, and the status moves to `PENDING`.
+
+    **The rate locks here and the 60-minute expiry starts.** Do not call this on page load.
+  </Step>
+
+  <Step title="Show the three things that matter">
+    The exact amount, the address, and the QR code. Add a line telling customers to check their provider's fee is not being deducted from the total.
+  </Step>
+
+  <Step title="Fulfil on the webhook">
+    **Expect** `payment.received`. Fulfil then — not when the customer returns to your site.
+  </Step>
+
+  <Step title="Handle the awkward outcomes">
+    Underpaid, overpaid or abandoned. Each needs a decision before launch, not after.
+  </Step>
+</Steps>
+
+<Card title="Accepting payments" icon="code" href="/payments/pay-ins" horizontal />
+
+### Invoicing without an integration
+
+<Steps>
+  <Step title="Create a static link per invoice">
+    `POST /v1/payment-links` with `link_type: static` and the amount, or create it in the dashboard.
+  </Step>
+
+  <Step title="Share the payment_url">
+    WhatsApp, email, SMS, a button on your site.
+  </Step>
+
+  <Step title="Reconcile from webhooks">
+    Each use of a link creates its own transaction.
+  </Step>
+</Steps>
+
+<Warning>
+  Payment links are **reusable**. A static link can be paid many times, which is wrong for an invoice you expect to be settled once. If single use matters, initialize a transaction directly instead.
+</Warning>
+
+### Collect in crypto, hold in stablecoin
+
+Customers pay in whatever they hold; you never carry exposure to it.
+
+<Steps>
+  <Step title="Turn on conversion">
+    **Settings → Settlement Settings → Convert payments received to a currency**, set to USDT or USDC.
+  </Step>
+
+  <Step title="Take payments normally">
+    Everything converts as it arrives. Your balance shows one currency.
+  </Step>
+
+  <Step title="Settle on your schedule">
+    Non-NGN settlements are requested manually.
+  </Step>
+</Steps>
+
+<Warning>
+  Stablecoin settlement carries roughly 1 USDT in gas. A 4 USD payment does not land as exactly 4 USDT — build that into anything you quote precisely.
+</Warning>
+
+### Marketplace: collect and pay out
+
+Payments handles the collection. **Payouts are built on the Wallets API.**
+
+<Steps>
+  <Step title="Collect from buyers">
+    Checkout or payment links, converted to a single settlement currency.
+  </Step>
+
+  <Step title="Fund a payout balance">
+    Settle into a wallet you control.
+  </Step>
+
+  <Step title="Pay sellers">
+    Individually or as a CSV batch.
+
+    <Card title="Payouts" icon="paper-plane" href="/payments/payouts" horizontal />
+  </Step>
+</Steps>
+
+## Architectural decisions
+
+### Checkout SDK, payment links, or the API?
+
+| | Checkout SDK | Payment links | API |
+| --- | --- | --- | --- |
+| Who builds the payment screen | Basqet | Basqet | You |
+| Integration effort | Embed a modal | None | Two calls plus webhooks |
+| Single-use payments | Yes | **No, links are reusable** | Yes |
+| Control over the experience | Standard | None | Complete |
+
+Start with the checkout modal unless you have a specific reason not to. It handles the currency picker, address display, QR code and countdown — the parts customers get wrong — and you receive the same webhooks either way.
+
+### Who absorbs the fees?
+
+Both the processing fee and the settlement fee can be passed to the customer, per payment link or as an account setting. Passing them keeps your margin intact but raises the displayed price; absorbing them is cleaner to communicate. Decide once and apply it consistently, because switching later changes every price your customers see.
+
+### Under and overpayments
+
+The defaults are asymmetric, and both are configurable:
+
+| | Default | Consider |
+| --- | --- | --- |
+| Underpaid | Refunded, nothing credited to you | Accepting them if your margins tolerate small shortfalls |
+| Overpaid | Credited to you in full | Auto-refunding if fairness matters more than revenue |
+
+Underpayments are common because wallets deduct withdrawal fees from the amount sent. Warning customers at checkout reduces them more than any setting will.
+
+## What Payments does not do
+
+- **No chargebacks.** Crypto payments are final once confirmed. This is a feature, but it changes how you handle disputes.
+- **No self-serve refunds.** Refunds are processed as a payout to the customer's wallet.
+- **No fiat pay-ins yet.** Customers pay in crypto; you can settle in fiat.
+- **No payouts API of its own.** Payouts run on Wallets, or the dashboard.
+- **No guaranteed exact settlement amounts** in stablecoin, because of gas.
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="How it works" icon="route" href="/payments/how-it-works" horizontal />
+
+  <Card title="Coverage and limits" icon="globe" href="/payments/coverage" horizontal />
+
+  <Card title="Quickstart" icon="rocket" href="/payments/quickstart" horizontal />
+
+  <Card title="Schedule a demo" icon="calendar" href="/get-started/schedule-a-demo" horizontal />
+</CardGroup>

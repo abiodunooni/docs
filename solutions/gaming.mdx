@@ -1,0 +1,106 @@
+---
+title: "Gaming"
+description: "Fund player balances, run in-game economies, and pay winnings out fast."
+icon: "dice"
+---
+
+Gaming and betting products live or die on two moments: how quickly a player can deposit, and how quickly they get paid when they win. Both are payment problems.
+
+## What you need
+
+| Moment | Product |
+| --- | --- |
+| Player funds in local currency | [Ramp](/ramp) on-ramp |
+| Player funds in crypto | [Wallets](/wallets) addresses, or [Payments](/payments) checkout |
+| Player balance | [Wallets](/wallets) sub-accounts, or your own ledger |
+| Winnings to a bank account | [Ramp](/ramp) off-ramp |
+| Winnings to a wallet | [Wallets](/wallets) withdrawals |
+
+## Build it
+
+<Steps>
+  <Step title="Fund the player">
+    Ramp on-ramp for local currency, or a Wallets address if they hold crypto.
+
+    **Credit the player balance only on the settlement webhook** — `buy_transaction.successful` with `data.status: completed`, or a deposit at `ACCEPTED`.
+
+    Crediting on `processing` or on `deposit.successful` alone means crediting money that can still be held or reversed. In gaming that becomes a player who has already staked funds you never received.
+  </Step>
+
+  <Step title="Run the balance">
+    Either hold it in a Wallets sub-account, or hold your own ledger and keep funds pooled in your treasury account.
+
+    Sub-accounts give you automatic deposit attribution. A pooled model means you reconcile deposits to players yourself, which is the part that goes wrong.
+  </Step>
+
+  <Step title="Pay winnings">
+    Off-ramp to a bank account, or a Wallets withdrawal to a wallet address.
+
+    Generate a unique `reference` per payout before you call, and resolve anything uncertain by reference rather than resubmitting.
+
+    <Card title="Payouts" icon="paper-plane" href="/payments/payouts" horizontal />
+  </Step>
+
+  <Step title="Handle the batch case">
+    Tournament and jackpot payouts arrive all at once. Stay inside 300 requests per minute, submit one at a time, and make the batch resumable with deterministic references.
+  </Step>
+</Steps>
+
+## What will bite you
+
+<AccordionGroup>
+  <Accordion title="Payouts cannot be reversed" icon="triangle-exclamation">
+    An on-chain payout to a wrong address is gone. There is no address-validation endpoint, so validate format client-side and consider a small test send for unusually large wins.
+
+    The 6-second cancellation window is not a customer-facing undo.
+  </Accordion>
+
+  <Accordion title="Double-crediting on webhook retries" icon="fingerprint">
+    The same event can arrive more than once. In gaming a double credit is immediately exploitable — key every credit on the transaction ID and check before giving value.
+  </Accordion>
+
+  <Accordion title="Limits are per player, per rolling day" icon="gauge-high">
+    Not per merchant, and not per calendar day. A player who deposits at 15:00 regains that headroom at 15:00 the next day.
+
+    There is no endpoint for remaining headroom, so track it yourself if you want to warn a player before a deposit is rejected mid-session.
+  </Accordion>
+
+  <Accordion title="Underpayments on crypto deposits" icon="scale-unbalanced">
+    Players routinely send slightly less than quoted because their wallet deducts a fee. Decide up front whether you credit the shortfall or refund it.
+  </Accordion>
+
+  <Accordion title="Licensing" icon="scale-balanced">
+    Gaming and betting are regulated separately from payments, and holding player funds is its own regulated activity. Confirm both positions during onboarding.
+  </Accordion>
+</AccordionGroup>
+
+## Speed expectations
+
+| Leg | Typical |
+| --- | --- |
+| On-ramp funding | Under 5 minutes |
+| NGN payout | Under 2 minutes |
+| GHS mobile money payout | Under 5 minutes |
+| Internal transfer | Instant |
+
+Nigeria's instant rail runs continuously. Some bank rails have processing hours and queue outside them.
+
+## Before you launch
+
+<CardGroup cols={2}>
+  <Card title="Ramp testing" icon="flask" href="/ramp/testing" horizontal />
+
+  <Card title="Wallets testing" icon="flask" href="/wallets/testing" horizontal />
+</CardGroup>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Ramp" icon="arrow-right-arrow-left" href="/ramp" horizontal />
+
+  <Card title="Wallets" icon="wallet" href="/wallets" horizontal />
+
+  <Card title="Pay with stablecoins" icon="paper-plane" href="/use-cases/pay-with-stablecoins" horizontal />
+
+  <Card title="Schedule a demo" icon="calendar" href="/get-started/schedule-a-demo" horizontal />
+</CardGroup>

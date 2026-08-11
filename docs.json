@@ -87,6 +87,28 @@
             ]
           },
           {
+            "group": "Use cases",
+            "pages": [
+              "use-cases/build-crypto-exchange",
+              "use-cases/accept-crypto-payments",
+              "use-cases/pay-with-stablecoins",
+              "use-cases/collect-fiat-settle-stablecoins",
+              "use-cases/fund-stablecoins-payout-fiat",
+              "use-cases/stablecoin-savings"
+            ]
+          },
+          {
+            "group": "Solutions",
+            "pages": [
+              "solutions/remittance",
+              "solutions/neobank",
+              "solutions/gaming",
+              "solutions/payroll",
+              "solutions/ecommerce",
+              "solutions/exchanges"
+            ]
+          },
+          {
             "group": "Set up",
             "pages": [
               "get-started/onboarding",
@@ -149,6 +171,7 @@
             "group": "Overview",
             "pages": [
               "payments",
+              "payments/use-cases",
               "payments/how-it-works",
               "payments/coverage"
             ]
@@ -182,6 +205,8 @@
             "group": "Overview",
             "pages": [
               "wallets",
+              "wallets/use-cases",
+              "wallets/how-it-works",
               "wallets/coverage"
             ]
           },
@@ -200,8 +225,10 @@
             ]
           },
           {
-            "group": "Reference",
+            "group": "Launch",
             "pages": [
+              "wallets/testing",
+              "wallets/errors",
               "wallets/conventions"
             ]
           }
@@ -211,9 +238,11 @@
         "tab": "Orderbook",
         "groups": [
           {
-            "group": "Orderbook",
+            "group": "Order Book",
             "pages": [
-              "orderbook"
+              "orderbook",
+              "wallets/trading",
+              "wallets/swap"
             ]
           }
         ]
@@ -222,9 +251,26 @@
         "tab": "Developer Tools",
         "groups": [
           {
-            "group": "Developer",
+            "group": "Overview",
             "pages": [
-              "orderbook"
+              "developer-tools"
+            ]
+          },
+          {
+            "group": "Conventions",
+            "pages": [
+              "developer-tools/authentication",
+              "developer-tools/webhooks",
+              "developer-tools/errors-and-limits",
+              "developer-tools/sdks"
+            ]
+          },
+          {
+            "group": "Resources",
+            "pages": [
+              "testing",
+              "api-reference",
+              "changelog"
             ]
           }
         ]
@@ -339,6 +385,95 @@
                 "group": "Reference",
                 "pages": [
                   "api-reference/payments/reference/list-supported-currencies"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Wallets",
+            "pages": [
+              "api-reference/wallets/introduction",
+              {
+                "group": "Sub-accounts",
+                "pages": [
+                  "api-reference/wallets/sub-accounts/create-a-sub-account",
+                  "api-reference/wallets/sub-accounts/edit-sub-account-details",
+                  "api-reference/wallets/sub-accounts/fetch-a-sub-account",
+                  "api-reference/wallets/sub-accounts/fetch-all-sub-accounts",
+                  "api-reference/wallets/sub-accounts/fetch-the-parent-account"
+                ]
+              },
+              {
+                "group": "Wallets and addresses",
+                "pages": [
+                  "api-reference/wallets/wallets-and-addresses/create-a-payment-address",
+                  "api-reference/wallets/wallets-and-addresses/fetch-a-payment-address-by-id",
+                  "api-reference/wallets/wallets-and-addresses/fetch-a-wallet",
+                  "api-reference/wallets/wallets-and-addresses/fetch-all-payment-addresses",
+                  "api-reference/wallets/wallets-and-addresses/fetch-all-wallets",
+                  "api-reference/wallets/wallets-and-addresses/fetch-the-current-payment-address"
+                ]
+              },
+              {
+                "group": "Deposits",
+                "pages": [
+                  "api-reference/wallets/deposits/fetch-a-deposit",
+                  "api-reference/wallets/deposits/fetch-deposits-across-all-sub-accounts",
+                  "api-reference/wallets/deposits/fetch-deposits-for-a-user"
+                ]
+              },
+              {
+                "group": "Withdrawals",
+                "pages": [
+                  "api-reference/wallets/withdrawals/cancel-a-withdrawal",
+                  "api-reference/wallets/withdrawals/create-a-withdrawal",
+                  "api-reference/wallets/withdrawals/fetch-a-withdrawal-by-reference"
+                ]
+              },
+              {
+                "group": "Orders",
+                "pages": [
+                  "api-reference/wallets/orders/cancel-an-order",
+                  "api-reference/wallets/orders/create-an-order",
+                  "api-reference/wallets/orders/fetch-all-orders",
+                  "api-reference/wallets/orders/fetch-an-order"
+                ]
+              },
+              {
+                "group": "Swap",
+                "pages": [
+                  "api-reference/wallets/swap/confirm-a-swap-quotation",
+                  "api-reference/wallets/swap/create-a-swap-quotation",
+                  "api-reference/wallets/swap/create-a-temporary-swap-quotation",
+                  "api-reference/wallets/swap/fetch-a-swap-transaction",
+                  "api-reference/wallets/swap/fetch-all-swap-transactions",
+                  "api-reference/wallets/swap/refresh-a-swap-quotation"
+                ]
+              },
+              {
+                "group": "Markets",
+                "pages": [
+                  "api-reference/wallets/markets/fetch-a-market-ticker",
+                  "api-reference/wallets/markets/fetch-depth-data-for-a-market",
+                  "api-reference/wallets/markets/fetch-k-line-for-a-market",
+                  "api-reference/wallets/markets/fetch-k-line-with-pending-trades",
+                  "api-reference/wallets/markets/fetch-order-book-for-a-market",
+                  "api-reference/wallets/markets/list-all-markets",
+                  "api-reference/wallets/markets/list-market-tickers",
+                  "api-reference/wallets/markets/markets-summary"
+                ]
+              },
+              {
+                "group": "Trades",
+                "pages": [
+                  "api-reference/wallets/trades/fetch-recent-trades-for-a-market",
+                  "api-reference/wallets/trades/fetch-your-trades"
+                ]
+              },
+              {
+                "group": "Fees",
+                "pages": [
+                  "api-reference/wallets/fees/get-withdrawal-fees"
                 ]
               }
             ]

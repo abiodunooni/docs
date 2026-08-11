@@ -1,0 +1,97 @@
+---
+title: "Developer tools"
+description: "The things that are the same — and the things that differ — across every Quidax product."
+icon: "wrench"
+---
+
+Each product has its own guides. This section covers what sits **between** them: the conventions you need when you integrate more than one, and the places where they quietly disagree.
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/developer-tools/authentication">
+    Base URLs, key formats, and which header each product expects.
+  </Card>
+
+  <Card title="Webhooks across products" icon="webhook" href="/developer-tools/webhooks">
+    Three different signature schemes. Read this before writing a shared handler.
+  </Card>
+
+  <Card title="Errors and rate limits" icon="gauge-high" href="/developer-tools/errors-and-limits">
+    Response envelopes, throttling, and safe retries.
+  </Card>
+
+  <Card title="SDKs and tools" icon="cube" href="/developer-tools/sdks">
+    Official libraries and what to reach for.
+  </Card>
+</CardGroup>
+
+## The differences that catch people out
+
+| | Ramp | Payments | Wallets |
+| --- | --- | --- | --- |
+| Auth header | `x-private-key` | `Authorization: Bearer` | `Authorization: Bearer` |
+| Webhook algorithm | HMAC | HMAC **SHA512** | HMAC **SHA256** |
+| Webhook signs | Body | Body | **`timestamp.body`** |
+| Sandbox | No | **Yes** | No |
+| Branch errors on | `status` | HTTP code | `data.code` |
+
+<Warning>
+  The webhook row is the one that hurts. A handler written for one product will silently fail to validate another's events — no error, just nothing processed.
+</Warning>
+
+## Conventions that hold everywhere
+
+<AccordionGroup>
+  <Accordion title="Give value on the webhook, not on a redirect" icon="webhook">
+    A customer who closes the tab after paying still paid. One who returns without paying has not.
+  </Accordion>
+
+  <Accordion title="Re-query before giving value" icon="magnifying-glass">
+    The webhook says something happened; the API says what is true now. Where money is involved, act on the second.
+  </Accordion>
+
+  <Accordion title="Process idempotently" icon="fingerprint">
+    Every product can deliver the same event twice. Key on the resource ID and check before crediting.
+  </Accordion>
+
+  <Accordion title="Generate references before you call" icon="hashtag">
+    A reference created after a successful response cannot help you with a timeout, which is the only case you need it for.
+  </Accordion>
+
+  <Accordion title="Never retry money with a new reference" icon="triangle-exclamation">
+    Look up the original first. If it landed, you have already paid — and an on-chain payout cannot be recalled.
+  </Accordion>
+
+  <Accordion title="Fetch reference data, do not hard-code it" icon="list-check">
+    Currencies, networks, limits and fees all change. Every product exposes them, and hard-coding means a release each time one moves.
+  </Accordion>
+
+  <Accordion title="Secret keys are server-side only" icon="lock">
+    Never in client code, never committed, never logged.
+  </Accordion>
+</AccordionGroup>
+
+## Testing
+
+Only Payments has a sandbox. Ramp and Wallets are tested against production with small amounts, using a controlled sequence and explicit stop conditions.
+
+<CardGroup cols={2}>
+  <Card title="Testing overview" icon="flask" href="/testing" horizontal />
+
+  <Card title="Ramp testing" icon="flask" href="/ramp/testing" horizontal />
+
+  <Card title="Payments testing" icon="flask" href="/payments/testing" horizontal />
+
+  <Card title="Wallets testing" icon="flask" href="/wallets/testing" horizontal />
+</CardGroup>
+
+## Reference
+
+<CardGroup cols={2}>
+  <Card title="API reference" icon="code" href="/api-reference" horizontal />
+
+  <Card title="Go-live checklist" icon="clipboard-check" href="/get-started/go-live-checklist" horizontal />
+
+  <Card title="Security and licences" icon="shield-check" href="/get-started/licences" horizontal />
+
+  <Card title="Support" icon="life-ring" href="/support" horizontal />
+</CardGroup>

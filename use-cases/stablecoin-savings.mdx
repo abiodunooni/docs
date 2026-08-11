@@ -1,0 +1,118 @@
+---
+title: "Enable customers to save in stablecoins"
+description: "Let users move local currency into dollars and hold it, inside your product."
+icon: "piggy-bank"
+---
+
+Customers in markets with volatile local currency want to hold dollars. A stablecoin savings product lets them fund in naira or cedis, hold in USDT or USDC, and withdraw back to local currency when they need it.
+
+**Products:** [Ramp](/ramp) for the fiat legs, [Wallets](/wallets) for the balance each customer holds.
+
+## The shape of it
+
+```
+Customer funds in NGN  →  Ramp on-ramp  →  USDT held in their sub-account
+Customer withdraws     →  Ramp off-ramp →  NGN into their bank account
+```
+
+## Build it
+
+<Steps>
+  <Step title="Create a sub-account per customer">
+    `POST /users` with your internal user ID in `reference`.
+
+    Each customer's balance is then held and tracked separately, and you can show it directly rather than maintaining your own per-user accounting.
+
+    <Card title="Sub-accounts" icon="users" href="/wallets/sub-accounts" horizontal />
+  </Step>
+
+  <Step title="Fund in local currency">
+    Run a Ramp on-ramp transaction and settle the stablecoin into that customer's sub-account.
+
+    **Do not credit the customer's savings balance** until `buy_transaction.successful` arrives with `data.status: completed`. A transaction in `processing` has not settled.
+
+    <Card title="On-ramp" icon="arrow-down" href="/ramp/on-ramp" horizontal />
+  </Step>
+
+  <Step title="Show the balance">
+    `GET /users/{user_id}/wallets/usdt`
+
+    Show `balance`. `converted_balance` gives the value in `reference_currency`, which is what most customers actually want to see — their dollars expressed in naira.
+
+    **Never show `balance + locked`.** `locked` is committed elsewhere.
+  </Step>
+
+  <Step title="Let them add on-chain too">
+    If customers already hold stablecoin, generate an address so they can fund directly.
+
+    `POST /users/{user_id}/wallets/usdt/addresses?network=trc20`
+
+    **Credit at `ACCEPTED` only**, after re-querying the deposit — not on `deposit.successful` alone.
+  </Step>
+
+  <Step title="Withdraw back to local currency">
+    Run a Ramp off-ramp transaction from the customer's balance to their bank account.
+
+    **Expect** `sell_transaction.successful`. NGN payouts typically settle in under two minutes.
+
+    <Card title="Off-ramp" icon="arrow-up" href="/ramp/off-ramp" horizontal />
+  </Step>
+</Steps>
+
+## Decisions to make early
+
+<AccordionGroup>
+  <Accordion title="Where the customer's money legally sits" icon="scale-balanced">
+    Holding customer funds is a regulated activity in most markets. This is the first thing to settle, before any code — confirm your licensing position during onboarding.
+  </Accordion>
+
+  <Accordion title="Who verifies the customer" icon="id-card">
+    The Ramp **widget** has Quidax verify each user once, inside the flow, including sanctions screening. The **API** has you verify under your own licence, with Quidax doing transaction-level monitoring.
+
+    If you do not hold a licence covering verification, the widget is both faster and safer.
+
+    <Card title="Widget or API" icon="split" href="/ramp#widget-or-api" horizontal />
+  </Accordion>
+
+  <Accordion title="Limits will shape the experience" icon="gauge-high">
+    Limits are per customer per rolling 24 hours, not per merchant and not per calendar day. There is no endpoint for remaining headroom.
+
+    For a savings product where customers top up regularly, track consumption yourself so you can tell someone "you can add more at 15:00 tomorrow" rather than surfacing a bare rejection.
+  </Accordion>
+
+  <Accordion title="USDT or USDC" icon="coins">
+    Both are supported for on-ramp, off-ramp and custody. Pick one and be consistent — showing customers a balance split across two stablecoins invites questions you do not want to answer.
+  </Accordion>
+
+  <Accordion title="This is not an interest product" icon="percent">
+    Quidax provides the rails to hold and convert. Any yield you offer is your own arrangement, with its own regulatory consequences.
+  </Accordion>
+</AccordionGroup>
+
+## Your margin
+
+Ramp lets you configure a percentage markup on the quoted rate, per market and per direction. It accrues on every fund and withdrawal, and you withdraw it from the dashboard.
+
+<Card title="Rates and markup" icon="percent" href="/ramp/rates-and-markup" horizontal />
+
+## Before you launch
+
+Both products test against production. Ramp minimums are small enough that a full fund-and-withdraw round trip costs a few dollars.
+
+<CardGroup cols={2}>
+  <Card title="Ramp testing" icon="flask" href="/ramp/testing" horizontal />
+
+  <Card title="Wallets testing" icon="flask" href="/wallets/testing" horizontal />
+</CardGroup>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Ramp" icon="arrow-right-arrow-left" href="/ramp" horizontal />
+
+  <Card title="Wallets" icon="wallet" href="/wallets" horizontal />
+
+  <Card title="Neobank" icon="mobile" href="/solutions/neobank" horizontal />
+
+  <Card title="Schedule a demo" icon="calendar" href="/get-started/schedule-a-demo" horizontal />
+</CardGroup>

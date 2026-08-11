@@ -101,15 +101,15 @@ Show your user `to_amount`. `quoted_price` is the rate behind it, in `quoted_cur
 
 | Action | Method | Path |
 | --- | --- | --- |
+| Create an instant swap | `POST` | `/users/{user_id}/swap_quotation` |
 | Refresh a quotation | `POST` | `/users/{user_id}/swap_quotation/{quotation_id}/refresh` |
 | Confirm a quotation | `POST` | `/users/{user_id}/swap_quotation/{quotation_id}/confirm` |
-| Create a swap transaction | `POST` | `/users/{user_id}/swap_transactions` |
 | Fetch all swap transactions | `GET` | `/users/{user_id}/swap_transactions` |
-| Fetch one swap transaction | `GET` | `/users/{user_id}/swap_transactions/{transaction_id}` |
+| Fetch one swap transaction | `GET` | `/users/{user_id}/swap_transactions/{swap_transaction_id}` |
 
-<Warning>
-  Only the quotation endpoint above is fully documented in the current source. The paths in this table are inferred from the endpoint names — confirm them before building against them.
-</Warning>
+<Note>
+  There are two quotation endpoints. `temporary_swap_quotation` returns a **preview** with no ID — use it to show a rate. `swap_quotation` creates a real quotation you can then refresh and confirm.
+</Note>
 
 <Tip>
   Refresh rather than re-quote when a user hesitates. It keeps you on the same quotation record, which makes the eventual transaction easier to trace back to what the user was shown.
@@ -138,7 +138,7 @@ A completed swap usually produces two `wallet.updated` events — one for the cu
 <CardGroup cols={2}>
   <Card title="Trading" icon="chart-candlestick" href="/wallets/trading" horizontal />
 
-  <Card title="Supported assets" icon="globe" href="/wallets/coverage" horizontal />
+  <Card title="Coverage and limits" icon="globe" href="/wallets/coverage" horizontal />
 
   <Card title="Webhooks" icon="webhook" href="/wallets/webhooks" horizontal />
 

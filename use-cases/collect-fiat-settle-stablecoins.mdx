@@ -1,0 +1,100 @@
+---
+title: "Collect fiat and settle in stablecoins"
+description: "Take local currency from customers and hold the proceeds in USDT or USDC."
+icon: "arrow-right-arrow-left"
+---
+
+Your customers pay in naira or cedis. You hold dollars. Local currency exposure stops at the point of collection instead of sitting on your balance sheet.
+
+**Product:** [Ramp](/ramp) on-ramp — local currency in, stablecoin out.
+
+## How it works
+
+Your customer pays into a bank account Ramp generates for that transaction. Ramp converts and delivers stablecoin to a wallet you nominate.
+
+<Steps>
+  <Step title="Create the transaction">
+    Create an on-ramp transaction with the fiat amount and a destination wallet address — or without one, if you are settling to a balance Quidax holds for you.
+
+    **You get back** `status: pending`, a `TRX-...` reference and a `to_amount`. Store the reference separately from your own `merchant_reference`.
+  </Step>
+
+  <Step title="Refresh if the amount changes">
+    If the customer edits the amount, refresh rather than creating a second transaction. Updated `from_amount` and `to_amount` return against the same `merchant_reference`, with no duplicate created.
+  </Step>
+
+  <Step title="Confirm to get payment instructions">
+    **You get back** a bank account and `amount_expected`, with the fee and VAT fields broken out.
+  </Step>
+
+  <Step title="Show amount_expected exactly">
+    Display `amount_expected`, never the base `amount`, when the two differ. A customer who transfers the base amount has underpaid.
+  </Step>
+
+  <Step title="The customer pays from a name-matched account">
+    Ramp confirms the deposit and the transaction moves to `processing`.
+
+    **Do not credit the customer at this stage.** Handle repeated `processing` events safely.
+  </Step>
+
+  <Step title="Credit on settlement">
+    **Expect** `buy_transaction.successful` with `data.status: completed`. Credit exactly once, and confirm the destination balance increased.
+  </Step>
+</Steps>
+
+<Card title="On-ramp" icon="arrow-down" href="/ramp/on-ramp" horizontal>
+  The full flow, including settlement modes.
+</Card>
+
+## Choose a settlement mode
+
+| Mode | What happens | Suits |
+| --- | --- | --- |
+| To a wallet address you provide | Stablecoin is sent on-chain per transaction | You control custody |
+| To a Quidax balance | Proceeds accrue in your merchant account | Fewer on-chain fees, sweep on your own schedule |
+
+Settling to a balance and sweeping periodically costs less in network fees than settling each transaction on-chain.
+
+## Add your own margin
+
+Ramp lets you configure a percentage markup on the quoted rate, per market and per direction. It accrues on every transaction and you withdraw it from the dashboard.
+
+<Card title="Rates and markup" icon="percent" href="/ramp/rates-and-markup" horizontal />
+
+## Widget or API
+
+| | Widget | API |
+| --- | --- | --- |
+| Who builds the interface | Quidax | You |
+| Who verifies the end user | Quidax, once, in the flow | You, under your own licence |
+| Time to launch | 3–10 business days | 1–4 weeks |
+
+If you do not hold a licence covering customer verification, the widget is the faster and safer route — Quidax owns identity and sanctions screening on every user.
+
+<Card title="Choose a channel" icon="split" href="/ramp#choose-a-channel" horizontal />
+
+## Coverage
+
+NGN and GHS are live on both channels. Limits are per customer, per day, over a rolling 24-hour window.
+
+<Card title="Coverage and limits" icon="globe" href="/ramp/coverage" horizontal />
+
+## Before you launch
+
+Ramp is tested against production. The minimums are small enough that a full round trip costs a few dollars.
+
+<Card title="Testing" icon="flask" href="/ramp/testing" horizontal>
+  The controlled production test and its stop conditions.
+</Card>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Ramp" icon="arrow-right-arrow-left" href="/ramp" horizontal />
+
+  <Card title="Ramp quickstart" icon="rocket" href="/ramp/quickstart" horizontal />
+
+  <Card title="Fund with stablecoins and pay out fiat" icon="building-columns" href="/use-cases/fund-stablecoins-payout-fiat" horizontal />
+
+  <Card title="Schedule a demo" icon="calendar" href="/get-started/schedule-a-demo" horizontal />
+</CardGroup>

@@ -1,0 +1,118 @@
+---
+title: "Ecommerce"
+description: "Take crypto at checkout, settle in one currency, and pay sellers out."
+icon: "cart-shopping"
+---
+
+Price in the currency your customers think in. Let them pay in whatever they hold. Receive one currency, with no chargebacks and no acquirer in the middle.
+
+## What you need
+
+| Step | Product |
+| --- | --- |
+| Checkout | [Payments](/payments) — SDK, links or API |
+| Settlement | [Payments](/payments) settlement settings |
+| Paying sellers | [Wallets](/wallets), or the dashboard with a CSV |
+
+## Pick a channel
+
+| | Checkout SDK | Payment links | API |
+| --- | --- | --- | --- |
+| Effort | Embed a modal | None | Two calls plus webhooks |
+| Single-use payments | Yes | **No — links are reusable** | Yes |
+| Best for | Storefronts | Social selling, invoices | Custom checkouts |
+
+For a storefront, use the checkout modal. It handles the currency picker, address, QR code and countdown — the parts customers get wrong — and you receive the same webhooks either way.
+
+<Warning>
+  Payment links are reusable. A static link can be paid many times, which is wrong for a single order. If you need one payment per order, initialize a transaction directly.
+</Warning>
+
+## Build it
+
+<Steps>
+  <Step title="Initialize when the customer reaches checkout">
+    `POST /v1/transaction` with the amount, fiat currency and email. **Public** key.
+
+    Put your order ID in `meta` — it comes back on every webhook.
+
+    Validate the amount against the minimum first (₦2,000 or $1). Below it you currently get a `500`, not a validation error.
+  </Step>
+
+  <Step title="Initiate when they choose a currency">
+    `POST /v1/transaction/{id}/pay`. **Secret** key.
+
+    **The rate locks here and a 60-minute window starts.** Call it when they are ready to pay, not on page load — a customer browsing for an hour will find the transaction expired.
+  </Step>
+
+  <Step title="Reserve stock, do not sell it">
+    The transaction is `PENDING` until the money arrives. Hold the stock, and release it on `payment.abandoned`.
+  </Step>
+
+  <Step title="Fulfil on payment.received">
+    Never on the customer returning to your site. Someone who closes the tab after paying still paid.
+  </Step>
+
+  <Step title="Settle into one currency">
+    Turn on conversion so everything arrives in the currency you actually want to hold.
+
+    <Card title="Settlements" icon="building-columns" href="/payments/settlements" horizontal />
+  </Step>
+</Steps>
+
+## Marketplaces: paying sellers
+
+Collection and payout are separate systems. Payments collects; payouts run on the [Wallets API](/wallets) or the dashboard.
+
+<Steps>
+  <Step title="Settle collections into a payout balance" />
+  <Step title="Batch seller payouts">
+    Deterministic references per seller per period, submitted one at a time inside the rate limit, resolved by reference if anything is uncertain.
+
+    <Card title="Payouts" icon="paper-plane" href="/payments/payouts" horizontal />
+  </Step>
+</Steps>
+
+## What is different from cards
+
+<AccordionGroup>
+  <Accordion title="No chargebacks" icon="shield-check">
+    Payments are final once confirmed on-chain. That removes a category of fraud loss, but disputes are resolved by you rather than an acquirer — write a refund policy before launch.
+  </Accordion>
+
+  <Accordion title="Refunds are a payout" icon="rotate-left">
+    Not self-serve in the dashboard. An agreed refund is sent to the customer's wallet. Set `refund_address` when you initiate so you have somewhere to send it.
+  </Accordion>
+
+  <Accordion title="The amount arrives wrong more often than you expect" icon="scale-unbalanced">
+    Customers routinely send slightly less because their wallet deducts a withdrawal fee.
+
+    Default behaviour refunds underpayments and credits overpayments. Both are configurable, and a line at checkout telling customers to check their provider's fee prevents more of them than any setting.
+  </Accordion>
+
+  <Accordion title="Settlement is not exact in stablecoin" icon="gas-pump">
+    Roughly 1 USDT in gas. A 4 USD order does not settle as exactly 4 USDT — worth knowing if you reconcile per order.
+  </Accordion>
+
+  <Accordion title="Who pays the fee" icon="receipt">
+    Both the processing fee and the settlement fee can be passed to the customer, per link or as an account setting. Decide once — switching later changes every price your customers see.
+  </Accordion>
+</AccordionGroup>
+
+## Before you launch
+
+<Card title="Testing" icon="flask" href="/payments/testing" horizontal>
+  Simulate successful, underpaid, overpaid and abandoned outcomes without sending real crypto.
+</Card>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Payments" icon="credit-card" href="/payments" horizontal />
+
+  <Card title="Payments quickstart" icon="rocket" href="/payments/quickstart" horizontal />
+
+  <Card title="Accept crypto payments" icon="hand-holding-dollar" href="/use-cases/accept-crypto-payments" horizontal />
+
+  <Card title="Schedule a demo" icon="calendar" href="/get-started/schedule-a-demo" horizontal />
+</CardGroup>

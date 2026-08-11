@@ -64,12 +64,13 @@ Two rules reject orders more often than anything else.
 | Action | Method | Path |
 | --- | --- | --- |
 | List all markets | `GET` | `/markets` |
-| Markets summary | `GET` | `/markets/tickers` |
+| Markets summary | `GET` | `/markets/summary` |
+| List market tickers | `GET` | `/markets/tickers` |
 | One market's ticker | `GET` | `/markets/tickers/{market}` |
-| Order book for a market | `GET` | `/markets/{market}/order_book` |
-| Depth data | `GET` | `/markets/{market}/depth` |
+| Order book for a market | `GET` | `/markets/{currency}/order_book` |
+| Depth data | `GET` | `/markets/{currency}/depth` |
 | K-line (OHLC) data | `GET` | `/markets/{market}/k` |
-| K-line with pending trades | `GET` | `/markets/{market}/k_with_pending_trades` |
+| K-line with pending trades | `GET` | `/markets/{currency}/k_with_pending_trades/{trade_id}` |
 
 A market is a pair like `btcusdt` or `usdtngn`. The list endpoint is sorted by Quidax's internal ranking of markets, so the order is not alphabetical and is not stable — do not rely on position.
 
@@ -102,7 +103,7 @@ Your own trades are what you reconcile against — an order can fill in several 
 
   <Card title="Conventions" icon="list-check" href="/wallets/conventions" horizontal />
 
-  <Card title="Supported assets" icon="globe" href="/wallets/coverage" horizontal />
+  <Card title="Coverage and limits" icon="globe" href="/wallets/coverage" horizontal />
 
   <Card title="Webhooks" icon="webhook" href="/wallets/webhooks" horizontal />
 </CardGroup>

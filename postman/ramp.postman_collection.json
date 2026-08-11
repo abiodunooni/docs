@@ -1,0 +1,3222 @@
+{
+  "info": {
+    "name": "Quidax Ramp API",
+    "description": "Fiat-to-stablecoin and stablecoin-to-fiat infrastructure for African corridors.\n\nSet `secretKey` in collection variables. Docs: https://docs.quidax.com/ramp",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "x-private-key"
+      },
+      {
+        "key": "value",
+        "value": "{{secretKey}}"
+      },
+      {
+        "key": "in",
+        "value": "header"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Rates and limits",
+      "item": [
+        {
+          "name": "List payment methods",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payment_methods?currency=ngn&side=on_ramp",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payment_methods"
+              ],
+              "query": [
+                {
+                  "key": "currency",
+                  "value": "ngn",
+                  "description": "Fiat currency code.",
+                  "disabled": false
+                },
+                {
+                  "key": "side",
+                  "value": "on_ramp",
+                  "description": "Transaction direction.",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "Returns the payment methods currently available for a currency and direction. Use this to decide what to show your customer rather than hard-coding channels."
+          },
+          "response": [
+            {
+              "name": "200 Payment methods fetched.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/payment_methods",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "payment_methods"
+                  ]
+                }
+              },
+              "status": "Payment methods fetched.",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Payment methods fetched\",\n  \"data\": [\n    {\n      \"public_id\": \"d649b2ed-bddf-4c8e-8a44-1488434314e4\",\n      \"currency\": \"ngn\",\n      \"currency_name\": \"Nigerian Naira\",\n      \"title\": \"Bank Transfer\",\n      \"code\": \"bank_transfer\",\n      \"side\": \"ON_RAMP\",\n      \"active\": true,\n      \"created_at\": \"2025-04-15T13:23:40.520Z\",\n      \"updated_at\": \"2025-04-15T13:23:40.520Z\"\n    }\n  ]\n}"
+            },
+            {
+              "name": "400 The request was invalid, incomplete or duplicated.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/payment_methods",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "payment_methods"
+                  ]
+                }
+              },
+              "status": "The request was invalid, incomplete or d",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"bad_request\",\n  \"message\": \"Invalid amount\",\n  \"data\": null\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/payment_methods",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "payment_methods"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get on-ramp limits",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/purchase_limits/buy?currency_symbol=ngn",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "purchase_limits",
+                "buy"
+              ],
+              "query": [
+                {
+                  "key": "currency_symbol",
+                  "value": "ngn",
+                  "description": "Fiat currency code.",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "Returns the minimum and maximum amounts a customer can spend in a given fiat currency. Check this before showing an amount input so your validation always matches the live limits. Returns the cap only \u2014 there is no endpoint for a customer's consumed or remaining limit, so track consumption yourself if you need to show remaining headroom."
+          },
+          "response": [
+            {
+              "name": "200 Fiat currency limit retrieved.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/purchase_limits/buy",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "purchase_limits",
+                    "buy"
+                  ]
+                }
+              },
+              "status": "Fiat currency limit retrieved.",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Fiat currency limit retrieved\",\n  \"data\": {\n    \"code\": \"ngn\",\n    \"min_value\": \"2000.0\",\n    \"max_value\": \"2000000.0\",\n    \"interval\": \"daily\"\n  }\n}"
+            },
+            {
+              "name": "400 The request was invalid, incomplete or duplicated.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/purchase_limits/buy",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "purchase_limits",
+                    "buy"
+                  ]
+                }
+              },
+              "status": "The request was invalid, incomplete or d",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"bad_request\",\n  \"message\": \"Invalid amount\",\n  \"data\": null\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/purchase_limits/buy",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "purchase_limits",
+                    "buy"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get off-ramp limits",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/purchase_limits/sell?token_symbol=usdt",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "purchase_limits",
+                "sell"
+              ],
+              "query": [
+                {
+                  "key": "token_symbol",
+                  "value": "usdt",
+                  "description": "Digital asset code.",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "Returns the minimum and maximum amounts a customer can sell in a given digital asset. `max_value` is a per-customer cap over the `interval` returned alongside it; `daily` means a rolling 24-hour window, not a calendar day. Returns the cap only \u2014 there is no endpoint for a customer's consumed or remaining limit."
+          },
+          "response": [
+            {
+              "name": "200 Crypto sell limit retrieved.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/purchase_limits/sell",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "purchase_limits",
+                    "sell"
+                  ]
+                }
+              },
+              "status": "Crypto sell limit retrieved.",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Crypto sell limit retrieved\",\n  \"data\": {\n    \"code\": \"usdt\",\n    \"min_value\": \"2.0\",\n    \"max_value\": \"3000.0\",\n    \"interval\": \"daily\"\n  }\n}"
+            },
+            {
+              "name": "400 The request was invalid, incomplete or duplicated.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/purchase_limits/sell",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "purchase_limits",
+                    "sell"
+                  ]
+                }
+              },
+              "status": "The request was invalid, incomplete or d",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"bad_request\",\n  \"message\": \"Invalid amount\",\n  \"data\": null\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/purchase_limits/sell",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "purchase_limits",
+                    "sell"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get an on-ramp quote",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/purchase_quotes/buy?currency=ngn&token=usdt&fiat_amount=20000&token_network=bep20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "purchase_quotes",
+                "buy"
+              ],
+              "query": [
+                {
+                  "key": "currency",
+                  "value": "ngn",
+                  "description": "Fiat currency the customer pays with.",
+                  "disabled": false
+                },
+                {
+                  "key": "token",
+                  "value": "usdt",
+                  "description": "Digital asset the customer receives.",
+                  "disabled": false
+                },
+                {
+                  "key": "fiat_amount",
+                  "value": "20000",
+                  "description": "Fiat amount the customer wants to spend.",
+                  "disabled": false
+                },
+                {
+                  "key": "token_network",
+                  "value": "bep20",
+                  "description": "Network the asset will be delivered on.",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "Returns the digital asset amount a customer receives for a fiat amount, along with the estimated fiat processing fee. Quotes are indicative until a transaction is created, and are held for roughly 10 seconds."
+          },
+          "response": [
+            {
+              "name": "200 Crypto currency amount retrieved.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/purchase_quotes/buy",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "purchase_quotes",
+                    "buy"
+                  ]
+                }
+              },
+              "status": "Crypto currency amount retrieved.",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Crypto currency amount retrieved\",\n  \"data\": {\n    \"fee\": \"0.5\",\n    \"to_amount\": \"11.93\"\n  }\n}"
+            },
+            {
+              "name": "400 The request was invalid, incomplete or duplicated.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/purchase_quotes/buy",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "purchase_quotes",
+                    "buy"
+                  ]
+                }
+              },
+              "status": "The request was invalid, incomplete or d",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"bad_request\",\n  \"message\": \"Invalid amount\",\n  \"data\": null\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/purchase_quotes/buy",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "purchase_quotes",
+                    "buy"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get an off-ramp quote",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/purchase_quotes/sell?token=usdt&currency=ngn&token_amount=10&token_network=bep20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "purchase_quotes",
+                "sell"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "usdt",
+                  "description": "Digital asset the customer sells.",
+                  "disabled": false
+                },
+                {
+                  "key": "currency",
+                  "value": "ngn",
+                  "description": "Fiat currency the customer receives.",
+                  "disabled": false
+                },
+                {
+                  "key": "token_amount",
+                  "value": "10",
+                  "description": "Amount of the digital asset the customer wants to sell.",
+                  "disabled": false
+                },
+                {
+                  "key": "token_network",
+                  "value": "bep20",
+                  "description": "Network the customer will send the asset on.",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "Returns the fiat amount a customer receives for a digital asset amount, along with the estimated processing fee. Stamp duty, where it applies, is deducted from the converted amount and is not included here."
+          },
+          "response": [
+            {
+              "name": "200 Fiat currency amount retrieved.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/purchase_quotes/sell",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "purchase_quotes",
+                    "sell"
+                  ]
+                }
+              },
+              "status": "Fiat currency amount retrieved.",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Fiat currency amount retrieved\",\n  \"data\": {\n    \"fee\": \"50.0\",\n    \"to_amount\": \"15947.94\"\n  }\n}"
+            },
+            {
+              "name": "400 The request was invalid, incomplete or duplicated.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/purchase_quotes/sell",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "purchase_quotes",
+                    "sell"
+                  ]
+                }
+              },
+              "status": "The request was invalid, incomplete or d",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"bad_request\",\n  \"message\": \"Invalid amount\",\n  \"data\": null\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/purchase_quotes/sell",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "purchase_quotes",
+                    "sell"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "On-ramp",
+      "item": [
+        {
+          "name": "Create an on-ramp transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/custodial/on_ramp_transactions/initiate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "custodial",
+                "on_ramp_transactions",
+                "initiate"
+              ]
+            },
+            "description": "Creates a transaction that converts fiat to a digital asset.\n\nWhere the converted asset is delivered depends on whether you send `wallet_address`:\n\n- **Include `wallet_address`** \u2014 the asset is sent to that address on the network you specify. Use this when each customer holds their own wallet.\n- **Omit `wallet_address`** \u2014 the asset is credited to your Ramp merchant custodial wallet, and you credit the customer on your own ledger. Use this when you hold balances for your customers.\n\nThe `merchant_reference` must be unique. Reusing one returns a duplicate transaction error.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"from_currency\": \"ngn\",\n  \"to_currency\": \"usdt\",\n  \"from_amount\": \"3000\",\n  \"merchant_reference\": \"order_12345\",\n  \"customer\": {\n    \"email\": \"ada@example.com\",\n    \"first_name\": \"Ada\",\n    \"last_name\": \"Lovelace\"\n  },\n  \"wallet_address\": {\n    \"address\": \"0x2c8cb922aede1464ec575c\",\n    \"network\": \"bep20\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 Transaction successfully initiated.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/on_ramp_transactions/initiate",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "on_ramp_transactions",
+                    "initiate"
+                  ]
+                }
+              },
+              "status": "Transaction successfully initiated.",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Transaction successfully initiated\",\n  \"data\": {\n    \"public_id\": \"6a089a1a-7633-4e4c-b6e6-39da723dd4fa\",\n    \"reference\": \"TRX-29U3YLYGC8\",\n    \"merchant_reference\": \"order_12345\",\n    \"from_currency\": \"ngn\",\n    \"to_currency\": \"usdt\",\n    \"from_amount\": \"3000.0\",\n    \"to_amount\": \"2.05\",\n    \"status\": \"pending\",\n    \"created_at\": \"2026-05-16T13:17:30.212Z\",\n    \"updated_at\": \"2026-05-16T13:17:33.292Z\",\n    \"blockchain_fee\": \"1.0\"\n  }\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/on_ramp_transactions/initiate",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "on_ramp_transactions",
+                    "initiate"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Refresh an on-ramp transaction",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/custodial/on_ramp_transactions/{merchant_reference}/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "custodial",
+                "on_ramp_transactions",
+                ":merchant_reference",
+                "refresh"
+              ],
+              "variable": [
+                {
+                  "key": "merchant_reference",
+                  "value": "",
+                  "description": "The unique reference you generated when initiating the transaction."
+                }
+              ]
+            },
+            "description": "Recalculates the quote on a transaction that has not been confirmed, and optionally changes the amount. Call this if the customer takes longer than the quote window to proceed.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"from_currency\": \"ngn\",\n  \"to_currency\": \"usdt\",\n  \"from_amount\": \"3000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 Transaction successfully refreshed.",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/on_ramp_transactions/{merchant_reference}/refresh",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "on_ramp_transactions",
+                    ":merchant_reference",
+                    "refresh"
+                  ]
+                }
+              },
+              "status": "Transaction successfully refreshed.",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Transaction found\",\n  \"data\": {\n    \"public_id\": \"6a089a1a-7633-4e4c-b6e6-39da723dd4fa\",\n    \"reference\": \"TRX-29U3YLYGC8\",\n    \"merchant_reference\": \"order_12345\",\n    \"mode\": \"buy\",\n    \"status\": \"pending\",\n    \"from_currency\": \"ngn\",\n    \"to_currency\": \"usdt\",\n    \"from_amount\": \"3000.0\",\n    \"to_amount\": \"1.23\",\n    \"network\": \"trc20\",\n    \"blockchain_fee\": \"1.0\",\n    \"stamp_charge\": \"0.0\",\n    \"error_message\": null,\n    \"created_at\": \"\",\n    \"updated_at\": \"\"\n  }\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/on_ramp_transactions/{merchant_reference}/refresh",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "on_ramp_transactions",
+                    ":merchant_reference",
+                    "refresh"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Confirm an on-ramp transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/custodial/on_ramp_transactions/{merchant_reference}/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "custodial",
+                "on_ramp_transactions",
+                ":merchant_reference",
+                "confirm"
+              ],
+              "variable": [
+                {
+                  "key": "merchant_reference",
+                  "value": "",
+                  "description": "The unique reference you generated when initiating the transaction."
+                }
+              ]
+            },
+            "description": "Locks the quote and generates a single-use bank account for the customer's deposit. This request takes no body.\n\nThe customer must transfer exactly `amount_expected`, which is the transaction amount plus the processor fee and VAT. Deposits above or below that amount are rejected. The name on the paying account must match the customer name on the transaction, because third-party deposits are not supported.\n\nNote that `data.reference` here is the **bank account** reference (`BANK_ACCOUNT_...`), not the transaction reference. Store it separately \u2014 overwriting the `TRX-...` reference from the create response breaks transaction lookups.\n\nOnly confirm when the customer is ready to pay."
+          },
+          "response": [
+            {
+              "name": "200 Transaction successfully confirmed.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/on_ramp_transactions/{merchant_reference}/confirm",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "on_ramp_transactions",
+                    ":merchant_reference",
+                    "confirm"
+                  ]
+                }
+              },
+              "status": "Transaction successfully confirmed.",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Transaction successfully confirmed\",\n  \"data\": {\n    \"public_id\": \"7047c360-4ef6-404d-835d-b41dc832ed49\",\n    \"account_name\": \"Quidax / Ada Lovelace\",\n    \"account_number\": \"0565084270\",\n    \"bank_name\": \"Test Bank\",\n    \"reference\": \"BANK_ACCOUNT_8f8102c76be41979\",\n    \"amount\": \"2000.0\",\n    \"amount_expected\": \"2053.75\",\n    \"processor_fee\": \"50.0\",\n    \"vat\": \"3.75\",\n    \"created_at\": \"2026-05-16T14:12:11.419Z\",\n    \"updated_at\": \"2026-05-16T14:12:11.419Z\"\n  }\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/on_ramp_transactions/{merchant_reference}/confirm",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "on_ramp_transactions",
+                    ":merchant_reference",
+                    "confirm"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            },
+            {
+              "name": "404 The resource could not be found.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/on_ramp_transactions/{merchant_reference}/confirm",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "on_ramp_transactions",
+                    ":merchant_reference",
+                    "confirm"
+                  ]
+                }
+              },
+              "status": "The resource could not be found.",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"not_found\",\n  \"message\": \"Transaction does not exist\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Initiate a mobile money deposit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/custodial/on_ramp_transactions/initiate_mobile_money",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "custodial",
+                "on_ramp_transactions",
+                "initiate_mobile_money"
+              ]
+            },
+            "description": "Requests a GHS mobile money debit against an on-ramp transaction you have already created.\n\nThe response carries `next_step`, which tells you how the customer authorises the debit:\n\n- `OTP` \u2014 the provider sends a one-time code. Collect it and call **Verify a mobile money OTP**.\n- `PIN` \u2014 the provider pushes a prompt to the customer's handset. They approve it there and you take no further action.\n\nCall this endpoint again to send the customer a new code. There is no cap on resends.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"merchant_reference\": \"order_12345\",\n  \"phone_number\": \"0209546124\",\n  \"network_provider\": \"MTN\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 Mobile money deposit successfully initiated.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/on_ramp_transactions/initiate_mobile_money",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "on_ramp_transactions",
+                    "initiate_mobile_money"
+                  ]
+                }
+              },
+              "status": "Mobile money deposit successfully initia",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Mobile money deposit successfully initiated\",\n  \"data\": {\n    \"next_step\": \"PIN\",\n    \"fee\": \"23.0\",\n    \"amount\": \"1000.0\",\n    \"instruction\": \"You will receive a prompt on your mobile number ******7778 to enter your PIN to authorize your payment request of GHS 1000\",\n    \"currency\": \"ghs\"\n  }\n}"
+            },
+            {
+              "name": "400 The deposit could not be initiated.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/on_ramp_transactions/initiate_mobile_money",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "on_ramp_transactions",
+                    "initiate_mobile_money"
+                  ]
+                }
+              },
+              "status": "The deposit could not be initiated.",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"bad_request\",\n  \"message\": \"Mobile money deposit failed\",\n  \"data\": null\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/on_ramp_transactions/initiate_mobile_money",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "on_ramp_transactions",
+                    "initiate_mobile_money"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Verify a mobile money OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/custodial/on_ramp_transactions/verify_mobile_money_otp/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "custodial",
+                "on_ramp_transactions",
+                "verify_mobile_money_otp"
+              ]
+            },
+            "description": "Submits the one-time code the provider sent to the customer. Only call this when `next_step` was `OTP`.\n\nThis endpoint is idempotent, so a customer can submit a code more than once for the same transaction without it being charged twice. If the code expires, initiate the deposit again to send a new one.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"merchant_reference\": \"order_12345\",\n  \"otp\": \"123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 Mobile money deposit verified.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/on_ramp_transactions/verify_mobile_money_otp/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "on_ramp_transactions",
+                    "verify_mobile_money_otp"
+                  ]
+                }
+              },
+              "status": "Mobile money deposit verified.",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Mobile money deposit verified\",\n  \"data\": \"OTP verified successfully\"\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/on_ramp_transactions/verify_mobile_money_otp/",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "on_ramp_transactions",
+                    "verify_mobile_money_otp"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create an auto-swap account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/custodial/auto_swap/initiate_onramp",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "custodial",
+                "auto_swap",
+                "initiate_onramp"
+              ]
+            },
+            "description": "Creates a **static** NGN bank account tied to one customer. Any fiat sent to it is converted automatically and delivered to the wallet address you registered, with no per-transaction API call.\n\nUse this for recurring funding, where a customer keeps their own account details. For one-off purchases, use the standard on-ramp flow, which issues a single-use account per transaction.\n\nStatic accounts are available for NGN on request and require the customer's BVN.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer\": {\n    \"email\": \"ada@example.com\",\n    \"first_name\": \"Ada\",\n    \"last_name\": \"Lovelace\"\n  },\n  \"coin_deposit\": {\n    \"address\": \"0x2c8cb922aede1464ec575c\",\n    \"network\": \"bep20\",\n    \"currency\": \"usdt\"\n  },\n  \"bank_account\": {\n    \"bvn\": \"22222222222\",\n    \"bank_code\": \"035\",\n    \"currency\": \"ngn\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 Auto swap successfully created.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/auto_swap/initiate_onramp",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "auto_swap",
+                    "initiate_onramp"
+                  ]
+                }
+              },
+              "status": "Auto swap successfully created.",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Auto swap successfully created\",\n  \"data\": {\n    \"public_id\": \"c869619a-ce05-4111-95bf-a09559d053a3\",\n    \"customer\": {\n      \"email\": \"ada@example.com\",\n      \"first_name\": \"Ada\",\n      \"last_name\": \"Lovelace\"\n    },\n    \"side\": \"onramp\",\n    \"deposit_bank_account\": {\n      \"account_number\": \"1234567890\",\n      \"account_name\": \"Ada Lovelace\",\n      \"currency\": \"ngn\",\n      \"bank_name\": \"Wema Bank\",\n      \"bank_code\": \"035\"\n    }\n  }\n}"
+            },
+            {
+              "name": "400 The request was invalid, incomplete or duplicated.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/auto_swap/initiate_onramp",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "auto_swap",
+                    "initiate_onramp"
+                  ]
+                }
+              },
+              "status": "The request was invalid, incomplete or d",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"bad_request\",\n  \"message\": \"Invalid amount\",\n  \"data\": null\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/auto_swap/initiate_onramp",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "auto_swap",
+                    "initiate_onramp"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Off-ramp",
+      "item": [
+        {
+          "name": "Create an off-ramp transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/custodial/off_ramp_transactions/initiate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "custodial",
+                "off_ramp_transactions",
+                "initiate"
+              ]
+            },
+            "description": "Creates a transaction that converts a digital asset to fiat and pays it to the customer's bank or mobile money account.\n\nThe amount of the asset you send determines the fiat the customer receives. The `merchant_reference` must be unique.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"from_currency\": \"usdt\",\n  \"to_currency\": \"ghs\",\n  \"from_amount\": \"3\",\n  \"network\": \"bep20\",\n  \"customer\": {\n    \"email\": \"ada@example.com\",\n    \"first_name\": \"Ada\",\n    \"last_name\": \"Lovelace\"\n  },\n  \"merchant_reference\": \"order_67890\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 Transaction successfully initiated.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/off_ramp_transactions/initiate",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "off_ramp_transactions",
+                    "initiate"
+                  ]
+                }
+              },
+              "status": "Transaction successfully initiated.",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Transaction successfully initiated\",\n  \"data\": {\n    \"public_id\": \"3e9e395c-a8df-4694-97a9-237a0ea21b9b\",\n    \"from_currency\": \"usdt\",\n    \"to_currency\": \"ghs\",\n    \"to_amount\": \"33.64684\",\n    \"from_amount\": \"3.0\",\n    \"reference\": \"TRX-ZTIKAIJPFA\",\n    \"merchant_reference\": \"order_67890\",\n    \"status\": \"pending\",\n    \"created_at\": \"2026-07-20T21:39:35.727Z\",\n    \"updated_at\": \"2026-07-20T21:39:36.029Z\",\n    \"stamp_charge\": \"0.0\"\n  }\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/off_ramp_transactions/initiate",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "off_ramp_transactions",
+                    "initiate"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Refresh an off-ramp transaction",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/custodial/off_ramp_transactions/{merchant_reference}/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "custodial",
+                "off_ramp_transactions",
+                ":merchant_reference",
+                "refresh"
+              ],
+              "variable": [
+                {
+                  "key": "merchant_reference",
+                  "value": "",
+                  "description": "The unique reference you generated when initiating the transaction."
+                }
+              ]
+            },
+            "description": "Recalculates the quote before the customer sends the asset. Use the same `merchant_reference` you used to create the transaction.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"from_currency\": \"usdt\",\n  \"to_currency\": \"ghs\",\n  \"from_amount\": \"3\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 Transaction successfully refreshed.",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/off_ramp_transactions/{merchant_reference}/refresh",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "off_ramp_transactions",
+                    ":merchant_reference",
+                    "refresh"
+                  ]
+                }
+              },
+              "status": "Transaction successfully refreshed.",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Transaction found\",\n  \"data\": {\n    \"public_id\": \"6a089a1a-7633-4e4c-b6e6-39da723dd4fa\",\n    \"reference\": \"TRX-29U3YLYGC8\",\n    \"merchant_reference\": \"order_12345\",\n    \"mode\": \"buy\",\n    \"status\": \"pending\",\n    \"from_currency\": \"ngn\",\n    \"to_currency\": \"usdt\",\n    \"from_amount\": \"3000.0\",\n    \"to_amount\": \"1.23\",\n    \"network\": \"trc20\",\n    \"blockchain_fee\": \"1.0\",\n    \"stamp_charge\": \"0.0\",\n    \"error_message\": null,\n    \"created_at\": \"\",\n    \"updated_at\": \"\"\n  }\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/off_ramp_transactions/{merchant_reference}/refresh",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "off_ramp_transactions",
+                    ":merchant_reference",
+                    "refresh"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Add a payout account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/custodial/off_ramp_transactions/{merchant_reference}/bank_account",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "custodial",
+                "off_ramp_transactions",
+                ":merchant_reference",
+                "bank_account"
+              ],
+              "variable": [
+                {
+                  "key": "merchant_reference",
+                  "value": "",
+                  "description": "The unique reference you generated when initiating the transaction."
+                }
+              ]
+            },
+            "description": "Attaches the bank or mobile money account that will receive the fiat payout.\n\nRamp resolves the account and compares the resolved name against the customer name on the transaction. If they do not match, the account is not attached. Add the payout account before confirming the transaction.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currency_code\": \"ghs\",\n  \"bank_code\": \"0006\",\n  \"account_number\": \"0123456789\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 Bank account successfully created and attached.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/off_ramp_transactions/{merchant_reference}/bank_account",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "off_ramp_transactions",
+                    ":merchant_reference",
+                    "bank_account"
+                  ]
+                }
+              },
+              "status": "Bank account successfully created and at",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Bank account successfully created and attached to off-ramp transaction\",\n  \"data\": {\n    \"public_id\": \"f5bf2c47-9581-4285-ab9d-124b8d89516d\",\n    \"metadata\": {\n      \"account_number\": \"0123456789\",\n      \"bank_code\": \"0006\",\n      \"slug\": \"VOD\",\n      \"account_name\": \"Ada Lovelace\"\n    },\n    \"status\": \"active\",\n    \"created_at\": \"2026-07-20T21:46:00.458Z\",\n    \"updated_at\": \"2026-07-20T21:46:00.458Z\"\n  }\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/off_ramp_transactions/{merchant_reference}/bank_account",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "off_ramp_transactions",
+                    ":merchant_reference",
+                    "bank_account"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Confirm an off-ramp transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/custodial/off_ramp_transactions/{merchant_reference}/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "custodial",
+                "off_ramp_transactions",
+                ":merchant_reference",
+                "confirm"
+              ],
+              "variable": [
+                {
+                  "key": "merchant_reference",
+                  "value": "",
+                  "description": "The unique reference you generated when initiating the transaction."
+                }
+              ]
+            },
+            "description": "Generates the deposit address the customer sends the asset to.\n\nThe customer must send the exact amount, in the correct asset, on the correct network. Anything else may fail or need manual review. Confirm only after the payout account has been attached."
+          },
+          "response": [
+            {
+              "name": "200 Address successfully created.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/off_ramp_transactions/{merchant_reference}/confirm",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "off_ramp_transactions",
+                    ":merchant_reference",
+                    "confirm"
+                  ]
+                }
+              },
+              "status": "Address successfully created.",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Address has been successfully created\",\n  \"data\": {\n    \"id\": \"1075784d-79ff-4e9c-816e-74a5eb2eb1ff\",\n    \"address\": \"0x2c8cb922aede1464ec575c\",\n    \"tag\": null,\n    \"network\": \"bep20\",\n    \"currency\": \"usdt\",\n    \"assigned_at\": \"2026-06-16T16:59:24.353Z\",\n    \"status\": \"assigned\"\n  }\n}"
+            },
+            {
+              "name": "400 The request was invalid, incomplete or duplicated.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/off_ramp_transactions/{merchant_reference}/confirm",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "off_ramp_transactions",
+                    ":merchant_reference",
+                    "confirm"
+                  ]
+                }
+              },
+              "status": "The request was invalid, incomplete or d",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"bad_request\",\n  \"message\": \"Invalid amount\",\n  \"data\": null\n}"
+            },
+            {
+              "name": "404 The resource could not be found.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/off_ramp_transactions/{merchant_reference}/confirm",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "off_ramp_transactions",
+                    ":merchant_reference",
+                    "confirm"
+                  ]
+                }
+              },
+              "status": "The resource could not be found.",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"not_found\",\n  \"message\": \"Transaction does not exist\",\n  \"data\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "Fetch an on-ramp transaction",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/on_ramp_transaction/{reference}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "on_ramp_transaction",
+                ":reference"
+              ],
+              "variable": [
+                {
+                  "key": "reference",
+                  "value": "",
+                  "description": "The Quidax transaction reference returned when the transaction was initiated, for example `TRX-29U3YLYGC8`."
+                }
+              ]
+            },
+            "description": "Returns the current state of an on-ramp transaction, including the fiat deposit and the crypto payout.\n\nPass the Quidax `reference` returned when the transaction was created, not your own `merchant_reference`."
+          },
+          "response": [
+            {
+              "name": "200 Transaction found.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/on_ramp_transaction/{reference}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "on_ramp_transaction",
+                    ":reference"
+                  ]
+                }
+              },
+              "status": "Transaction found.",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Transaction found\",\n  \"data\": {\n    \"public_id\": \"11fbee44-eef0-4d27-b21c-b2d0070aa3bb\",\n    \"status\": \"completed\",\n    \"mode\": \"buy\",\n    \"from_currency\": \"ngn\",\n    \"to_currency\": \"usdc\",\n    \"from_amount\": \"3000.0\",\n    \"to_amount\": \"1.927314\",\n    \"network\": \"solana\",\n    \"merchant_reference\": \"order_12345\",\n    \"error_message\": null,\n    \"blockchain_fee\": \"0.025\",\n    \"crypto_payout\": {\n      \"public_id\": \"656b176e-9e33-48ec-bf8b-b5f119ef05ac\",\n      \"transaction_hash\": \"5WCENqT47Qs3aGz2yghSvDMYK2KBCmxEShaPWeyiLgP1\",\n      \"status\": \"completed\",\n      \"amount\": \"1.927314\",\n      \"processor_fee\": \"0.025\",\n      \"address\": \"FQw1J6qke2JDgjzLmdzeU7mxKgNDePK2Stf81XGpUZog\",\n      \"network\": \"solana\",\n      \"currency\": \"usdc\",\n      \"created_at\": \"2026-05-29T16:57:24.982Z\",\n      \"updated_at\": \"2026-05-29T16:58:21.729Z\"\n    },\n    \"fiat_deposit\": {\n      \"public_id\": \"d0dbc26b-3937-4d09-87ef-9a1a231d60d1\",\n      \"status\": \"success\",\n      \"currency\": \"ngn\",\n      \"amount\": \"3000.0\",\n      \"fee\": \"80.63\",\n      \"created_at\": \"2026-05-29T16:57:19.983Z\",\n      \"updated_at\": \"2026-05-29T16:57:20.008Z\"\n    },\n    \"mobile_money_deposit\": null,\n    \"created_at\": \"2026-05-29T16:53:50.733Z\",\n    \"updated_at\": \"2026-05-29T16:58:21.755Z\"\n  }\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/on_ramp_transaction/{reference}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "on_ramp_transaction",
+                    ":reference"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            },
+            {
+              "name": "404 The resource could not be found.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/on_ramp_transaction/{reference}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "on_ramp_transaction",
+                    ":reference"
+                  ]
+                }
+              },
+              "status": "The resource could not be found.",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"not_found\",\n  \"message\": \"Transaction does not exist\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Fetch an off-ramp transaction",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/off_ramp_transaction/{reference}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "off_ramp_transaction",
+                ":reference"
+              ],
+              "variable": [
+                {
+                  "key": "reference",
+                  "value": "",
+                  "description": "The Quidax transaction reference returned when the transaction was initiated, for example `TRX-29U3YLYGC8`."
+                }
+              ]
+            },
+            "description": "Returns the current state of an off-ramp transaction, including the crypto deposit and the fiat payout."
+          },
+          "response": [
+            {
+              "name": "200 Transaction found.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/off_ramp_transaction/{reference}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "off_ramp_transaction",
+                    ":reference"
+                  ]
+                }
+              },
+              "status": "Transaction found.",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Transaction found\",\n  \"data\": {\n    \"public_id\": \"e2aaf8f6-57d5-4c2f-a452-00ca4882de3a\",\n    \"status\": \"completed\",\n    \"mode\": \"sell\",\n    \"from_currency\": \"usdt\",\n    \"to_currency\": \"ngn\",\n    \"from_amount\": \"3.0\",\n    \"to_amount\": \"3993.3387841\",\n    \"network\": \"solana\",\n    \"merchant_reference\": \"order_67890\",\n    \"error_message\": null,\n    \"crypto_deposit\": {\n      \"public_id\": \"0fde6700-0020-42e3-afe0-8ace7d049542\",\n      \"txid\": \"4r9RoMLvpF1v7mCfiwB13ck1MuUeuokSGAyDDoL1sbK\",\n      \"status\": \"accepted\",\n      \"amount\": \"3.0\",\n      \"currency\": \"usdt\",\n      \"network\": \"solana\",\n      \"created_at\": \"2026-05-29T22:38:32.587Z\",\n      \"updated_at\": \"2026-05-29T22:38:32.645Z\"\n    },\n    \"fiat_payout\": {\n      \"public_id\": \"71e8ef80-2f35-4780-880e-76c9e48b3eef\",\n      \"amount\": \"3993.3387841\",\n      \"status\": \"completed\",\n      \"currency\": \"ngn\",\n      \"processor_fee\": \"50.0\",\n      \"completed_at\": null,\n      \"created_at\": \"2026-05-29T22:38:36.772Z\",\n      \"updated_at\": \"2026-05-29T22:38:48.504Z\"\n    },\n    \"created_at\": \"2026-05-29T22:02:18.117Z\",\n    \"updated_at\": \"2026-05-29T22:38:48.614Z\"\n  }\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/off_ramp_transaction/{reference}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "off_ramp_transaction",
+                    ":reference"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            },
+            {
+              "name": "404 The resource could not be found.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/off_ramp_transaction/{reference}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "off_ramp_transaction",
+                    ":reference"
+                  ]
+                }
+              },
+              "status": "The resource could not be found.",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"not_found\",\n  \"message\": \"Transaction does not exist\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "List on-ramp transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/on_ramp_transactions?page=1&per_page=25&status=pending&from_currency=&to_currency=&start_date=&end_date=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "on_ramp_transactions"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number. Must be a positive integer.",
+                  "disabled": true
+                },
+                {
+                  "key": "per_page",
+                  "value": "25",
+                  "description": "Records per page. Must be a positive integer.",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "pending",
+                  "description": "Filter by transaction status.",
+                  "disabled": true
+                },
+                {
+                  "key": "from_currency",
+                  "value": "",
+                  "description": "Filter by source currency code, for example `ngn` or `usdt`.",
+                  "disabled": true
+                },
+                {
+                  "key": "to_currency",
+                  "value": "",
+                  "description": "Filter by destination currency code, for example `usdt` or `ngn`.",
+                  "disabled": true
+                },
+                {
+                  "key": "start_date",
+                  "value": "",
+                  "description": "Start date, formatted `YYYY-MM-DD`. Must be sent with `end_date`.",
+                  "disabled": true
+                },
+                {
+                  "key": "end_date",
+                  "value": "",
+                  "description": "End date, formatted `YYYY-MM-DD`. Must be sent with `start_date`.",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Returns a paginated list of on-ramp transactions for the authenticated app. Use the date filters for reconciliation runs."
+          },
+          "response": [
+            {
+              "name": "200 Transactions fetched successfully.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/on_ramp_transactions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "on_ramp_transactions"
+                  ]
+                }
+              },
+              "status": "Transactions fetched successfully.",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Transactions fetched successfully\",\n  \"data\": [\n    {\n      \"public_id\": \"d5e46711-7f96-4d81-8f7a-57b6c7304090\",\n      \"status\": \"completed\",\n      \"mode\": \"buy\",\n      \"from_currency\": \"ngn\",\n      \"to_currency\": \"usdt\",\n      \"from_amount\": \"3000.0\",\n      \"to_amount\": \"2.0542\",\n      \"network\": \"celo\",\n      \"merchant_reference\": \"order_12345\",\n      \"error_message\": null\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"per_page\": 25,\n    \"total_count\": 16,\n    \"total_pages\": 1,\n    \"next_page\": null\n  }\n}"
+            },
+            {
+              "name": "400 The query was invalid.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/on_ramp_transactions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "on_ramp_transactions"
+                  ]
+                }
+              },
+              "status": "The query was invalid.",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Invalid currency\",\n  \"data\": null\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/on_ramp_transactions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "on_ramp_transactions"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "List off-ramp transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/off_ramp_transactions?page=1&per_page=25&status=pending&from_currency=&to_currency=&start_date=&end_date=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "off_ramp_transactions"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number. Must be a positive integer.",
+                  "disabled": true
+                },
+                {
+                  "key": "per_page",
+                  "value": "25",
+                  "description": "Records per page. Must be a positive integer.",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "pending",
+                  "description": "Filter by transaction status.",
+                  "disabled": true
+                },
+                {
+                  "key": "from_currency",
+                  "value": "",
+                  "description": "Filter by source currency code, for example `ngn` or `usdt`.",
+                  "disabled": true
+                },
+                {
+                  "key": "to_currency",
+                  "value": "",
+                  "description": "Filter by destination currency code, for example `usdt` or `ngn`.",
+                  "disabled": true
+                },
+                {
+                  "key": "start_date",
+                  "value": "",
+                  "description": "Start date, formatted `YYYY-MM-DD`. Must be sent with `end_date`.",
+                  "disabled": true
+                },
+                {
+                  "key": "end_date",
+                  "value": "",
+                  "description": "End date, formatted `YYYY-MM-DD`. Must be sent with `start_date`.",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Returns a paginated list of off-ramp transactions for the authenticated app."
+          },
+          "response": [
+            {
+              "name": "200 Transactions fetched successfully.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/off_ramp_transactions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "off_ramp_transactions"
+                  ]
+                }
+              },
+              "status": "Transactions fetched successfully.",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Transactions fetched successfully\",\n  \"data\": [\n    {\n      \"public_id\": \"d5e46711-7f96-4d81-8f7a-57b6c7304090\",\n      \"status\": \"completed\",\n      \"mode\": \"sell\",\n      \"from_currency\": \"usdt\",\n      \"to_currency\": \"ngn\",\n      \"from_amount\": \"3.0\",\n      \"to_amount\": \"3993.33\",\n      \"network\": \"celo\",\n      \"merchant_reference\": \"order_12345\",\n      \"error_message\": null\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"per_page\": 25,\n    \"total_count\": 16,\n    \"total_pages\": 1,\n    \"next_page\": null\n  }\n}"
+            },
+            {
+              "name": "400 The query was invalid.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/off_ramp_transactions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "off_ramp_transactions"
+                  ]
+                }
+              },
+              "status": "The query was invalid.",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Invalid currency\",\n  \"data\": null\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/off_ramp_transactions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "off_ramp_transactions"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Refunds",
+      "item": [
+        {
+          "name": "Verify a bank account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/refunds/{merchant_reference}/verify_account",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "refunds",
+                ":merchant_reference",
+                "verify_account"
+              ],
+              "variable": [
+                {
+                  "key": "merchant_reference",
+                  "value": "",
+                  "description": "The unique reference you generated when initiating the transaction."
+                }
+              ]
+            },
+            "description": "Resolves a bank account and returns the account holder's name. Call this before submitting refund details, so you can confirm the destination with your customer. A completed refund cannot be reversed.\n\nA failed verification returns `400` immediately.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"account_number\": \"0123456789\",\n  \"bank_code\": \"058\",\n  \"currency_code\": \"NGN\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 Bank account successfully verified.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/refunds/{merchant_reference}/verify_account",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "refunds",
+                    ":merchant_reference",
+                    "verify_account"
+                  ]
+                }
+              },
+              "status": "Bank account successfully verified.",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Bank account successfully verified\",\n  \"data\": {\n    \"account_name\": \"Ada Lovelace\",\n    \"account_number\": \"0123456789\",\n    \"bank_name\": \"GTBank\",\n    \"bank_code\": \"058\"\n  }\n}"
+            },
+            {
+              "name": "400 The request was invalid, incomplete or duplicated.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/refunds/{merchant_reference}/verify_account",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "refunds",
+                    ":merchant_reference",
+                    "verify_account"
+                  ]
+                }
+              },
+              "status": "The request was invalid, incomplete or d",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"bad_request\",\n  \"message\": \"Invalid amount\",\n  \"data\": null\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/refunds/{merchant_reference}/verify_account",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "refunds",
+                    ":merchant_reference",
+                    "verify_account"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            },
+            {
+              "name": "404 The resource could not be found.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/refunds/{merchant_reference}/verify_account",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "refunds",
+                    ":merchant_reference",
+                    "verify_account"
+                  ]
+                }
+              },
+              "status": "The resource could not be found.",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"not_found\",\n  \"message\": \"Transaction does not exist\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Submit refund bank details",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/refunds/{merchant_reference}/details",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "refunds",
+                ":merchant_reference",
+                "details"
+              ],
+              "variable": [
+                {
+                  "key": "merchant_reference",
+                  "value": "",
+                  "description": "The unique reference you generated when initiating the transaction."
+                }
+              ]
+            },
+            "description": "Submits the account that should receive a refund, in response to a `buy_transaction.refund.details_requested` webhook.\n\nSubmitting identical details more than once in the same refund cycle is safe. Ramp stores one submission and returns the refund.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"account_number\": \"0123456789\",\n  \"bank_code\": \"058\",\n  \"account_name\": \"Ada Lovelace\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 Refund details submitted successfully.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/refunds/{merchant_reference}/details",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "refunds",
+                    ":merchant_reference",
+                    "details"
+                  ]
+                }
+              },
+              "status": "Refund details submitted successfully.",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Refund details submitted successfully\",\n  \"data\": {\n    \"public_id\": \"mref_abc123\",\n    \"refund_reference\": \"RFN9K4D2M8Q1\",\n    \"status\": \"refund_details_received\",\n    \"amount\": \"1000.0\",\n    \"currency\": \"NGN\",\n    \"merchant_reference\": \"order_12345\",\n    \"created_at\": \"2026-07-17T10:00:00Z\",\n    \"updated_at\": \"2026-07-17T10:05:00Z\"\n  }\n}"
+            },
+            {
+              "name": "400 The request was invalid, incomplete or duplicated.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/refunds/{merchant_reference}/details",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "refunds",
+                    ":merchant_reference",
+                    "details"
+                  ]
+                }
+              },
+              "status": "The request was invalid, incomplete or d",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"bad_request\",\n  \"message\": \"Invalid amount\",\n  \"data\": null\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/refunds/{merchant_reference}/details",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "refunds",
+                    ":merchant_reference",
+                    "details"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            },
+            {
+              "name": "404 The resource could not be found.",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/refunds/{merchant_reference}/details",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "refunds",
+                    ":merchant_reference",
+                    "details"
+                  ]
+                }
+              },
+              "status": "The resource could not be found.",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"not_found\",\n  \"message\": \"Transaction does not exist\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get a refund",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/refunds/{merchant_reference}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "refunds",
+                ":merchant_reference"
+              ],
+              "variable": [
+                {
+                  "key": "merchant_reference",
+                  "value": "",
+                  "description": "The unique reference you generated when initiating the transaction."
+                }
+              ]
+            },
+            "description": "Returns the refund attached to an on-ramp transaction. Use this to reconcile if you miss a refund webhook."
+          },
+          "response": [
+            {
+              "name": "200 Refund found.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/refunds/{merchant_reference}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "refunds",
+                    ":merchant_reference"
+                  ]
+                }
+              },
+              "status": "Refund found.",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Refund found\",\n  \"data\": {\n    \"public_id\": \"mref_abc123\",\n    \"refund_reference\": \"RFN9K4D2M8Q1\",\n    \"status\": \"pending_refund_details\",\n    \"amount\": \"1000.0\",\n    \"currency\": \"NGN\",\n    \"merchant_reference\": \"order_12345\",\n    \"created_at\": \"2026-07-17T10:00:00Z\",\n    \"updated_at\": \"2026-07-17T10:00:00Z\"\n  }\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/refunds/{merchant_reference}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "refunds",
+                    ":merchant_reference"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            },
+            {
+              "name": "404 The refund could not be found.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/refunds/{merchant_reference}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "refunds",
+                    ":merchant_reference"
+                  ]
+                }
+              },
+              "status": "The refund could not be found.",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"not_found\",\n  \"message\": \"Refund not found\",\n  \"data\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Banks",
+      "item": [
+        {
+          "name": "List supported institutions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/custodial/banks?country=NG",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "custodial",
+                "banks"
+              ],
+              "query": [
+                {
+                  "key": "country",
+                  "value": "NG",
+                  "description": "Country code.",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Returns the banks and mobile money providers supported in a country. Use each entry's `code` as the `bank_code` when adding a payout account or submitting refund details.\n\nFetch this list rather than hard-coding it, so newly supported institutions reach your integration without a release."
+          },
+          "response": [
+            {
+              "name": "200 Banks successfully fetched.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/banks",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "banks"
+                  ]
+                }
+              },
+              "status": "Banks successfully fetched.",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Banks successfully fetched\",\n  \"data\": [\n    {\n      \"public_id\": \"f9cf0f2d-da7b-40cd-be43-e2b2a82f68b4\",\n      \"code\": \"0004\",\n      \"name\": \"MTN\",\n      \"created_at\": \"2025-10-29T10:15:14.140Z\",\n      \"updated_at\": \"2025-11-26T12:14:45.837Z\"\n    },\n    {\n      \"public_id\": \"9024ec7a-1394-45d8-8e1a-3df32b4392ba\",\n      \"code\": \"0006\",\n      \"name\": \"VODAFONE\",\n      \"created_at\": \"2025-10-29T10:15:14.176Z\",\n      \"updated_at\": \"2025-11-26T12:14:13.552Z\"\n    },\n    {\n      \"public_id\": \"207b1aac-af2a-4da7-832e-2a38c8a38644\",\n      \"code\": \"0005\",\n      \"name\": \"AIRTEL\",\n      \"created_at\": \"2025-10-29T10:15:14.106Z\",\n      \"updated_at\": \"2025-11-26T12:15:01.903Z\"\n    },\n    {\n      \"public_id\": \"a1b49f16-2578-49e2-b04c-667231d08316\",\n      \"code\": \"280100\",\n      \"name\": \"Access Bank\",\n      \"created_at\": \"2026-05-19T12:26:14.878Z\",\n      \"updated_at\": \"2026-05-19T12:26:14.878Z\"\n    }\n  ]\n}"
+            },
+            {
+              "name": "403 The private key is missing or invalid.",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/custodial/banks",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "custodial",
+                    "banks"
+                  ]
+                }
+              },
+              "status": "The private key is missing or invalid.",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"forbidden\",\n  \"message\": \"Invalid private key\",\n  \"data\": null\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://ramp-be.quidax.io/api/v1/merchants",
+      "type": "string"
+    },
+    {
+      "key": "secretKey",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

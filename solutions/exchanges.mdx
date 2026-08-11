@@ -1,0 +1,119 @@
+---
+title: "Exchanges"
+description: "Order book liquidity, custody and local currency rails for trading products."
+icon: "chart-candlestick"
+---
+
+Run a trading product without building custody, an order book or blockchain infrastructure. You own the interface, the customer and the pricing; Quidax provides execution and settlement underneath.
+
+## What you need
+
+| Component | Product |
+| --- | --- |
+| Customer accounts and custody | [Wallets](/wallets) sub-accounts |
+| Deposits and withdrawals | [Wallets](/wallets) addresses and withdrawals |
+| Execution | [Order Book](/wallets/trading) |
+| Market data | [Order Book](/wallets/trading#market-data) |
+| Local currency funding | [Ramp](/ramp) |
+| Simple conversions | [Swap](/wallets/swap) |
+
+## Build it
+
+<Steps>
+  <Step title="Accounts per user">
+    `POST /users` with your internal ID in `reference`. Deposits then attribute automatically rather than needing manual reconciliation.
+  </Step>
+
+  <Step title="Deposits">
+    Generate addresses lazily, with an explicit `network`.
+
+    **Credit at `ACCEPTED` only**, after re-querying. A deposit confirmed on-chain can still be held or fail AML screening.
+  </Step>
+
+  <Step title="Prices">
+    `GET /markets/tickers` for the board, `GET /markets/tickers/{market}` for one pair.
+
+    Use tickers for display. Order book and depth responses are far heavier — reach for them for a trading view or slippage calculation, not a headline price.
+  </Step>
+
+  <Step title="Orders">
+    `POST /users/{user_id}/orders`.
+
+    **Round to the pair's precision and check the minimum** (₦1,000 or $0.90) before submitting. These two rules cause most rejections.
+
+    **Expect** `order.done`. An order can fill across several trades — reconcile against `GET /users/{user_id}/trades`.
+  </Step>
+
+  <Step title="Withdrawals">
+    Pre-generated unique `reference`, explicit `network`, and resolution by reference for anything uncertain.
+  </Step>
+</Steps>
+
+<Card title="Build your own crypto exchange" icon="chart-candlestick" href="/use-cases/build-crypto-exchange" horizontal>
+  The full step-by-step build.
+</Card>
+
+## Limit or market orders
+
+| Type | Behaviour | Use when |
+| --- | --- | --- |
+| Limit | Rests on the book at your price | The user set a price and can wait |
+| Market | Fills immediately at best available | The user wants certainty of execution |
+
+<Warning>
+  A market order carries no price guarantee. On a thin pair it can fill materially away from the last traded price. If you quote a rate to a user before placing one, you carry the difference.
+</Warning>
+
+For a plain "convert X to Y" experience, [Swap](/wallets/swap) is the better tool — quote, show, confirm, with no partial fills.
+
+## What will bite you
+
+<AccordionGroup>
+  <Accordion title="Precision and minimums" icon="ruler">
+    Each pair caps decimal places on volume and price independently. Round in your own code rather than passing raw user input through — a rejection after the user has confirmed is a much worse experience than a rounded amount shown up front.
+
+    <Card title="Precision by pair" icon="ruler" href="/wallets/conventions#precision" horizontal />
+  </Accordion>
+
+  <Accordion title="Balance fields" icon="scale-balanced">
+    Spendable balance is `balance` alone. `locked` is committed to open orders and pending withdrawals — showing it as available lets users place orders that cannot fill.
+  </Accordion>
+
+  <Accordion title="Market ordering is not stable" icon="list">
+    `GET /markets` is sorted by Quidax's internal ranking, not alphabetically, and the order can change. Do not rely on position.
+  </Accordion>
+
+  <Accordion title="Trade-only assets" icon="ban">
+    Several listed assets can be bought and sold but never sent, received, or given an address. Never offer a deposit flow for one.
+
+    <Card title="Coverage and limits" icon="globe" href="/wallets/coverage" horizontal />
+  </Accordion>
+
+  <Accordion title="Rate limits" icon="gauge-high">
+    300 requests per minute, 20 per second on address generation. Polling tickers per user per second will exhaust that quickly — poll once centrally and fan out internally.
+  </Accordion>
+
+  <Accordion title="Custody is regulated" icon="scale-balanced">
+    Holding customer funds is a licensed activity in most markets. Confirm your position during onboarding before you build.
+  </Accordion>
+</AccordionGroup>
+
+## Before you launch
+
+There is no sandbox. Test against production with small amounts, including a deliberate rejection and a rate-limit response.
+
+<Card title="Testing" icon="flask" href="/wallets/testing" horizontal>
+  The controlled production test and its stop conditions.
+</Card>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Trading" icon="chart-candlestick" href="/wallets/trading" horizontal />
+
+  <Card title="Wallets" icon="wallet" href="/wallets" horizontal />
+
+  <Card title="Ramp" icon="arrow-right-arrow-left" href="/ramp" horizontal />
+
+  <Card title="Schedule a demo" icon="calendar" href="/get-started/schedule-a-demo" horizontal />
+</CardGroup>

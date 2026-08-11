@@ -1,0 +1,163 @@
+---
+title: "How it works"
+description: "The account model, the lifecycle of money in and out, and the rules that govern each step."
+icon: "route"
+---
+
+Wallets gives you an account tree. Your merchant account sits at the top, each of your customers gets a sub-account beneath it, and every account holds a wallet per currency. Money enters through a blockchain address, moves between accounts internally, and leaves on-chain or to a bank.
+
+## The account model
+
+```
+Your merchant account  (me)
+├── Sub-account            → wallets → addresses
+├── Sub-account            → wallets → addresses
+└── Sub-account            → wallets → addresses
+```
+
+Every endpoint takes a `user_id` that decides which account you are acting on: `me` for the parent, or a sub-account's ID.
+
+<Warning>
+  One secret key reaches every account in the tree, including withdrawals. There is no per-sub-account credential — protect the key accordingly.
+</Warning>
+
+## Receiving money
+
+<Steps>
+  <Step title="Create the sub-account">
+    `POST /users` with the customer's email and your own `reference`.
+
+    **You get back** an `id`. That is the `user_id` for every later call. Store it against your user.
+  </Step>
+
+  <Step title="Check the currency can be received">
+    `GET /users/{user_id}/wallets/{currency}`
+
+    **You get back** `blockchain_enabled`, `default_network` and a `networks` array. Each network carries `deposits_enabled` independently.
+
+    **Stop here** if `blockchain_enabled` is false or no network has `deposits_enabled: true`. Some assets are trade-only and can never receive funds.
+  </Step>
+
+  <Step title="Generate an address">
+    `POST /users/{user_id}/wallets/{currency}/addresses?network=trc20`
+
+    **Always pass `network` explicitly.** Omitting it uses the currency default, which for a multi-network asset is rarely what your customer is sending from.
+
+    **You get back** an address — or you may not. Generation is asynchronous for some currencies.
+
+    **Expect** a `wallet.address.generated` webhook when it is ready. Listen for it rather than polling.
+  </Step>
+
+  <Step title="Show the address">
+    Display the address, the network, and the `destination_tag` if one is present. A chain like XRP needs both — an address without its tag credits the wrong account.
+  </Step>
+
+  <Step title="Wait for the deposit">
+    **Expect** `deposit.transaction.confirmation` as confirmations arrive, then `deposit.successful` once confirmed.
+
+    **Do not credit yet.**
+  </Step>
+
+  <Step title="Re-query and credit">
+    `GET /users/{user_id}/deposits/{deposit_id}`
+
+    **Credit only when `status` is `ACCEPTED`.** A deposit that has been seen on-chain can still be held, rejected, or fail AML screening.
+  </Step>
+</Steps>
+
+<Warning>
+  The gap between `deposit.successful` and `ACCEPTED` is where most integration bugs live. Crediting on the webhook alone means crediting money that can still be reversed by a compliance hold.
+</Warning>
+
+## Sending money
+
+Withdrawals all use one endpoint. What you put in `fund_uid` decides the rail.
+
+<Steps>
+  <Step title="Check the balance">
+    `GET /users/{user_id}/wallets/{currency}`
+
+    **Spendable balance is `balance` alone.** `locked` is committed to open orders and pending withdrawals; `staked` is unavailable. Adding either will oversell the position.
+  </Step>
+
+  <Step title="Check the network allows withdrawals">
+    From the same response, find your network in `networks` and confirm `withdraws_enabled` is true. A network can accept deposits while withdrawals are disabled.
+  </Step>
+
+  <Step title="Generate and store a reference">
+    Before you call. If the request times out you will need it to find out what happened.
+  </Step>
+
+  <Step title="Create the withdrawal">
+    `POST /users/{user_id}/withdraws`
+
+    | `fund_uid` | Rail |
+    | --- | --- |
+    | Blockchain address | On-chain |
+    | Account ID | Internal, instant, no fee |
+    | Bank account number | Fiat payout, with `fund_uid2` as the bank code |
+
+    **You get back** a withdrawal with `status: processing`.
+  </Step>
+
+  <Step title="Watch for the outcome">
+    **Expect** `withdraw.successful` or `withdraw.rejected`.
+
+    A rejected withdrawal carries a `reason`. Read it before retrying — most rejections will repeat.
+  </Step>
+
+  <Step title="Reconcile">
+    `GET /users/{user_id}/withdraws/reference/{reference}`
+
+    Compare `amount`, `fee` and `total` against your own ledger. `total` is what actually left the wallet.
+  </Step>
+</Steps>
+
+<Warning>
+  There is a 6-second cancellation window after a withdrawal is created, and no address-validation endpoint. Once that window closes, an on-chain withdrawal to a wrong address is gone permanently.
+</Warning>
+
+## Moving money internally
+
+Set `fund_uid` to a destination **account ID** rather than a blockchain address. No chain is touched, so it settles instantly and costs nothing.
+
+This is how you sweep customer balances into your treasury account. Do not route these through an on-chain withdrawal — you would pay a network fee to move money that never needed to leave Quidax.
+
+<Card title="Sub-accounts" icon="users" href="/wallets/sub-accounts#moving-funds-between-accounts" horizontal />
+
+## Converting
+
+| You want | Use |
+| --- | --- |
+| A simple "convert X to Y" | [Swap](/wallets/swap) — quote, show, confirm |
+| Control over price and execution | [Trading](/wallets/trading) — limit and market orders |
+
+Swap quotes and order fills both change balances, and both emit `wallet.updated`.
+
+## Statuses at a glance
+
+| Resource | States |
+| --- | --- |
+| Deposit | `SUBMITTING` → `SUBMITTED` → `CHECKED` → **`ACCEPTED`**, or `ON_HOLD` / `REJECTED` / `FAILED` / `FAILED_AML` |
+| Withdrawal | `PROCESSING` → `DONE`, or `REJECTED` |
+| Order | `WAIT` → `DONE`, or `CANCEL` |
+
+<Note>
+  Statuses are uppercase in these tables and lowercase in webhook payloads. Compare case-insensitively.
+</Note>
+
+<Card title="Errors and statuses" icon="triangle-alert" href="/wallets/errors" horizontal>
+  Every status, every error code, and what to do about each.
+</Card>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Use cases" icon="lightbulb" href="/wallets/use-cases" horizontal />
+
+  <Card title="Quickstart" icon="rocket" href="/wallets/quickstart" horizontal />
+
+  <Card title="Coverage and limits" icon="globe" href="/wallets/coverage" horizontal />
+
+  <Card title="Testing" icon="flask" href="/wallets/testing" horizontal />
+</CardGroup>

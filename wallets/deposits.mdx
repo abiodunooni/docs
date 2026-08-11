@@ -12,6 +12,13 @@ A deposit is money arriving into one of your wallets — crypto sent to an addre
 | --- | --- | --- |
 | All deposits for a user | `GET` | `/users/{user_id}/deposits` |
 | One deposit | `GET` | `/users/{user_id}/deposits/{deposit_id}` |
+| **All deposits across every sub-account** | `GET` | `/users/deposits/all` |
+
+`GET /users/{user_id}/deposits` accepts `currency` and `state` as query parameters. `/users/deposits/all` also accepts `start_date` and `end_date`.
+
+<Tip>
+  `/users/deposits/all` returns deposits across your whole sub-account tree in one call. For a reconciliation job it saves you paginating per user — which at 300 requests per minute matters once you have more than a few hundred customers.
+</Tip>
 
 ```bash
 curl 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me/deposits' \
@@ -102,7 +109,7 @@ Deposits move through several states, and only one of them means the money is yo
   <Accordion title="An asset that cannot be received" icon="ban">
     Several supported assets are trade-only — they can be bought and sold but not sent or received, and no address can be generated.
 
-    <Card title="Supported assets" icon="globe" href="/wallets/coverage" horizontal />
+    <Card title="Coverage and limits" icon="globe" href="/wallets/coverage" horizontal />
   </Accordion>
 </AccordionGroup>
 

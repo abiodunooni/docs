@@ -1,0 +1,148 @@
+---
+title: "Errors and rate limits"
+description: "Response envelopes, error conventions and throttling, compared across products."
+icon: "gauge-high"
+---
+
+## Response envelopes
+
+Each product wraps responses differently. Branch on the machine-readable field, never on the human-readable message.
+
+| | Ramp | Payments | Wallets |
+| --- | --- | --- | --- |
+| Success marker | `status: "ok"` | `status: "success"` | `status: "success"` |
+| Failure marker | `status: "bad_request"` etc. | `status: "error"` | `status: "error"` |
+| Machine-readable code | `status` | HTTP code | `data.code` |
+| Branch on | `status` | HTTP code | **`data.code`** |
+
+<Tabs>
+  <Tab title="Ramp">
+    ```json
+    { "status": "ok", "message": "Transaction found", "data": {} }
+    ```
+
+    | `status` | HTTP |
+    | --- | --- |
+    | `ok` | 200 |
+    | `bad_request` | 400 |
+    | `forbidden` | 403 |
+    | `not_found` | 404 |
+  </Tab>
+
+  <Tab title="Payments">
+    ```json
+    { "status": "success", "data": {}, "meta": {} }
+    ```
+
+    <Note>
+      Payment link endpoints return their fields at the top level with a `message`, rather than inside `data`. Read the schema per endpoint rather than assuming one shape.
+    </Note>
+  </Tab>
+
+  <Tab title="Wallets">
+    ```json
+    {
+      "status": "error",
+      "message": "Invalid secret key.",
+      "data": { "code": "E0001", "message": "Invalid secret key." }
+    }
+    ```
+
+    | Code | Meaning |
+    | --- | --- |
+    | `E0001` | Invalid secret key |
+    | `E0104` | Sub-account does not exist |
+    | `E0107` | Validation failed |
+    | `E0605` | Invalid currency value |
+    | `110112` | No withdrawal with that reference |
+
+    <Card title="Wallets errors" icon="triangle-alert" href="/wallets/errors" horizontal />
+  </Tab>
+</Tabs>
+
+## Rate limits
+
+| Product | Limit | Over-limit response |
+| --- | --- | --- |
+| Wallets — address generation | 20 per second | `444` |
+| Wallets — everything else | 300 per minute | `444` |
+| Ramp, Payments | Not published | `429` |
+
+<Warning>
+  `444` is non-standard. Some HTTP clients and proxies surface it as a connection failure rather than a response — confirm yours reports it properly, or you will retry immediately and make the problem worse.
+</Warning>
+
+### Staying inside them
+
+<AccordionGroup>
+  <Accordion title="Poll centrally, fan out internally" icon="share-nodes">
+    Fetching market tickers per user per second exhausts 300 per minute almost immediately. Poll once, cache, and serve every user from that.
+  </Accordion>
+
+  <Accordion title="Queue bulk work" icon="list-check">
+    A payout batch or a bulk address generation run needs pacing built in. Roughly one request every 250ms leaves headroom for retries inside the Wallets limit.
+  </Accordion>
+
+  <Accordion title="Generate addresses lazily" icon="qrcode">
+    On first use, not for every user in every currency up front. The 20-per-second cap makes eager generation slow and pointless.
+  </Accordion>
+
+  <Accordion title="Back off, do not hammer" icon="clock">
+    Exponential backoff on `429` and `444`. Retrying immediately extends the throttle.
+  </Accordion>
+</AccordionGroup>
+
+## Retry safety
+
+The rule is the same everywhere: **a retry must be identifiable as the same operation.**
+
+| Product | Mechanism |
+| --- | --- |
+| Ramp | `merchant_reference` |
+| Payments | Transaction reference; `Idempotency-Key` on conversions |
+| Wallets | Your `reference` on withdrawals |
+
+<Steps>
+  <Step title="Generate the reference before you call">
+    And persist it. A reference generated after a successful response is useless for the case you actually need it for.
+  </Step>
+
+  <Step title="On a timeout, look it up">
+    Do not guess and do not resubmit blindly.
+
+    ```bash
+    curl '.../users/me/withdraws/reference/<reference>' \
+      -H "Authorization: Bearer $QUIDAX_SECRET_KEY"
+    ```
+  </Step>
+
+  <Step title="Interpret the answer">
+    Found means it landed — **do not resubmit.** Not found (`110112` on Wallets) means it never landed and is safe to resubmit with the same reference.
+  </Step>
+</Steps>
+
+<Warning>
+  Never retry a money movement with a **new** reference. If the original landed you have paid twice, and an on-chain payout cannot be recalled.
+</Warning>
+
+## Errors worth knowing about
+
+| Symptom | Product | Cause |
+| --- | --- | --- |
+| `500` with no detail | Payments | Amount below the minimum. A proper validation message is on the way. |
+| `301` | Wallets | Plain HTTP. Fix the URL **and rotate the key.** |
+| `Invalid private key` | Ramp | Wrong header — Ramp uses `x-private-key`, not bearer auth. |
+| Transaction not created | Payments | Secret key sent to Initialize, which expects the public key. |
+| Order rejected | Wallets | Below the minimum value, or too many decimals for the pair. |
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/developer-tools/authentication" horizontal />
+
+  <Card title="Webhooks across products" icon="webhook" href="/developer-tools/webhooks" horizontal />
+
+  <Card title="Testing" icon="flask" href="/testing" horizontal />
+
+  <Card title="Support" icon="life-ring" href="/support" horizontal />
+</CardGroup>

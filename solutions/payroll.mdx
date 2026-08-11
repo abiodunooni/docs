@@ -1,0 +1,141 @@
+---
+title: "Payroll"
+description: "Pay a distributed team in stablecoins or local currency, on a schedule."
+icon: "users"
+---
+
+Paying people across borders through banks is slow, expensive and opaque. Paying them in stablecoin takes minutes and costs cents — and anyone who wants local currency can still receive it.
+
+## What you need
+
+| Step | Product |
+| --- | --- |
+| Hold the payroll float | [Wallets](/wallets) treasury account |
+| Pay in stablecoin | [Wallets](/wallets) withdrawals, or the dashboard with a CSV |
+| Pay in local currency | [Ramp](/ramp) off-ramp, or a fiat withdrawal |
+| Convert the float | [Swap](/wallets/swap) |
+
+## Two ways to run it
+
+| | Dashboard CSV | Wallets API |
+| --- | --- | --- |
+| Effort | None | An integration |
+| Approval step | Built into the flow | You build it |
+| Best for | Monthly runs, stable headcount | Automated, frequent, or large teams |
+
+Most teams start with the CSV. Move to the API when the batch becomes routine enough that a human clicking through it is the bottleneck.
+
+## Run it with a CSV
+
+<Steps>
+  <Step title="Load beneficiaries once">
+    **Settings → Beneficiary settings → Add bulk beneficiaries.** Download the template first — the columns must match exactly.
+
+    Invalid rows are skipped rather than failing the upload, so check the resulting count against your file.
+  </Step>
+
+  <Step title="Upload the run">
+    **Payout → Send → Bulk Transfer.** Select saved beneficiaries, or upload a CSV with recipients and amounts.
+  </Step>
+
+  <Step title="Check the confirmation page">
+    Recipient count and total, against your source file. This is the last point at which a shifted column is recoverable.
+  </Step>
+
+  <Step title="Confirm">
+    The batch is submitted.
+  </Step>
+</Steps>
+
+<Tip>
+  Run a two-person batch with trivial amounts before the first real payroll. It costs almost nothing and proves your file format end to end.
+</Tip>
+
+## Run it through the API
+
+<Steps>
+  <Step title="Persist the run before calling anything">
+    One row per employee, each with a **deterministic** reference built from the run and the row — `payroll-2026-04-0042`.
+
+    Deterministic references are what make an accidental re-run harmless. Random ones mean the second run pays everyone again.
+  </Step>
+
+  <Step title="Validate the whole file first">
+    Reject everything if any row fails. Half a payroll is worse than none.
+
+    | Check | Catches |
+    | --- | --- |
+    | Address well-formed for the network | Unrecoverable losses |
+    | Network has `withdraws_enabled` | Every row failing |
+    | Amount positive and within bounds | A shifted column |
+    | No duplicate rows | A copy-paste error |
+    | Total within `balance` | Running dry mid-run |
+  </Step>
+
+  <Step title="Require a human approval">
+    Show headcount, total per currency, and the largest single payment. Payroll is the one batch where an extra click is worth it.
+  </Step>
+
+  <Step title="Submit one at a time">
+    Inside 300 requests per minute. Mark each row `submitted` before the call, record the response after.
+  </Step>
+
+  <Step title="Resolve anything uncertain by reference">
+    ```bash
+    curl 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me/withdraws/reference/payroll-2026-04-0042' \
+      -H "Authorization: Bearer $QUIDAX_SECRET_KEY"
+    ```
+
+    `110112` means it never landed and is safe to resubmit. Anything else means it did — **do not resubmit**.
+  </Step>
+
+  <Step title="Reconcile on webhooks">
+    `withdraw.successful` or `withdraw.rejected` per row. Process idempotently.
+  </Step>
+</Steps>
+
+<Card title="Payouts" icon="paper-plane" href="/payments/payouts" horizontal>
+  The full build, dashboard and API.
+</Card>
+
+## Practical notes
+
+<AccordionGroup>
+  <Accordion title="Paying employees who want local currency" icon="building-columns">
+    Set `fund_uid` to their bank account number and `fund_uid2` to the bank code for a direct fiat payout, or run a Ramp off-ramp for a fuller local payout flow.
+  </Accordion>
+
+  <Accordion title="Paying people who bank with you already" icon="bolt">
+    Route by account ID rather than address. Instant, free, and no chance of a wrong-network loss.
+  </Accordion>
+
+  <Accordion title="Funding the float" icon="vault">
+    Convert your treasury into the payout currency ahead of the run, not during it. A swap quote lasts about ten seconds, which is not something you want in the middle of a batch.
+  </Accordion>
+
+  <Accordion title="Fees come out of the total" icon="receipt">
+    `total` on a completed withdrawal is what actually left the wallet, after `fee`. Reconcile against that, not the amount you requested.
+  </Accordion>
+
+  <Accordion title="Compliance" icon="scale-balanced">
+    Paying salaries in crypto has tax and employment-law consequences that vary by jurisdiction. That is your side of the arrangement, not Quidax's.
+  </Accordion>
+</AccordionGroup>
+
+## Before you launch
+
+<Card title="Wallets testing" icon="flask" href="/wallets/testing" horizontal>
+  The controlled production test, including the duplicate-reference case.
+</Card>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Withdrawals" icon="paper-plane" href="/wallets/withdrawals" horizontal />
+
+  <Card title="Pay with stablecoins" icon="paper-plane" href="/use-cases/pay-with-stablecoins" horizontal />
+
+  <Card title="Wallets" icon="wallet" href="/wallets" horizontal />
+
+  <Card title="Schedule a demo" icon="calendar" href="/get-started/schedule-a-demo" horizontal />
+</CardGroup>

@@ -1,0 +1,112 @@
+---
+title: "Neobank"
+description: "Add dollar balances, crypto and cross-border movement to a digital banking product."
+icon: "mobile"
+---
+
+Your customers already have a local-currency account with you. Adding a dollar balance they can fund, hold and spend from is usually the highest-value thing you can build next in a market with a volatile currency.
+
+## What you add
+
+| Feature | Product |
+| --- | --- |
+| A dollar balance per customer | [Wallets](/wallets) sub-accounts |
+| Fund it from local currency | [Ramp](/ramp) on-ramp |
+| Withdraw back to local currency | [Ramp](/ramp) off-ramp |
+| Receive crypto from outside | [Wallets](/wallets) addresses |
+| Send to anyone | [Wallets](/wallets) withdrawals |
+| Convert between currencies | [Swap](/wallets/swap) |
+
+One account, one secret key, across all of it.
+
+## Build it
+
+<Steps>
+  <Step title="Give every customer a sub-account">
+    `POST /users` with your internal user ID in `reference`.
+
+    Balances are then held and tracked per customer, and `reference` comes back on wallet and transaction payloads so you do not need a mapping table.
+  </Step>
+
+  <Step title="Let them fund from local currency">
+    Ramp on-ramp, settled into that customer's sub-account.
+
+    **Credit only on `buy_transaction.successful` with `data.status: completed`.** A transaction in `processing` has not settled.
+  </Step>
+
+  <Step title="Show the balance in both currencies">
+    `GET /users/{user_id}/wallets/usdt`
+
+    `balance` is the dollar figure. `converted_balance` expresses it in `reference_currency` — which is what most customers actually look at.
+
+    **Never add `locked` or `staked`** to the spendable figure.
+  </Step>
+
+  <Step title="Let them receive from outside">
+    Generate an address on demand, with an explicit `network`.
+
+    **Credit at `ACCEPTED` only**, after re-querying the deposit.
+  </Step>
+
+  <Step title="Let them send and withdraw">
+    Wallets withdrawals for crypto, Ramp off-ramp for local currency into a bank account.
+  </Step>
+</Steps>
+
+## Decisions to make early
+
+<AccordionGroup>
+  <Accordion title="Custody is regulated" icon="scale-balanced">
+    Holding customer funds is a licensed activity in most markets. Settle this before writing code — confirm your position during onboarding.
+  </Accordion>
+
+  <Accordion title="Who verifies the customer" icon="id-card">
+    You already onboard customers for the banking product. Whether that verification satisfies the crypto legs depends on your licence.
+
+    The Ramp **widget** has Quidax verify each user inside the flow, which is the faster route if your licence does not cover it. The **API** has you verify under your own licence.
+
+    <Card title="Widget or API" icon="split" href="/ramp#widget-or-api" horizontal />
+  </Accordion>
+
+  <Accordion title="One ledger or two" icon="book">
+    Quidax holds the crypto balances; your core banking system holds the fiat. Your product needs a view across both, and a reconciliation job that runs on a schedule rather than at month end.
+  </Accordion>
+
+  <Accordion title="Limits will shape onboarding" icon="gauge-high">
+    Limits are per customer per rolling 24 hours and rise with the verification a customer has completed. If your customers fund regularly, surface the tier upgrade path in-product rather than letting them hit a wall.
+
+    <Card title="Coverage and limits" icon="globe" href="/ramp/coverage" horizontal />
+  </Accordion>
+
+  <Accordion title="Which assets to expose" icon="list-check">
+    Most neobank customers want one stablecoin, not a list of thirty assets. Several supported assets are trade-only and cannot be sent or received at all.
+
+    <Card title="Coverage and limits" icon="globe" href="/wallets/coverage" horizontal />
+  </Accordion>
+</AccordionGroup>
+
+## Adding payments later
+
+If merchants on your platform want to accept crypto, [Payments](/payments) runs on the same relationship — checkout, payment links and settlement into a balance you already hold.
+
+## Before you launch
+
+Neither product has a sandbox. Both test against production with small amounts.
+
+<CardGroup cols={2}>
+  <Card title="Ramp testing" icon="flask" href="/ramp/testing" horizontal />
+
+  <Card title="Wallets testing" icon="flask" href="/wallets/testing" horizontal />
+</CardGroup>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Wallets" icon="wallet" href="/wallets" horizontal />
+
+  <Card title="Ramp" icon="arrow-right-arrow-left" href="/ramp" horizontal />
+
+  <Card title="Stablecoin savings" icon="piggy-bank" href="/use-cases/stablecoin-savings" horizontal />
+
+  <Card title="Schedule a demo" icon="calendar" href="/get-started/schedule-a-demo" horizontal />
+</CardGroup>

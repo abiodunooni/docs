@@ -1,0 +1,164 @@
+---
+title: "Errors and statuses"
+description: "Every transaction status, every error code, and what to do about each."
+icon: "triangle-alert"
+---
+
+## Response shape
+
+Success and failure use the same envelope. Errors carry a stable code nested inside `data`.
+
+```json
+{
+  "status": "error",
+  "message": "Invalid secret key.",
+  "data": {
+    "code": "E0001",
+    "message": "Invalid secret key."
+  }
+}
+```
+
+<Tip>
+  Branch on `data.code`, not on `message`. Messages are written for humans and get reworded; codes are stable.
+</Tip>
+
+## Error codes
+
+| Code | Meaning | What to do |
+| --- | --- | --- |
+| `E0001` | Invalid secret key. | Check the key, and that you are not sending a test key against production. |
+| `E0104` | The sub-account does not exist. | Check the `user_id`. Use `me` for your parent account. |
+| `E0107` | Validation failed. | The message names the field. Fix and resubmit. |
+| `E0605` | A currency value is not valid. | Check the currency code against the live currency list. |
+| `110112` | No withdrawal with that reference. | Check the reference. This is also how you confirm a timed-out request never landed. |
+
+<Note>
+  This list covers the codes visible in the current documentation and is not exhaustive. Handle unknown codes gracefully rather than assuming you have seen them all.
+</Note>
+
+## HTTP status codes
+
+| Code | Meaning | What to do |
+| --- | --- | --- |
+| `301` | You used HTTP, not HTTPS. | Fix the URL — **and rotate the key**, because it travelled in the clear. |
+| `400` | Bad request. | Something is missing or malformed. |
+| `401` | Unauthorized. | The key is invalid or absent. |
+| `403` | Forbidden. | The key lacks permission for this operation. |
+| `404` | Not found. | The resource does not exist. |
+| `429` | Too many requests. | Back off. |
+| `444` | Rate limited. | Back off and retry. See below. |
+| `5xx` | Server error. | Retry with backoff, then contact support. |
+
+<Warning>
+  `444` is non-standard. Some HTTP clients and proxies surface it as a connection failure rather than a response — confirm yours reports it properly, or you will retry immediately and make the problem worse.
+</Warning>
+
+## Transaction statuses
+
+<Tabs>
+  <Tab title="Deposits">
+    | Status | Meaning | Give value? |
+    | --- | --- | --- |
+    | `SUBMITTING` | Being submitted. | No |
+    | `SUBMITTED` | Awaiting processing. | No |
+    | `ON_HOLD` | Held for review. | No |
+    | `CHECKED` | Checks completed. | No |
+    | **`ACCEPTED`** | **Confirmed and credited.** | **Yes** |
+    | `CANCELED` | Cancelled. | No |
+    | `REJECTED` | Rejected. | No |
+    | `FAILED` | Failed. | No |
+    | `FAILED_AML` | Failed AML screening. | No |
+
+    <Warning>
+      `ACCEPTED` is the only status that means the money is yours. A deposit confirmed on-chain can still be held, rejected or fail screening.
+    </Warning>
+  </Tab>
+
+  <Tab title="Withdrawals">
+    | Status | Meaning |
+    | --- | --- |
+    | `PROCESSING` | Being processed. |
+    | `DONE` | Completed. |
+    | `REJECTED` | Failed. Read `reason`. |
+  </Tab>
+
+  <Tab title="Orders">
+    | Status | Meaning |
+    | --- | --- |
+    | `WAIT` | Queued for execution. |
+    | `DONE` | Executed. |
+    | `CANCEL` | Cancelled. |
+  </Tab>
+</Tabs>
+
+<Note>
+  Statuses are uppercase in these tables and lowercase in webhook payloads (`accepted`, `done`). Compare case-insensitively.
+</Note>
+
+## Common situations
+
+<AccordionGroup>
+  <Accordion title="A deposit is stuck on hold" icon="clock">
+    `ON_HOLD` means it is under review and may still be accepted. Do not credit the customer, and do not tell them it failed. Contact support with the deposit ID if it does not move.
+  </Accordion>
+
+  <Accordion title="A deposit failed AML" icon="shield-exclamation">
+    `FAILED_AML` is a compliance outcome, not a technical error. Retrying changes nothing. Contact support with the deposit ID.
+  </Accordion>
+
+  <Accordion title="Funds were sent on the wrong network" icon="link-slash">
+    Lost permanently. There is no recovery and no reversal — this is a property of the blockchain, not a Quidax policy.
+
+    Prevention is the only control: always pass an explicit `network`, read `deposits_enabled` per network, and show the network prominently wherever you display an address.
+  </Accordion>
+
+  <Accordion title="A withdrawal went to the wrong address" icon="triangle-exclamation">
+    Also unrecoverable once the 6-second cancellation window closes. There is no address-validation endpoint, so validate the format client-side and send a small test amount first for any new large destination.
+  </Accordion>
+
+  <Accordion title="A request timed out and I do not know if it landed" icon="hourglass">
+    Look it up by your own reference:
+
+    ```bash
+    curl 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me/withdraws/reference/<reference>' \
+      -H "Authorization: Bearer $QUIDAX_SECRET_KEY"
+    ```
+
+    `110112` means it never landed and is safe to resubmit. Anything else means it did — **do not retry with a new reference.**
+  </Accordion>
+
+  <Accordion title="An order keeps getting rejected" icon="ruler">
+    Almost always the minimum order value (₦1,000 or $0.90) or too many decimal places for the pair. Round to the pair's precision before submitting.
+
+    <Card title="Precision by pair" icon="ruler" href="/wallets/conventions#precision" horizontal />
+  </Accordion>
+
+  <Accordion title="A balance looks wrong" icon="scale-balanced">
+    Check which field you are reading. Spendable balance is `balance` alone — `locked` is committed to open orders and pending withdrawals, and `staked` is unavailable.
+  </Accordion>
+
+  <Accordion title="Webhooks stopped arriving" icon="bell">
+    Delivery is retried at 1 minute, 30 minutes, 1 hour and 24 hours, then stops permanently. There is no manual replay.
+
+    If your endpoint was down beyond that window, reconcile against the API — the events are gone.
+  </Accordion>
+</AccordionGroup>
+
+## Getting help
+
+Include the reference or resource ID, the timestamp with timezone, the request you sent and the response you got back. That is usually enough to resolve an issue without a second round trip.
+
+<Card title="Support" icon="life-ring" href="/support" horizontal />
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Testing" icon="flask" href="/wallets/testing" horizontal />
+
+  <Card title="Webhooks" icon="webhook" href="/wallets/webhooks" horizontal />
+
+  <Card title="Conventions" icon="list-check" href="/wallets/conventions" horizontal />
+
+  <Card title="How it works" icon="route" href="/wallets/how-it-works" horizontal />
+</CardGroup>

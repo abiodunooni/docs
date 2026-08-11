@@ -1,0 +1,103 @@
+---
+title: "Fund with stablecoins and pay out fiat"
+description: "Hold dollars, deliver local currency into bank accounts and mobile money."
+icon: "building-columns"
+---
+
+You hold stablecoin. Your recipients need naira, cedis or mobile money. Ramp converts and delivers into local accounts, so you never hold local currency between funding and payout.
+
+This is the shape of most remittance, marketplace payout and treasury-distribution products in Africa.
+
+**Product:** [Ramp](/ramp) off-ramp — stablecoin in, local currency out.
+
+## How it works
+
+<Steps>
+  <Step title="Create the transaction">
+    Create an off-ramp transaction with the customer's details and the amount.
+
+    **You get back** a reference and a quoted local-currency amount.
+  </Step>
+
+  <Step title="Attach the payout account">
+    Add the recipient's bank or mobile money account.
+
+    **Expect** a name check. `Name does not match` means the resolved account name does not match the customer on the transaction — surface it as a name problem, not a generic failure.
+
+    Bank codes must come from the institutions endpoint, not a list you maintain.
+  </Step>
+
+  <Step title="Confirm to get a deposit address">
+    **You get back** a deposit address and the exact amount to send.
+  </Step>
+
+  <Step title="Send the exact amount">
+    Send exactly what was quoted, on the right network. A different asset, a different amount or the wrong network pushes the transaction into `needs_attention` for manual review.
+  </Step>
+
+  <Step title="Watch it settle">
+    **Expect** `sell_transaction.successful`. NGN bank payouts typically settle in under two minutes, GHS mobile money in under five.
+
+    Reconcile against the payout status rather than assuming acceptance is final — a provider can accept and later reverse.
+  </Step>
+</Steps>
+
+<Card title="Off-ramp" icon="arrow-up" href="/ramp/off-ramp" horizontal>
+  The full flow, including payout accounts and refunds.
+</Card>
+
+## Practical considerations
+
+<AccordionGroup>
+  <Accordion title="Accounts must belong to the transacting party" icon="id-card">
+    Payouts go to accounts belonging to the person on the transaction. Design your beneficiary collection around this from the start — retrofitting it after launch means re-collecting details from every user.
+  </Accordion>
+
+  <Accordion title="Mobile money versus bank rails" icon="mobile">
+    In Ghana, mobile money reaches most consumer endpoints and settles in under five minutes. Bank rails reach formal account holders, settle more slowly and carry higher per-transaction caps.
+
+    Consumer products usually lead with mobile money; higher-ticket and B2B flows need bank rails.
+  </Accordion>
+
+  <Accordion title="A payout can be reversed after acceptance" icon="rotate-left">
+    Uncommon, but it happens. Watch for `sell_transaction.failed` and have a process for providing an alternative account.
+  </Accordion>
+
+  <Accordion title="Limits are per customer, per rolling day" icon="gauge-high">
+    Not per merchant, and not per calendar day — a customer who transacts at 15:00 regains that headroom at 15:00 the next day.
+
+    There is no endpoint for remaining headroom, so track consumption yourself if you want to warn users before Ramp rejects them.
+
+    <Card title="Coverage and limits" icon="globe" href="/ramp/coverage" horizontal />
+  </Accordion>
+
+  <Accordion title="Multi-corridor treasury" icon="globe">
+    Each corridor settles in its own local currency to a local account. Aggregating across currencies would place FX risk on Quidax on your behalf.
+
+    For a single consolidated position, settle to stablecoin and convert on your own treasury side.
+  </Accordion>
+</AccordionGroup>
+
+## Paying in crypto instead
+
+If some recipients would rather hold stablecoin than receive local currency, pay them directly from a Wallets balance — same account, one secret key.
+
+<Card title="Pay in stablecoins" icon="paper-plane" href="/use-cases/pay-with-stablecoins" horizontal />
+
+## Before you launch
+
+<Card title="Testing" icon="flask" href="/ramp/testing" horizontal>
+  The controlled production test and its stop conditions.
+</Card>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Ramp" icon="arrow-right-arrow-left" href="/ramp" horizontal />
+
+  <Card title="Off-ramp guide" icon="arrow-up" href="/ramp/off-ramp" horizontal />
+
+  <Card title="Remittance" icon="money-bill-transfer" href="/solutions/remittance" horizontal />
+
+  <Card title="Schedule a demo" icon="calendar" href="/get-started/schedule-a-demo" horizontal />
+</CardGroup>

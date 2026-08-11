@@ -1,0 +1,139 @@
+---
+title: "Pay merchants, suppliers and employees in stablecoins"
+description: "Fund a treasury balance and pay one recipient or thousands, on-chain or internally."
+icon: "paper-plane"
+---
+
+Hold a stablecoin balance and pay out from it — salaries, suppliers, contractors, marketplace sellers. Recipients get value in minutes, wherever they are, without correspondent banking.
+
+**Products:** [Wallets](/wallets) for the treasury balance and payouts, the dashboard if you would rather upload a CSV than write code.
+
+## Two ways to run it
+
+| | Dashboard CSV | Wallets API |
+| --- | --- | --- |
+| Effort | None | An integration |
+| Approval step | Built in | You build it |
+| Scheduling | Manual | Whatever you build |
+| Best for | Monthly payroll, occasional batches | Automated, recurring, high volume |
+
+Most teams start with the CSV and move to the API once the batch becomes routine.
+
+## Build it
+
+<Steps>
+  <Step title="Fund a payout balance">
+    Receive stablecoin into your account, or sweep it in from sub-accounts. Internal transfers are instant and free.
+  </Step>
+
+  <Step title="Check the balance and the network">
+    `GET /users/me/wallets/usdt`
+
+    **Spendable balance is `balance` alone** — `locked` and `staked` are already committed.
+
+    In the `networks` array, confirm the network you intend to use has `withdraws_enabled: true`. A network can accept deposits while withdrawals are off.
+  </Step>
+
+  <Step title="Generate a reference per recipient, before you call">
+    Persist the batch first — one row per recipient, each with a unique reference and a state of `pending`.
+
+    Make the reference **deterministic** from the batch and row, like `payroll-2026-04-0042`. That way an accidental re-run cannot double-pay.
+  </Step>
+
+  <Step title="Check the total against the balance">
+    Sum the batch plus expected fees. Running dry halfway through leaves you reconciling a partial payroll.
+  </Step>
+
+  <Step title="Submit, one at a time">
+    ```bash
+    curl -X POST 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me/withdraws' \
+      -H 'accept: application/json' \
+      -H 'content-type: application/json' \
+      -H "Authorization: Bearer $QUIDAX_SECRET_KEY" \
+      -d '{
+        "currency": "usdt",
+        "amount": "1500",
+        "fund_uid": "<wallet_address>",
+        "network": "trc20",
+        "reference": "payroll-2026-04-0042",
+        "narration": "April salary"
+      }'
+    ```
+
+    Stay inside 300 requests per minute. Roughly one every 250ms leaves headroom for retries.
+
+    **Always send `network`.** Omitting it uses the currency default, and a mismatch loses the funds permanently.
+  </Step>
+
+  <Step title="Resolve anything uncertain by reference">
+    For any row you submitted but got no clean response for:
+
+    ```bash
+    curl 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me/withdraws/reference/<reference>' \
+      -H "Authorization: Bearer $QUIDAX_SECRET_KEY"
+    ```
+
+    | Response | Meaning |
+    | --- | --- |
+    | A withdrawal | It landed. **Do not resubmit.** |
+    | `110112` | It never landed. Safe to resubmit with the same reference. |
+  </Step>
+
+  <Step title="Reconcile on webhooks">
+    **Expect** `withdraw.successful` or `withdraw.rejected` per row. A rejection carries a `reason` — read it before retrying, because most rejections repeat.
+
+    Process idempotently. The same event can arrive twice.
+  </Step>
+</Steps>
+
+<Warning>
+  Never retry a payout with a **new** reference. If the original landed you have paid twice, and an on-chain payout cannot be recalled.
+</Warning>
+
+<Tip>
+  Pay internal recipients — anyone who also holds an account with you — by account ID rather than address. Instant, free, and no possibility of a wrong-network loss.
+</Tip>
+
+<Card title="Payouts, including CSV batches" icon="paper-plane" href="/payments/payouts" horizontal>
+  The full build, dashboard and API.
+</Card>
+
+## Getting it wrong is expensive
+
+<AccordionGroup>
+  <Accordion title="Wrong network, funds gone" icon="link-slash">
+    Sending an asset over a network the recipient's wallet does not support loses it permanently. No recovery, no reversal.
+
+    There is no address-validation endpoint, so validate format client-side and send a small test amount to any new large destination first.
+  </Accordion>
+
+  <Accordion title="A shifted CSV column" icon="table">
+    Check the recipient count and total on the confirmation page against your source file before confirming. Run a two-row batch before a two-hundred-row one.
+  </Accordion>
+
+  <Accordion title="A double-run of the same file" icon="copy">
+    Deterministic references make this harmless. Random per-run references mean the second upload pays everyone again.
+  </Accordion>
+
+  <Accordion title="Six seconds to cancel" icon="clock">
+    A withdrawal can be cancelled within 6 seconds of creation. That is not a customer-facing undo — do not build a cancel button around it.
+  </Accordion>
+</AccordionGroup>
+
+## Paying out in local currency instead
+
+If recipients want naira or cedis rather than stablecoin, pay out fiat directly — set `fund_uid` to the account number and `fund_uid2` to the bank code — or use [Ramp off-ramp](/ramp/off-ramp) for a fuller local payout flow.
+
+<Card title="Fund with stablecoins and pay out fiat" icon="building-columns" href="/use-cases/fund-stablecoins-payout-fiat" horizontal />
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Withdrawals" icon="paper-plane" href="/wallets/withdrawals" horizontal />
+
+  <Card title="Wallets" icon="wallet" href="/wallets" horizontal />
+
+  <Card title="Payroll" icon="users" href="/solutions/payroll" horizontal />
+
+  <Card title="Schedule a demo" icon="calendar" href="/get-started/schedule-a-demo" horizontal />
+</CardGroup>

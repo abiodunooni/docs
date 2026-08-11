@@ -1,0 +1,1635 @@
+{
+  "info": {
+    "name": "Quidax Payments API",
+    "description": "Accept crypto payments, pay out, and settle in the currency you choose.\n\nSet `secretKey` (sec_...) in collection variables. Initialize Transaction needs the PUBLIC key instead. Docs: https://docs.quidax.com/payments",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{secretKey}}"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "Initialize a transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/transaction",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transaction"
+              ]
+            },
+            "description": "Creates the record of what the customer owes. Returns a reference with status `INITIATED` \u2014 no address exists and no rate is locked yet. Takes your **public** key.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer\": {\n    \"name\": \"tunde\",\n    \"email\": \"customer@example.com\"\n  },\n  \"amount\": \"1000\",\n  \"currency\": \"NGN\",\n  \"meta\": {\n    \"reference\": \"\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 200",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/transaction",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "transaction"
+                  ]
+                }
+              },
+              "status": "200",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"id\": 42,\n    \"reference\": \"bq_pL2upBiLivl_o1Zg0\",\n    \"amount_paid\": null,\n    \"status\": \"INITIATED\",\n    \"description\": null,\n    \"initialized_amount\": 1000,\n    \"payment_amount\": null,\n    \"payment_address\": null,\n    \"payment_currency\": null,\n    \"initialized_currency\": 2,\n    \"merchant\": {\n      \"id\": 10,\n      \"name\": \"Appstate\"\n    }\n  },\n  \"meta\": {}\n}"
+            },
+            {
+              "name": "400 400",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/transaction",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "transaction"
+                  ]
+                }
+              },
+              "status": "400",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}"
+            }
+          ]
+        },
+        {
+          "name": "Initiate a payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/transaction/{transaction_id}/pay",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transaction",
+                ":transaction_id",
+                "pay"
+              ],
+              "variable": [
+                {
+                  "key": "transaction_id",
+                  "value": "",
+                  "description": ""
+                }
+              ]
+            },
+            "description": "Assigns a payment currency, locks the rate, and returns the wallet address, exact crypto amount and a QR code. Moves the transaction to `PENDING`, which starts the 60-minute expiry window.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currency_id\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 200",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/transaction/{transaction_id}/pay",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "transaction",
+                    ":transaction_id",
+                    "pay"
+                  ]
+                }
+              },
+              "status": "200",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"qrCode\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJQAAACUCAYAAAB1PADUAAAAAklEQVR4AewaftIAAAThSURBVO3BQY4bSRAEwfAC//9l3znmqYBGJ6VZIczwR6qWnFQtOqladFK16KRq0UnVopOqRSdVi06qFp1ULTqpWnRSteikatFJ1aKTqkUnVYs+eQnIn6RmE5BJzRNAnlAzAZnUTED+JDVvnFQtOqladFK16JNlajYBeQPIjZobIJOaSc0bap5QswnIppOqRSdVi06qFn3yZUCeUPMEkEnNpGYCMgG5UTMBeULNNwF5Qs03nVQtOqladFK16JN/HJBJzQ2QCcikZgIyqZmATGomIJOa/7OTqkUnVYtOqhZ98o9T84SaGyA3QJ5Q8y85qVp0UrXopGrRJ1+m5m8CMql5Asik5gkg36TmNzmpWnRSteikatEny4D8nwCZ1DwBZFLzBJBJzQ2Q3+ykatFJ1aKTqkX4I/9jQCY1E5A31ExAJjVPAJnU/EtOqhadVC06qVr0yUtAJjUTkE1qJjUTkEnNDZAbIG8AmdRMQCY1E5BNar7ppGrRSdWik6pF+CN/EZBJzQ2QSc0NkBs1TwC5UfMGkBs1E5BJzQ2QGzVvnFQtOqladFK16JMvAzKpuQHyBpBJzQTkDTVvAHlCzY2aCciNmm86qVp0UrXopGrRJy8BuVEzAZnUPAHkRs0bQN5Qc6PmBsgNkCfUTEBu1LxxUrXopGrRSdWiT34ZIDdqboA8AWRScwPkCSCTmgnIpOZGzRtqvumkatFJ1aKTqkWf/GFqJiA3ap5Q8wSQGyA3aiYgT6h5AsgTam6ATGreOKladFK16KRqEf7IIiA3ap4AMqm5ATKpmYBMap4AcqPmBsikZgLyhJoJyKRmAjKp2XRSteikatFJ1aJPlqm5ATKpuVEzAXkCyKTmBsik5kbNBORGzRtqJiCTmr/ppGrRSdWik6pF+CMvAJnUTEAmNTdAbtRMQG7UTEAmNTdAJjVvALlRcwNkUjMBeUPNGydVi06qFp1ULfrkl1MzAZnUTEBu1ExAJjWTmgnIpOYGyBNAJjWTmgnIjZobIJtOqhadVC06qVr0yV8GZFIzAZnU/CZAJjWTmgnIpOYGyBtAJjWTmk0nVYtOqhadVC365JcBMqmZgDwB5EbNBGRSc6NmAjKpmdRMQCY1N2pugExqJiCTmk0nVYtOqhadVC365MvUTEAmNTdAJjU3QCY1N0AmNROQGyCTmgnIE0BugNyomYD8SSdVi06qFp1ULcIf+R8DMqn5JiA3am6A3Kh5Asik5gkgk5o3TqoWnVQtOqla9MlLQP4kNZOaGyBPqJmATGqeADKpmYDcAJnU3ACZ1ExAJjWbTqoWnVQtOqla9MkyNZuA3AC5UTMBeULNBOQNIE+oeULN33RSteikatFJ1aJPvgzIE2reUDMBmdRMQN5Q8waQCcgbQG7UTEAmNW+cVC06qVp0UrXok38MkL8JyKTmRs0TQCY1TwCZ1Gw6qVp0UrXopGrRJ/84NROQSc0E5Akgk5obIJOaJ9RMQH6Tk6pFJ1WLTqoWffJlar5JzSY1E5AbNROQSc2k5pvU3AD5ppOqRSdVi06qFn2yDMifBGRSc6NmAnKjZgIyAZnUTEBu1ExAbtTcALlR800nVYtOqhadVC3CH6laclK16KRq0UnVopOqRSdVi06qFp1ULTqpWnRSteikatFJ1aKTqkUnVYtOqhadVC36D4yuQj9aZj6fAAAAAElFTkSuQmCC\",\n    \"id\": 118,\n    \"reference\": \"bq_J7WCL-EC4G3OhJUyK\",\n    \"amount_paid\": null,\n    \"status\": \"PENDING\",\n    \"description\": null,\n    \"initialized_amount\": 1000,\n    \"payment_amount\": 1.74342681,\n    \"payment_address\": \"0x6cE7a3093fD6FF69B26B8bEC1d7dA4BE07998d01\",\n    \"payment_currency\": 3,\n    \"initialized_currency\": 2,\n    \"merchant\": {\n      \"id\": 10,\n      \"name\": \"Appstate\"\n    }\n  },\n  \"meta\": {}\n}"
+            },
+            {
+              "name": "400 400",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/transaction/{transaction_id}/pay",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "transaction",
+                    ":transaction_id",
+                    "pay"
+                  ]
+                }
+              },
+              "status": "400",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Validation Error\",\n  \"meta\": {},\n  \"data\": {\n    \"transaction_id\": {\n      \"message\": \"transaction_id must be a number\"\n    }\n  }\n}"
+            },
+            {
+              "name": "404 404",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/transaction/{transaction_id}/pay",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "transaction",
+                    ":transaction_id",
+                    "pay"
+                  ]
+                }
+              },
+              "status": "404",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"resource not found\",\n  \"path\": \"/v1/transaction/ccc/pay\"\n}"
+            },
+            {
+              "name": "422 422",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/transaction/{transaction_id}/pay",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "transaction",
+                    ":transaction_id",
+                    "pay"
+                  ]
+                }
+              },
+              "status": "422",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"The transaction is not initiated\",\n  \"meta\": {}\n}"
+            }
+          ]
+        },
+        {
+          "name": "Verify a transaction",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/transaction/{transaction_id}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transaction",
+                ":transaction_id",
+                "status"
+              ],
+              "variable": [
+                {
+                  "key": "transaction_id",
+                  "value": "",
+                  "description": ""
+                }
+              ]
+            },
+            "description": "Returns the current status of a transaction. Use it when a webhook is delayed or to reconcile \u2014 it supplements webhooks rather than replacing them."
+          },
+          "response": [
+            {
+              "name": "200 200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/transaction/{transaction_id}/status",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "transaction",
+                    ":transaction_id",
+                    "status"
+                  ]
+                }
+              },
+              "status": "200",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"status\": \"SUCCESSFUL\"\n  },\n  \"meta\": {}\n}"
+            },
+            {
+              "name": "400 400",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/transaction/{transaction_id}/status",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "transaction",
+                    ":transaction_id",
+                    "status"
+                  ]
+                }
+              },
+              "status": "400",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Validation Error\",\n  \"meta\": {},\n  \"data\": {\n    \"transaction_id\": {\n      \"message\": \"transaction_id must be a number\"\n    }\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Payment links",
+      "item": [
+        {
+          "name": "Create a payment link",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payment-links",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payment-links"
+              ]
+            },
+            "description": "Creates a hosted checkout link. Static links carry a fixed amount, dynamic links let the customer enter one. Links are reusable and each use creates a new transaction.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"\",\n  \"link_type\": \"static\",\n  \"currency\": \"NGN\",\n  \"amount\": \"\",\n  \"description\": \"\",\n  \"metadata\": {\n    \"name\": \"tunde\",\n    \"email\": \"customer@example.com\"\n  },\n  \"pass_fee_to_customer\": false,\n  \"pass_settlement_fee_to_customer\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 200",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/payment-links",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "payment-links"
+                  ]
+                }
+              },
+              "status": "200",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Payment Link created\",\n  \"id\": \"bq_pl_aBcDeFgHiJkLmNo\",\n  \"title\": \"Invoice #1024\",\n  \"link_type\": \"static\",\n  \"currency\": \"USD\",\n  \"amount\": 150,\n  \"payment_url\": \"https://pay.basqet.com/pl_aBcDeFgHiJkLmNo\",\n  \"metadata\": {\n    \"order_id\": \"order_1024\",\n    \"customer_tier\": \"premium\"\n  },\n  \"created_at\": \"2026-04-22T10:30:00.000Z\",\n  \"last_used\": null,\n  \"deleted_at\": null\n}"
+            },
+            {
+              "name": "400 400",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/payment-links",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "payment-links"
+                  ]
+                }
+              },
+              "status": "400",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}"
+            }
+          ]
+        },
+        {
+          "name": "List payment links",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payment-links?offset=&limit=10&order=desc&from=&to=&search_term=&status=active",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payment-links"
+              ],
+              "query": [
+                {
+                  "key": "offset",
+                  "value": "",
+                  "description": "Number of records to skip.",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of records to return.",
+                  "disabled": true
+                },
+                {
+                  "key": "order",
+                  "value": "desc",
+                  "description": "Sort order by creation date.",
+                  "disabled": true
+                },
+                {
+                  "key": "from",
+                  "value": "",
+                  "description": "Filter links created on or after this date.",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "",
+                  "description": "Filter links created on or before this date.",
+                  "disabled": true
+                },
+                {
+                  "key": "search_term",
+                  "value": "",
+                  "description": "Search links by title or currency code.",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "active",
+                  "description": "Filter by link status. `archived` returns deleted links.",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Returns a paginated list of payment links for your merchant account. By default, only active (non-deleted) links are returned. Use the `status` parameter to retrieve archived links."
+          },
+          "response": [
+            {
+              "name": "200 200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/payment-links",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "payment-links"
+                  ]
+                }
+              },
+              "status": "200",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"bq_pl_aBcDeFgHiJkLmNo\",\n      \"title\": \"Invoice #1024\",\n      \"link_type\": \"static\",\n      \"currency\": \"USD\",\n      \"amount\": 150,\n      \"payment_url\": \"https://pay.basqet.com/pl_aBcDeFgHiJkLmNo\",\n      \"metadata\": null,\n      \"created_at\": \"2026-04-22T10:30:00.000Z\",\n      \"last_used\": null,\n      \"deleted_at\": null\n    }\n  ],\n  \"meta\": {\n    \"limit\": 20,\n    \"count\": 1,\n    \"hasNext\": false\n  }\n}"
+            },
+            {
+              "name": "400 400",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/payment-links",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "payment-links"
+                  ]
+                }
+              },
+              "status": "400",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}"
+            }
+          ]
+        },
+        {
+          "name": "Get a payment link",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payment-links/{id}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payment-links",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "The unique ID of the payment link (bq_pl_\u2026)."
+                }
+              ]
+            },
+            "description": "Retrieve the details of a single payment link by its ID."
+          },
+          "response": [
+            {
+              "name": "200 200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/payment-links/{id}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "payment-links",
+                    ":id"
+                  ]
+                }
+              },
+              "status": "200",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"bq_pl_aBcDeFgHiJkLmNo\",\n  \"title\": \"Invoice #1024\",\n  \"link_type\": \"static\",\n  \"currency\": \"USD\",\n  \"amount\": 150,\n  \"payment_url\": \"https://pay.basqet.com/pl_aBcDeFgHiJkLmNo\",\n  \"metadata\": null,\n  \"created_at\": \"2026-04-22T10:30:00.000Z\",\n  \"last_used\": null,\n  \"deleted_at\": null\n}"
+            },
+            {
+              "name": "400 400",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/payment-links/{id}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "payment-links",
+                    ":id"
+                  ]
+                }
+              },
+              "status": "400",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}"
+            }
+          ]
+        },
+        {
+          "name": "Update a payment link",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payment-links/{id}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payment-links",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "The unique ID of the payment link to update"
+                }
+              ]
+            },
+            "description": "Updates one or more fields on an existing payment link. At least one field must be provided.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"\",\n  \"link_type\": \"static\",\n  \"currency\": \"NGN\",\n  \"amount\": \"\",\n  \"description\": \"\",\n  \"metadata\": {\n    \"name\": \"tunde\",\n    \"email\": \"customer@example.com\"\n  },\n  \"pass_fee_to_customer\": false,\n  \"pass_settlement_fee_to_customer\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 200",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/payment-links/{id}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "payment-links",
+                    ":id"
+                  ]
+                }
+              },
+              "status": "200",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"bq_pl_aBcDeFgHiJkLmNo\",\n  \"title\": \"Invoice #1024 (Updated)\",\n  \"link_type\": \"static\",\n  \"currency\": \"USD\",\n  \"amount\": 200,\n  \"payment_url\": \"https://pay.basqet.com/pl_aBcDeFgHiJkLmNo\",\n  \"metadata\": null,\n  \"created_at\": \"2026-04-22T10:30:00.000Z\",\n  \"last_used\": null,\n  \"deleted_at\": null\n}"
+            },
+            {
+              "name": "400 400",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/payment-links/{id}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "payment-links",
+                    ":id"
+                  ]
+                }
+              },
+              "status": "400",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}"
+            }
+          ]
+        },
+        {
+          "name": "Delete a payment link",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payment-links/{id}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payment-links",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "The unique ID of the payment link to delete."
+                }
+              ]
+            },
+            "description": "Soft-deletes a payment link. Deleted links are no longer accessible to customers and are excluded from your default list view. This action cannot be undone via the API."
+          },
+          "response": [
+            {
+              "name": "200 200",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/payment-links/{id}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "payment-links",
+                    ":id"
+                  ]
+                }
+              },
+              "status": "200",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"bq_pl_aBcDeFgHiJkLmNo\",\n  \"status\": \"deleted\",\n  \"deleted_at\": \"2026-04-22T14:00:00.000Z\"\n}"
+            },
+            {
+              "name": "400 400",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/payment-links/{id}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "payment-links",
+                    ":id"
+                  ]
+                }
+              },
+              "status": "400",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Conversions and rates",
+      "item": [
+        {
+          "name": "Create a conversion quote",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "",
+                "description": "Optional. Reusing the same key within the quote window replays the same response for your account and environment."
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/wallets/conversions/quotes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wallets",
+                "conversions",
+                "quotes"
+              ]
+            },
+            "description": "Quotes a wallet-to-wallet conversion. Quotes last roughly 10 seconds and can only be used once.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"from_currency\": \"\\\"NGN\\\"\",\n  \"to_currency\": \"\\\"NGN\\\"\",\n  \"amount\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 200",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Idempotency-Key",
+                    "value": "",
+                    "description": "Optional. Reusing the same key within the quote window replays the same response for your account and environment."
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/wallets/conversions/quotes",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "wallets",
+                    "conversions",
+                    "quotes"
+                  ]
+                }
+              },
+              "status": "200",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"quote_id\": \"cq_x9R4mL2pQ8sT7vA\",\n    \"from_currency\": \"NGN\",\n    \"to_currency\": \"USDT\",\n    \"from_amount\": 14000,\n    \"to_amount\": 10,\n    \"exchange_rate\": 0.000714285714285714,\n    \"expires_at\": \"2026-05-15T12:05:30.000Z\"\n  }\n}"
+            },
+            {
+              "name": "400 400",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Idempotency-Key",
+                    "value": "",
+                    "description": "Optional. Reusing the same key within the quote window replays the same response for your account and environment."
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/wallets/conversions/quotes",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "wallets",
+                    "conversions",
+                    "quotes"
+                  ]
+                }
+              },
+              "status": "400",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}"
+            }
+          ]
+        },
+        {
+          "name": "Get an exchange rate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exchange-rates",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "exchange-rates"
+              ]
+            },
+            "description": "Returns a live rate and equivalent amount for a currency pair. A preview only \u2014 it does not move funds.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"base_currency\": \"\",\n  \"quote_currency\": \"\",\n  \"amount\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 200",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/exchange-rates",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "exchange-rates"
+                  ]
+                }
+              },
+              "status": "200",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"rate_id\": \"rate_p8Mz6BnL3rQx2Va\",\n    \"base_currency\": \"USD\",\n    \"quote_currency\": \"NGN\",\n    \"rate\": 1500,\n    \"base_amount\": 100,\n    \"quote_amount\": 150000,\n    \"expires_at\": \"2026-05-15T12:05:30.000Z\",\n    \"expiry_in_seconds\": 30,\n    \"created_at\": \"2026-05-15T12:05:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "400 400",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/exchange-rates",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "exchange-rates"
+                  ]
+                }
+              },
+              "status": "400",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}"
+            }
+          ]
+        },
+        {
+          "name": "Execute a wallet conversion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "",
+                "description": "Recommended. Reusing a key returns the cached result for your account and environment."
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/wallets/conversions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wallets",
+                "conversions"
+              ]
+            },
+            "description": "Executes a conversion using a quote from Create Quote. Quotes expire in roughly 10 seconds and can only be used once. Send an Idempotency-Key so a timed-out request is safe to retry.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quote_id\": \"cq_aBcDeFgHiJkLmNo\",\n  \"reference\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List wallet conversions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/wallets/conversions?limit=50&offset=&reference=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wallets",
+                "conversions"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "offset",
+                  "value": "",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "reference",
+                  "value": "",
+                  "description": "Filter conversions by your own reference.",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Returns your conversion history for reconciliation."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Testing",
+      "item": [
+        {
+          "name": "Update a test transaction status",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/transaction/{transaction_id}/trigger",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transaction",
+                ":transaction_id",
+                "trigger"
+              ],
+              "variable": [
+                {
+                  "key": "transaction_id",
+                  "value": "",
+                  "description": ""
+                }
+              ]
+            },
+            "description": "Test mode only. Moves a transaction to `successful`, `overpaid`, `underpaid` or `abandoned` and fires the matching webhook. The exact shape of this endpoint is being confirmed \u2014 see the Testing guide.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"successful\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 200",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/transaction/{transaction_id}/trigger",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "transaction",
+                    ":transaction_id",
+                    "trigger"
+                  ]
+                }
+              },
+              "status": "200",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}"
+            },
+            {
+              "name": "400 400",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/transaction/{transaction_id}/trigger",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "transaction",
+                    ":transaction_id",
+                    "trigger"
+                  ]
+                }
+              },
+              "status": "400",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}"
+            }
+          ]
+        },
+        {
+          "name": "Resend a webhook event",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/transaction/{transaction_id}/webhook",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transaction",
+                ":transaction_id",
+                "webhook"
+              ],
+              "variable": [
+                {
+                  "key": "transaction_id",
+                  "value": "",
+                  "description": ""
+                }
+              ]
+            },
+            "description": "Replays the webhook for a transaction. Useful when your endpoint was down."
+          },
+          "response": [
+            {
+              "name": "200 200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/transaction/{transaction_id}/webhook",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "transaction",
+                    ":transaction_id",
+                    "webhook"
+                  ]
+                }
+              },
+              "status": "200",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}"
+            },
+            {
+              "name": "400 400",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/transaction/{transaction_id}/webhook",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "transaction",
+                    ":transaction_id",
+                    "webhook"
+                  ]
+                }
+              },
+              "status": "400",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Reference",
+      "item": [
+        {
+          "name": "List supported currencies",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/currency?type=FIAT",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "currency"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "FIAT",
+                  "description": "Options: FIAT or CRYPTO",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Returns every supported currency grouped as `FIAT` or `CRYPTO`, with the networks each crypto is available on. Fetch this rather than hard-coding currency IDs."
+          },
+          "response": [
+            {
+              "name": "200 200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/currency",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "currency"
+                  ]
+                }
+              },
+              "status": "200",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"United States Dollar\",\n      \"slug\": \"USD\",\n      \"icon_url\": null,\n      \"type\": \"FIAT\",\n      \"created_at\": \"2022-01-19T13:41:40.000Z\",\n      \"updated_at\": \"2022-01-19T13:41:40.000Z\"\n    }\n  ],\n  \"meta\": {}\n}"
+            },
+            {
+              "name": "400 400",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/currency",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "currency"
+                  ]
+                }
+              },
+              "status": "400",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Validation Error\",\n  \"meta\": {},\n  \"data\": {\n    \"type\": {\n      \"message\": \"type must be one of [FIAT, CRYPTO]\"\n    }\n  }\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://api.basqet.com/v1",
+      "type": "string"
+    },
+    {
+      "key": "secretKey",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

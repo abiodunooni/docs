@@ -1,0 +1,90 @@
+---
+title: "SDKs and tools"
+description: "Official libraries, and what to reach for when there isn't one."
+icon: "cube"
+---
+
+## Official libraries
+
+<CardGroup cols={2}>
+  <Card title="basqet-node" icon="server" href="https://www.npmjs.com/package/basqet-node">
+    Server-side library for Payments. Initialize transactions, fetch currencies, verify payments.
+  </Card>
+
+  <Card title="basqet-checkout" icon="window" href="https://www.npmjs.com/package/basqet-checkout">
+    Client-side library for Payments. Embed the payment modal in your checkout.
+  </Card>
+</CardGroup>
+
+Both are typed and ship their own installation docs on npm.
+
+<Note>
+  Ramp and Wallets have no official SDK. Both are plain REST over JSON, so any HTTP client works — the guides use `curl` throughout.
+</Note>
+
+## Where the SDK boundary sits
+
+The checkout SDK is the only library that renders anything. Everything else is a thin wrapper over REST, so writing directly against the API costs you very little.
+
+| | Use the SDK | Use the API |
+| --- | --- | --- |
+| Payments checkout UI | Yes — it handles the currency picker, address, QR code and countdown | Only if you need a custom experience |
+| Payments server calls | Convenient | Equally fine |
+| Ramp | — | Always |
+| Wallets | — | Always |
+
+## Building your own client
+
+A few things are worth getting right once, in a shared layer, rather than per call site.
+
+<AccordionGroup>
+  <Accordion title="Per-product auth" icon="key">
+    Ramp uses `x-private-key`; Payments and Wallets use bearer auth. Keep them as separate clients rather than one client with a switch — the failure mode of getting it wrong is an opaque auth error.
+
+    <Card title="Authentication" icon="key" href="/developer-tools/authentication" horizontal />
+  </Accordion>
+
+  <Accordion title="Retry and backoff" icon="clock">
+    Exponential backoff on `429`, `444` and `5xx`. **Never** blind-retry a money movement — look it up by reference first.
+  </Accordion>
+
+  <Accordion title="Reference generation" icon="hashtag">
+    Generate before the call, persist before the call. For batches, make them deterministic from the batch and row so a re-run cannot double-pay.
+  </Accordion>
+
+  <Accordion title="Pagination" icon="list">
+    Wallets list endpoints page with `per_page` (default 50, max 100) and return `x-next-page`. Loop until it is empty rather than counting to `x-total-pages` — records can be added while you paginate.
+  </Accordion>
+
+  <Accordion title="Webhook verification" icon="shield-check">
+    Three different schemes. Route on the header and keep the verifiers separate.
+
+    <Card title="Webhooks across products" icon="webhook" href="/developer-tools/webhooks" horizontal />
+  </Accordion>
+</AccordionGroup>
+
+## Exploring the APIs
+
+Every endpoint in the API reference has a request builder with schemas and examples, which is usually faster than importing a collection.
+
+<CardGroup cols={2}>
+  <Card title="Ramp API" icon="code" href="/api-reference/ramp/introduction" horizontal />
+
+  <Card title="Payments API" icon="code" href="/api-reference/payments/introduction" horizontal />
+</CardGroup>
+
+<Note>
+  There is no published Postman collection. The OpenAPI definitions behind the reference pages can be imported into Postman or Insomnia directly if you prefer working there.
+</Note>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/developer-tools/authentication" horizontal />
+
+  <Card title="Errors and rate limits" icon="gauge-high" href="/developer-tools/errors-and-limits" horizontal />
+
+  <Card title="API reference" icon="code" href="/api-reference" horizontal />
+
+  <Card title="Support" icon="life-ring" href="/support" horizontal />
+</CardGroup>

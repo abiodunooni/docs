@@ -122,8 +122,13 @@ For single-address currencies, calling generate again returns the existing addre
 
 | Action | Method | Path |
 | --- | --- | --- |
+| The current address for a currency | `GET` | `/users/{user_id}/wallets/{currency}/address` |
 | All addresses for a currency | `GET` | `/users/{user_id}/wallets/{currency}/addresses` |
 | A specific address by ID | `GET` | `/users/{user_id}/wallets/{currency}/addresses/{address_id}` |
+
+<Note>
+  Note the singular `address` versus plural `addresses`. The singular returns the current address; the plural returns every address on that wallet — which only differs for the multi-address currencies below.
+</Note>
 
 ## Rate limit
 
@@ -138,7 +143,7 @@ Address generation is capped at **20 requests per second**, separately from the 
 
   <Card title="Withdrawals" icon="paper-plane" href="/wallets/withdrawals" horizontal />
 
-  <Card title="Supported assets" icon="globe" href="/wallets/coverage" horizontal />
+  <Card title="Coverage and limits" icon="globe" href="/wallets/coverage" horizontal />
 
   <Card title="Webhooks" icon="webhook" href="/wallets/webhooks" horizontal />
 </CardGroup>

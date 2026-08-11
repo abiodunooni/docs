@@ -1,0 +1,116 @@
+---
+title: "Authentication across products"
+description: "Base URLs, key formats and which header each product expects."
+icon: "key"
+---
+
+Each product authenticates differently. If you integrate more than one, this is what changes between them.
+
+## At a glance
+
+| | Ramp | Payments | Wallets |
+| --- | --- | --- | --- |
+| Base URL | `ramp-be.quidax.io/api/v1/merchants` | `api.basqet.com/v1` | `openapi.quidax.io/exchange-open-api/api/v1` |
+| Header | `x-private-key` | `Authorization: Bearer` | `Authorization: Bearer` |
+| Secret key | `sk_live_…` | `sec_live_…` | Opaque |
+| Public key | `pub_…` | `pub_live_…` | — |
+| Separate test keys | No | **Yes** (`_test_`) | No |
+
+<Warning>
+  Ramp uses a custom `x-private-key` header, not bearer auth. Copying an `Authorization` header pattern across from another product will fail with `Invalid private key`.
+</Warning>
+
+## Which key, where
+
+<Tabs>
+  <Tab title="Ramp">
+    ```bash
+    curl 'https://ramp-be.quidax.io/api/v1/merchants/purchase_limits/buy?currency_symbol=ngn' \
+      -H 'accept: application/json' \
+      -H "x-private-key: $RAMP_SECRET_KEY"
+    ```
+
+    The secret key is server-side only. The widget uses a separate public key, which is safe on a client.
+
+    <Card title="Ramp API reference" icon="code" href="/api-reference/ramp/introduction" horizontal />
+  </Tab>
+
+  <Tab title="Payments">
+    Which key depends on the endpoint:
+
+    | Endpoint | Key |
+    | --- | --- |
+    | Initialize a transaction | **Public** |
+    | Verify a transaction | Either |
+    | Everything else | **Secret** |
+
+    ```bash
+    curl 'https://api.basqet.com/v1/currency' \
+      -H 'Authorization: Bearer sec_live_xxxxxxxxxxxxx'
+    ```
+
+    <Note>
+      Initialize takes the public key. Sending a secret key does not create the transaction — the key is looked up as a public key and the call fails.
+    </Note>
+
+    <Card title="Payments API reference" icon="code" href="/api-reference/payments/introduction" horizontal />
+  </Tab>
+
+  <Tab title="Wallets">
+    One secret key, bearer auth, on everything.
+
+    ```bash
+    curl 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me' \
+      -H 'accept: application/json' \
+      -H "Authorization: Bearer $QUIDAX_SECRET_KEY"
+    ```
+
+    <Warning>
+      This key reaches every sub-account in your tree, including withdrawals. There is no per-sub-account credential — a compromised key exposes all your customers' funds, not just your own.
+    </Warning>
+
+    <Card title="Wallets authentication" icon="key" href="/wallets/authentication" horizontal />
+  </Tab>
+</Tabs>
+
+## Test and live
+
+**Payments** has fully separate environments — different keys, data and webhooks, with nothing carrying over. Test mode needs no KYB, so you can build before verification completes.
+
+**Ramp and Wallets have no sandbox.** You test against production with small amounts.
+
+<Card title="Testing" icon="flask" href="/testing" horizontal>
+  How to test each product safely.
+</Card>
+
+## Rules that hold everywhere
+
+<AccordionGroup>
+  <Accordion title="Secret keys are server-side only" icon="lock">
+    Never in browser or mobile code, never committed, never logged. Only the public keys are safe on a client.
+  </Accordion>
+
+  <Accordion title="Always HTTPS" icon="shield-check">
+    Wallets returns `301` on a plain HTTP request. Beyond failing, the request leaks your key in transit — treat any key sent over HTTP as compromised and rotate it.
+  </Accordion>
+
+  <Accordion title="Restrict by IP where you can" icon="filter">
+    Wallets lets you bind a key to an IP address when you create it. A leaked key that only works from one address is far less damaging than one that works anywhere.
+  </Accordion>
+
+  <Accordion title="Have a rotation procedure you have run" icon="arrows-rotate">
+    Not a document — an actual procedure someone has executed. The moment you need it is the worst moment to write it.
+  </Accordion>
+</AccordionGroup>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Webhooks across products" icon="webhook" href="/developer-tools/webhooks" horizontal />
+
+  <Card title="Errors and rate limits" icon="gauge-high" href="/developer-tools/errors-and-limits" horizontal />
+
+  <Card title="API reference" icon="code" href="/api-reference" horizontal />
+
+  <Card title="Onboarding" icon="clipboard-check" href="/get-started/onboarding" horizontal />
+</CardGroup>

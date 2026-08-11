@@ -198,19 +198,24 @@ There is no address-validation endpoint in the current documentation. Validate b
 
 ## Withdrawal fees
 
-Fetch the current fee for a currency before quoting a customer.
+Fetch the current fee before quoting a customer. The fee depends on the amount and the network, not just the currency.
+
+| | |
+| --- | --- |
+| **Method** | `GET` |
+| **Path** | `/users/me/fee_rule` |
+
+| Parameter | In | Description |
+| --- | --- | --- |
+| `currency` | query | Currency to withdraw. |
+| `amount` | query | The amount being withdrawn. |
+| `network` | query | The blockchain network. |
 
 ```bash
-curl 'https://app.quidax.io/api/v1/fee?currency=usdt' \
+curl 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me/fee_rule?currency=usdt&amount=25&network=trc20' \
   -H 'accept: application/json' \
   -H "Authorization: Bearer $QUIDAX_SECRET_KEY"
 ```
-
-<Note>
-  The fee endpoint is documented against the `app.quidax.io` host rather than `openapi.quidax.io`. That is how it appears in the source material — confirm which host your account should use before relying on it in production.
-</Note>
-
-Fees are available for `btc`, `ltc`, `xrp`, `dash`, `trx`, `doge`, `matic`, `bnb`, `busd`, `usdt`, `usdc` and `floki`.
 
 <Warning>
   Fetch fees rather than hard-coding them. Network conditions change what a withdrawal costs, and a stale fee means either absorbing the difference or a rejected withdrawal.
@@ -233,7 +238,7 @@ Fees are available for `btc`, `ltc`, `xrp`, `dash`, `trx`, `doge`, `matic`, `bnb
 
   <Card title="Sub-accounts" icon="users" href="/wallets/sub-accounts" horizontal />
 
-  <Card title="Supported assets" icon="globe" href="/wallets/coverage" horizontal />
+  <Card title="Coverage and limits" icon="globe" href="/wallets/coverage" horizontal />
 
   <Card title="Conventions" icon="list-check" href="/wallets/conventions" horizontal />
 </CardGroup>

@@ -1,0 +1,129 @@
+---
+title: "Introduction"
+description: "Base URL, authentication and conventions for the Wallets API."
+icon: "code"
+---
+
+The Wallets API is a REST API over JSON. It creates and manages crypto and fiat wallets for your users, moves funds in and out, and trades.
+
+## Base URL
+
+```
+https://openapi.quidax.io/exchange-open-api/api/v1
+```
+
+Every path on these pages is relative to that root. There is no sandbox — see [Testing](/wallets/testing).
+
+<Warning>
+  Older samples in circulation use `www.quidax.com/api/v1` and `app.quidax.io/api/v1`. Use the host above.
+</Warning>
+
+## Authentication
+
+Send your secret key as a bearer token on every request.
+
+```bash
+curl 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me' \
+  -H 'accept: application/json' \
+  -H "Authorization: Bearer $QUIDAX_SECRET_KEY"
+```
+
+<Warning>
+  One key reaches **every sub-account in your tree**, including withdrawals. There is no per-sub-account credential — a compromised key exposes all your customers' funds. Restrict it to your server's IP when you create it.
+</Warning>
+
+Always use HTTPS. A plain HTTP request returns `301` and leaks your key in transit — rotate any key that has travelled that way.
+
+## The user_id path segment
+
+Almost every endpoint takes a `user_id` that decides which account you are acting on.
+
+| Value | Acts on |
+| --- | --- |
+| `me` | Your parent account |
+| A sub-account's ID | That sub-account |
+
+<Card title="Sub-accounts" icon="users" href="/wallets/sub-accounts" horizontal />
+
+## Response format
+
+Success and failure share one envelope. Errors carry a stable code inside `data`.
+
+```json
+{ "status": "success", "message": "Successful", "data": { } }
+```
+
+```json
+{
+  "status": "error",
+  "message": "Invalid secret key.",
+  "data": { "code": "E0001", "message": "Invalid secret key." }
+}
+```
+
+<Tip>
+  Branch on `data.code`, not on `message`. Messages are written for humans and get reworded; codes are stable.
+</Tip>
+
+| Code | Meaning |
+| --- | --- |
+| `E0001` | Invalid secret key |
+| `E0104` | Sub-account does not exist |
+| `E0107` | Validation failed — the message names the field |
+| `E0605` | Invalid currency value |
+| `110112` | No withdrawal with that reference |
+
+<Card title="Errors and statuses" icon="triangle-alert" href="/wallets/errors" horizontal />
+
+## Pagination
+
+List endpoints take `per_page` (default 50, max 100) and return `x-page`, `x-per-page`, `x-total-pages` and `x-next-page`.
+
+Loop until `x-next-page` is empty rather than counting to `x-total-pages` — records can be added while you paginate.
+
+## Rate limits
+
+| Endpoint | Limit |
+| --- | --- |
+| Address generation | 20 per second |
+| Everything else | 300 per minute |
+
+Over the limit returns **`444`**, which is non-standard — confirm your HTTP client surfaces it as a response rather than a connection error, or you will retry immediately and extend the throttle.
+
+## Retry safety
+
+Withdrawals are keyed on the `reference` you supply.
+
+<Steps>
+  <Step title="Generate and store the reference before you call">
+    A reference created after a successful response cannot help with the case you need it for.
+  </Step>
+
+  <Step title="On a timeout, look it up">
+    `GET /users/{user_id}/withdraws/reference/{reference}`
+  </Step>
+
+  <Step title="Interpret the answer">
+    Found means it landed — **do not resubmit**. `110112` means it never landed and is safe to resubmit with the same reference.
+  </Step>
+</Steps>
+
+<Warning>
+  Never retry a withdrawal with a new reference. If the original landed you have paid twice, and an on-chain payout cannot be recalled.
+</Warning>
+
+## Postman
+
+A generated collection covers every endpoint here, with example responses and `baseUrl` / `secretKey` variables.
+
+## Reference
+
+<CardGroup cols={2}>
+  <Card title="How it works" icon="route" href="/wallets/how-it-works" horizontal />
+
+  <Card title="Webhooks" icon="webhook" href="/wallets/webhooks" horizontal />
+
+  <Card title="Coverage and limits" icon="globe" href="/wallets/coverage" horizontal />
+
+  <Card title="Testing" icon="flask" href="/wallets/testing" horizontal />
+</CardGroup>

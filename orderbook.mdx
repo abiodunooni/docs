@@ -1,0 +1,113 @@
+---
+title: "Order Book"
+description: "Live market prices, deep liquidity and order execution for trading products."
+icon: "chart-candlestick"
+---
+
+Place buy and sell orders against Quidax's order book, and read the market data behind it. Order Book runs on the same API and the same account as [Wallets](/wallets) — one secret key covers both.
+
+<CardGroup cols={2}>
+  <Card title="Trading guide" icon="chart-candlestick" href="/wallets/trading">
+    Orders, market data and trades, with endpoints and expected behaviour.
+  </Card>
+
+  <Card title="Wallets quickstart" icon="rocket" href="/wallets/quickstart">
+    Get a key and make your first call.
+  </Card>
+</CardGroup>
+
+## What you can do
+
+<Columns cols={2}>
+  <Card title="Place orders" icon="arrow-right-arrow-left" horizontal>
+    Limit orders at your price, or market orders filled immediately.
+  </Card>
+
+  <Card title="Read prices" icon="chart-line" horizontal>
+    Tickers, order book, depth and OHLC data.
+  </Card>
+
+  <Card title="Trade for your users" icon="users" horizontal>
+    Execute on behalf of any sub-account under your merchant account.
+  </Card>
+
+  <Card title="Reconcile fills" icon="list-check" horizontal>
+    An order can fill across several trades. Reconcile against trades, not orders.
+  </Card>
+</Columns>
+
+## At a glance
+
+| | |
+| --- | --- |
+| **Base URL** | `https://openapi.quidax.io/exchange-open-api/api/v1` |
+| **Auth** | `Authorization: Bearer <secret_key>` |
+| **Order types** | Limit and market |
+| **Minimum order** | ₦1,000 or $0.90 |
+| **Rate limit** | 300 requests per minute |
+
+## Orders
+
+| Action | Method | Path |
+| --- | --- | --- |
+| Create an order | `POST` | `/users/{user_id}/orders` |
+| Fetch all orders | `GET` | `/users/{user_id}/orders` |
+| Fetch one order | `GET` | `/users/{user_id}/orders/{order_id}` |
+| Cancel an order | `POST` | `/users/{user_id}/orders/{order_id}/cancel` |
+
+| Status | Meaning |
+| --- | --- |
+| `WAIT` | Queued for execution. |
+| `DONE` | Executed. |
+| `CANCEL` | Cancelled. |
+
+<Warning>
+  A market order carries no price guarantee. On a thin pair it can fill materially away from the last traded price — if you quote a rate to a user before placing one, you carry the difference.
+</Warning>
+
+## Market data
+
+| Action | Method | Path |
+| --- | --- | --- |
+| List all markets | `GET` | `/markets` |
+| Markets summary | `GET` | `/markets/summary` |
+| List market tickers | `GET` | `/markets/tickers` |
+| One market ticker | `GET` | `/markets/tickers/{market}` |
+| Order book | `GET` | `/markets/{currency}/order_book` |
+| Depth | `GET` | `/markets/{currency}/depth` |
+| K-line (OHLC) | `GET` | `/markets/{market}/k` |
+| Recent trades | `GET` | `/trades/{market_pair}` |
+
+<Tip>
+  Use tickers to display a price. Order book and depth are much heavier responses — reach for them when building a trading view or calculating slippage, not for a headline number.
+</Tip>
+
+## Two rules that cause most rejections
+
+**Minimum order value** — ₦1,000 or $0.90. Below it, orders are rejected.
+
+**Precision** — each pair caps the decimal places allowed on volume and price independently. For `BTC/USDT`, BTC volume takes 5 decimals, USDT volume 2, and price 2.
+
+<Card title="Precision by pair" icon="ruler" href="/wallets/conventions#precision" horizontal>
+  The full table, and why not to treat it as permanent.
+</Card>
+
+Round in your own code rather than passing raw user input through. A rejection after a customer has confirmed is a much worse experience than a rounded amount shown up front.
+
+## Swap instead?
+
+For a plain "convert X to Y" experience, [Swap](/wallets/swap) is the better tool — quote, show, confirm, with no partial fills and no order book to reason about.
+
+Use orders when you want control over price and execution.
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Trading guide" icon="chart-candlestick" href="/wallets/trading" horizontal />
+
+  <Card title="Build your own exchange" icon="code" href="/use-cases/build-crypto-exchange" horizontal />
+
+  <Card title="Coverage and limits" icon="globe" href="/wallets/coverage" horizontal />
+
+  <Card title="Testing" icon="flask" href="/wallets/testing" horizontal />
+</CardGroup>

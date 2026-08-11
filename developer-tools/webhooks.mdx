@@ -1,0 +1,141 @@
+---
+title: "Webhooks across products"
+description: "Signature schemes, retry behaviour and response rules — they differ by product."
+icon: "webhook"
+---
+
+Every Quidax product uses webhooks, and **no two of them sign or retry the same way.** If you integrate more than one, this page is the difference between one working handler and three subtly broken ones.
+
+## The differences that matter
+
+| | Ramp | Payments | Wallets |
+| --- | --- | --- | --- |
+| Header | `X-Ramp-Signature` | `basqetSignature` | `quidax-signature` |
+| Algorithm | HMAC | **HMAC SHA512** | **HMAC SHA256** |
+| Signed payload | Body | Body | **`timestamp.body`** |
+| Header format | Signature | Signature | `t=<ts>,s=<sig>` |
+| Success response | `2xx` | `200` | `200` |
+| Retries | On failure | On failure | **5 attempts, then permanent stop** |
+| Manual replay | — | Retry endpoint | **None** |
+
+<Warning>
+  Wallets signs `timestamp.body`, not the body alone. A handler written for Payments will never validate a Wallets webhook, and the failure is silent — you just stop processing events.
+</Warning>
+
+## Verifying each one
+
+<Tabs>
+  <Tab title="Wallets">
+    HMAC SHA256 over `<timestamp>.<body>`, with the timestamp taken from the header.
+
+    ```javascript
+    const [tsPart, sigPart] = req.headers['quidax-signature'].split(',');
+    const [, timestamp] = tsPart.split('=');
+    const [, signature] = sigPart.split('=');
+
+    const expected = crypto
+      .createHmac('sha256', secret)
+      .update(`${timestamp}.${JSON.stringify(req.body)}`)
+      .digest('hex');
+    ```
+
+    <Card title="Wallets webhooks" icon="webhook" href="/wallets/webhooks" horizontal />
+  </Tab>
+
+  <Tab title="Payments">
+    HMAC SHA512 over the body.
+
+    ```javascript
+    const expected = crypto
+      .createHmac('sha512', secret)
+      .update(JSON.stringify(req.body))
+      .digest('hex');
+
+    // Node lowercases incoming header names
+    if (expected !== req.headers['basqetsignature']) return res.sendStatus(401);
+    ```
+
+    <Warning>
+      Read `basqetsignature` in lowercase. Node lowercases incoming header names, so the camel-case version is always `undefined` — the comparison fails silently and you process nothing.
+    </Warning>
+
+    <Card title="Payments webhooks" icon="webhook" href="/payments/webhooks" horizontal />
+  </Tab>
+
+  <Tab title="Ramp">
+    Verify `X-Ramp-Signature` against the payload with your secret key.
+
+    <Card title="Ramp webhooks" icon="webhook" href="/ramp/webhooks" horizontal />
+  </Tab>
+</Tabs>
+
+<Tip>
+  Compare signatures with a timing-safe comparison such as `crypto.timingSafeEqual` rather than `!==`. It costs nothing and closes a class of attack a plain string compare leaves open.
+</Tip>
+
+## Rules that hold everywhere
+
+<AccordionGroup>
+  <Accordion title="Acknowledge before you process" icon="bolt">
+    Return the success status immediately, then do the work. A handler that writes to a database or calls another service before responding turns a slow moment into a timeout, and a timeout into a duplicate delivery.
+  </Accordion>
+
+  <Accordion title="Assume every event arrives more than once" icon="fingerprint">
+    Record what you have processed, keyed on the transaction or deposit ID, and check before giving value. This is not defensive programming — retries are normal operation.
+  </Accordion>
+
+  <Accordion title="Re-query before giving value" icon="magnifying-glass">
+    The webhook tells you something happened; the API tells you what is true now. Where money is involved, act on the second.
+
+    This matters most on Wallets deposits, where `deposit.successful` does not mean `ACCEPTED`.
+  </Accordion>
+
+  <Accordion title="Give value on the webhook, not on a redirect" icon="link">
+    A customer who closes the tab after paying still paid. One who returns without paying has not.
+  </Accordion>
+
+  <Accordion title="Register per environment" icon="arrows-rotate">
+    Payments has separate test and live webhooks that never carry over. Ramp and Wallets test against production.
+  </Accordion>
+</AccordionGroup>
+
+## Retry behaviour
+
+**Wallets** retries immediately, then at 1 minute, 30 minutes, 1 hour and 24 hours — then stops permanently, with no replay endpoint.
+
+<Warning>
+  If a Wallets endpoint is down beyond 24 hours, those events are gone and the only recovery is reconciling against the API. Alert on delivery failures rather than discovering the gap later.
+</Warning>
+
+**Payments** exposes a retry endpoint so you can replay an event yourself:
+
+```
+GET /v1/transaction/:transaction_id/webhook
+```
+
+## Building one handler for several products
+
+If you integrate more than one product, route on the header rather than trying to normalise:
+
+```javascript
+function verify(req) {
+  if (req.headers['quidax-signature'])  return verifyWallets(req);
+  if (req.headers['basqetsignature'])   return verifyPayments(req);
+  if (req.headers['x-ramp-signature'])  return verifyRamp(req);
+  return false;
+}
+```
+
+Keep the verification functions separate. Sharing one with a configurable algorithm is how a SHA256 check ends up running against a SHA512 payload.
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/developer-tools/authentication" horizontal />
+
+  <Card title="Errors and rate limits" icon="gauge-high" href="/developer-tools/errors-and-limits" horizontal />
+
+  <Card title="Testing" icon="flask" href="/testing" horizontal />
+
+  <Card title="API reference" icon="code" href="/api-reference" horizontal />
+</CardGroup>
