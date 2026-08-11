@@ -1,0 +1,144 @@
+---
+title: "Wallets and addresses"
+description: "Fetch a user's wallets and generate blockchain addresses to receive funds."
+icon: "qrcode"
+---
+
+Every account — parent or sub-account — has a wallet per supported currency. A wallet holds a balance; an **address** is what you give someone so they can send funds to it.
+
+## Fetching wallets
+
+| Action | Method | Path |
+| --- | --- | --- |
+| All wallets for a user | `GET` | `/users/{user_id}/wallets` |
+| One currency's wallet | `GET` | `/users/{user_id}/wallets/{currency}` |
+
+Use `me` as `user_id` for your parent account, or a sub-account's user ID.
+
+```bash
+curl 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me/wallets' \
+  -H 'accept: application/json' \
+  -H "Authorization: Bearer $QUIDAX_SECRET_KEY"
+```
+
+```json
+{
+  "status": "success",
+  "message": "Successful",
+  "data": {
+    "id": "pmmope46",
+    "name": "Bitcoin",
+    "currency": "btc",
+    "balance": "0.0000000037183942",
+    "locked": "0.0",
+    "staked": "0.0",
+    "converted_balance": "0.2893103895362632",
+    "reference_currency": "ngn",
+    "is_crypto": true,
+    "blockchain_enabled": true,
+    "default_network": "btc",
+    "networks": [
+      { "id": "btc", "name": "Bitcoin", "deposits_enabled": true, "withdraws_enabled": true },
+      { "id": "bep20", "name": "Binance Smart Chain", "deposits_enabled": true, "withdraws_enabled": false }
+    ],
+    "deposit_address": null,
+    "destination_tag": null,
+    "user": { "id": "23azi7bj", "sn": "QDXXIRPXXKS", "email": "test@gmail.com", "reference": null }
+  }
+}
+```
+
+| Field | What it tells you |
+| --- | --- |
+| `balance` | Spendable balance. |
+| `locked` | Committed to open orders or pending withdrawals. **Not spendable.** |
+| `staked` | Staked and not available. |
+| `converted_balance` | Value in `reference_currency`, for display. |
+| `blockchain_enabled` | Whether this wallet can hold an on-chain address at all. |
+| `default_network` | The network used when you generate an address without specifying one. |
+| `networks` | Every network for this currency, each with its own enabled flags. |
+| `deposit_address` | The current address, or `null` if none has been generated. |
+| `destination_tag` | Required by some chains alongside the address. |
+
+<Warning>
+  Spendable balance is `balance` alone. Adding `locked` or `staked` to it will oversell a user's position — those funds are already committed.
+</Warning>
+
+### Read the network flags
+
+Each entry in `networks` carries `deposits_enabled` and `withdraws_enabled` **independently**. A network can accept deposits while withdrawals are disabled, as BEP-20 does for BTC in the example above.
+
+<Tip>
+  Drive your network picker off these flags rather than a static list. Showing a deposit address on a network with `deposits_enabled: false`, or offering a withdrawal where `withdraws_enabled` is false, produces a failure your customer cannot understand.
+</Tip>
+
+<Note>
+  `destination_tag` matters for chains like XRP. An address without its tag will not credit the right account — surface both wherever you show a deposit address.
+</Note>
+
+## Generating an address
+
+| | |
+| --- | --- |
+| **Method** | `POST` |
+| **Path** | `/users/{user_id}/wallets/{currency}/addresses` |
+
+| Parameter | In | Required | Description |
+| --- | --- | --- | --- |
+| `user_id` | path | Yes | `me`, or a sub-account's user ID. |
+| `currency` | path | Yes | Currency code, for example `btc` or `usdt`. |
+| `network` | query | No | Blockchain network. Omit to use the currency's default. |
+
+```bash
+curl -X POST 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me/wallets/usdt/addresses?network=trc20' \
+  -H 'accept: application/json' \
+  -H "Authorization: Bearer $QUIDAX_SECRET_KEY"
+```
+
+<Warning>
+  Omitting `network` generates an address on the currency's **default** network. For a multi-network asset like USDT that is rarely what you want — always pass the network your customer is sending from.
+</Warning>
+
+Address generation is asynchronous for some currencies. The address may not be in the response immediately; a `wallet.address.generated` webhook fires when it is ready.
+
+<Card title="Webhooks" icon="webhook" href="/wallets/webhooks" horizontal>
+  Listen for `wallet.address.generated` rather than polling.
+</Card>
+
+### One address or many?
+
+| Behaviour | Currencies |
+| --- | --- |
+| **Multiple addresses** per wallet | BTC, LTC, DASH, XRP, BCH, DOGE |
+| **One address** per network | Everything else |
+
+For single-address currencies, calling generate again returns the existing address rather than creating a new one. If your product assumes a fresh address per invoice, that assumption only holds for the first group.
+
+<Warning>
+  Some assets cannot have addresses generated at all — they are trade-only. Check [Supported assets](/wallets/coverage) before offering a deposit flow.
+</Warning>
+
+## Fetching addresses
+
+| Action | Method | Path |
+| --- | --- | --- |
+| All addresses for a currency | `GET` | `/users/{user_id}/wallets/{currency}/addresses` |
+| A specific address by ID | `GET` | `/users/{user_id}/wallets/{currency}/addresses/{address_id}` |
+
+## Rate limit
+
+Address generation is capped at **20 requests per second**, separately from the general 300-per-minute limit. Generating addresses for a large batch of users needs queueing.
+
+<Card title="Rate limits" icon="gauge-high" href="/wallets/authentication#rate-limits" horizontal />
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Deposits" icon="arrow-down" href="/wallets/deposits" horizontal />
+
+  <Card title="Withdrawals" icon="paper-plane" href="/wallets/withdrawals" horizontal />
+
+  <Card title="Supported assets" icon="globe" href="/wallets/coverage" horizontal />
+
+  <Card title="Webhooks" icon="webhook" href="/wallets/webhooks" horizontal />
+</CardGroup>

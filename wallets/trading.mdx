@@ -1,0 +1,108 @@
+---
+title: "Trading"
+description: "Place orders on the order book, read market data, and fetch executed trades."
+icon: "chart-candlestick"
+---
+
+Buy and sell on behalf of your users against Quidax's order book, and read the market data behind it.
+
+<Note>
+  For a simple "convert X to Y" experience, use [Swap](/wallets/swap) instead. Orders are the right tool when you want control over price and execution; swap is the right tool when you just want the conversion done.
+</Note>
+
+## Order types
+
+| Type | Behaviour | Use when |
+| --- | --- | --- |
+| **Limit** | Sits on the order book at your price. Executes when the market reaches it. | You care about the price and can wait. |
+| **Market** | Executes immediately at the best available price. | You care about certainty of execution, not price. |
+
+<Warning>
+  A market order gives no price guarantee. On a thin pair it can fill materially away from the last traded price — if you quote your customer a rate before placing one, you carry the difference.
+</Warning>
+
+## Orders
+
+| Action | Method | Path |
+| --- | --- | --- |
+| Create an order | `POST` | `/users/{user_id}/orders` |
+| Fetch all orders | `GET` | `/users/{user_id}/orders` |
+| Fetch one order | `GET` | `/users/{user_id}/orders/{order_id}` |
+| Cancel an order | `POST` | `/users/{user_id}/orders/{order_id}/cancel` |
+
+| Status | Meaning |
+| --- | --- |
+| `WAIT` | Queued for execution. |
+| `DONE` | Executed. |
+| `CANCEL` | Cancelled. |
+
+Only limit orders can meaningfully be cancelled — a market order executes immediately.
+
+## Minimums and precision
+
+Two rules reject orders more often than anything else.
+
+**Minimum order value**
+
+| Currency | Minimum |
+| --- | --- |
+| NGN | 1,000 |
+| USDT | 0.90 |
+
+**Precision.** Each pair caps the decimal places allowed for volume and price. For `BTC/USDT`, BTC volume takes 5 decimals, USDT volume 2, and price 2. Submitting more precision fails.
+
+<Card title="Precision by pair" icon="ruler" href="/wallets/conventions#precision" horizontal>
+  The full table, and why you should not treat it as permanent.
+</Card>
+
+<Tip>
+  Round to the pair's precision in your own code before submitting rather than passing a user's raw input through. A rejected order after a customer has confirmed is a much worse experience than a rounded amount shown up front.
+</Tip>
+
+## Market data
+
+| Action | Method | Path |
+| --- | --- | --- |
+| List all markets | `GET` | `/markets` |
+| Markets summary | `GET` | `/markets/tickers` |
+| One market's ticker | `GET` | `/markets/tickers/{market}` |
+| Order book for a market | `GET` | `/markets/{market}/order_book` |
+| Depth data | `GET` | `/markets/{market}/depth` |
+| K-line (OHLC) data | `GET` | `/markets/{market}/k` |
+| K-line with pending trades | `GET` | `/markets/{market}/k_with_pending_trades` |
+
+A market is a pair like `btcusdt` or `usdtngn`. The list endpoint is sorted by Quidax's internal ranking of markets, so the order is not alphabetical and is not stable — do not rely on position.
+
+<Tip>
+  Ticker data is the right source for displaying a price. Order book and depth are for building a trading interface or calculating slippage — they are considerably heavier responses, so do not poll them to show a headline price.
+</Tip>
+
+## Trades
+
+| Action | Method | Path |
+| --- | --- | --- |
+| Your executed trades | `GET` | `/users/{user_id}/trades` |
+| Recent trades for a market | `GET` | `/trades/{market}` |
+
+Your own trades are what you reconcile against — an order can fill in several trades, so a `DONE` order may correspond to more than one.
+
+## Order events
+
+| Event | Fires when |
+| --- | --- |
+| `order.done` | An order executed. |
+| `order.cancelled` | An order was cancelled. |
+
+<Card title="Webhooks" icon="webhook" href="/wallets/webhooks" horizontal />
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Swap" icon="arrow-right-arrow-left" href="/wallets/swap" horizontal />
+
+  <Card title="Conventions" icon="list-check" href="/wallets/conventions" horizontal />
+
+  <Card title="Supported assets" icon="globe" href="/wallets/coverage" horizontal />
+
+  <Card title="Webhooks" icon="webhook" href="/wallets/webhooks" horizontal />
+</CardGroup>

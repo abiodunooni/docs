@@ -1,0 +1,119 @@
+---
+title: "Deposits"
+description: "Receive crypto and fiat into user wallets, and know when funds are safe to credit."
+icon: "arrow-down"
+---
+
+A deposit is money arriving into one of your wallets — crypto sent to an address you generated, or fiat paid in. Quidax monitors the chain, confirms the transaction and credits the wallet.
+
+## Fetching deposits
+
+| Action | Method | Path |
+| --- | --- | --- |
+| All deposits for a user | `GET` | `/users/{user_id}/deposits` |
+| One deposit | `GET` | `/users/{user_id}/deposits/{deposit_id}` |
+
+```bash
+curl 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me/deposits' \
+  -H 'accept: application/json' \
+  -H "Authorization: Bearer $QUIDAX_SECRET_KEY"
+```
+
+List endpoints are paginated — see [Conventions](/wallets/conventions#pagination).
+
+## Knowing when to give value
+
+Deposits move through several states, and only one of them means the money is yours.
+
+| Status | Meaning |
+| --- | --- |
+| `SUBMITTING` | Being submitted. |
+| `SUBMITTED` | Submitted, awaiting processing. |
+| `ON_HOLD` | Held for review. |
+| `CHECKED` | Checks completed. |
+| **`ACCEPTED`** | **Confirmed and credited.** |
+| `CANCELED` | Cancelled before completion. |
+| `REJECTED` | Rejected. |
+| `FAILED` | Failed. |
+| `FAILED_AML` | Failed anti-money-laundering screening. |
+
+<Warning>
+  Give value on `ACCEPTED` only. A deposit that has been seen on-chain but not accepted can still be held, rejected or fail AML screening — crediting a customer at `SUBMITTED` means crediting money you may never receive.
+</Warning>
+
+## The recommended flow
+
+<Steps>
+  <Step title="Listen for the webhook">
+    `deposit.successful` fires once the blockchain has confirmed the transaction.
+  </Step>
+
+  <Step title="Re-query the deposit">
+    Fetch the deposit by ID and confirm the status and amount independently before acting on it.
+
+    ```bash
+    curl 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me/deposits/<deposit_id>' \
+      -H 'accept: application/json' \
+      -H "Authorization: Bearer $QUIDAX_SECRET_KEY"
+    ```
+  </Step>
+
+  <Step title="Credit your customer">
+    Once, idempotently, keyed on the deposit ID.
+  </Step>
+</Steps>
+
+<Tip>
+  Re-querying is worth the extra call. It protects you against a replayed or forged webhook, and against acting on a payload that has since been superseded.
+</Tip>
+
+## Deposit events
+
+| Event | Fires when |
+| --- | --- |
+| `deposit.transaction.confirmation` | A confirmation is seen on-chain. |
+| `deposit.successful` | The deposit is confirmed and credited. |
+| `deposit.on_hold` | The deposit is held for review. |
+| `deposit.rejected` | The deposit is rejected. |
+| `deposit.failed_aml` | The deposit failed AML screening. |
+| `wallet.updated` | The wallet balance changed. |
+
+<Card title="Webhooks" icon="webhook" href="/wallets/webhooks" horizontal>
+  Payload shapes, signature verification and the retry schedule.
+</Card>
+
+## Things that go wrong
+
+<AccordionGroup>
+  <Accordion title="Funds sent on the wrong network" icon="link-slash">
+    An asset sent over a network the address does not support is lost. There is no recovery — this is a property of the blockchain, not a Quidax policy.
+
+    Show the network prominently wherever you display a deposit address, and generate addresses with an explicit `network` rather than relying on the default.
+  </Accordion>
+
+  <Accordion title="A deposit is stuck on hold" icon="clock">
+    `ON_HOLD` means it is under review. It may still be accepted. Do not credit the customer, and do not tell them it has failed — contact support with the deposit ID if it stays there.
+  </Accordion>
+
+  <Accordion title="A deposit failed AML" icon="shield-exclamation">
+    `FAILED_AML` means the funds did not pass screening. This is a compliance outcome, not a technical error, and retrying will not change it. Contact support with the deposit ID.
+  </Accordion>
+
+  <Accordion title="An asset that cannot be received" icon="ban">
+    Several supported assets are trade-only — they can be bought and sold but not sent or received, and no address can be generated.
+
+    <Card title="Supported assets" icon="globe" href="/wallets/coverage" horizontal />
+  </Accordion>
+</AccordionGroup>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Wallets and addresses" icon="qrcode" href="/wallets/addresses" horizontal />
+
+  <Card title="Withdrawals" icon="paper-plane" href="/wallets/withdrawals" horizontal />
+
+  <Card title="Webhooks" icon="webhook" href="/wallets/webhooks" horizontal />
+
+  <Card title="Conventions" icon="list-check" href="/wallets/conventions" horizontal />
+</CardGroup>

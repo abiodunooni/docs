@@ -179,9 +179,30 @@
         "tab": "Wallets",
         "groups": [
           {
-            "group": "Wallets",
+            "group": "Overview",
             "pages": [
-              "wallets"
+              "wallets",
+              "wallets/coverage"
+            ]
+          },
+          {
+            "group": "Integrate",
+            "pages": [
+              "wallets/quickstart",
+              "wallets/authentication",
+              "wallets/sub-accounts",
+              "wallets/addresses",
+              "wallets/deposits",
+              "wallets/withdrawals",
+              "wallets/trading",
+              "wallets/swap",
+              "wallets/webhooks"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "wallets/conventions"
             ]
           }
         ]

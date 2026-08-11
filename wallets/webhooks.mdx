@@ -1,0 +1,205 @@
+---
+title: "Webhooks"
+description: "Receive deposit, withdrawal, order, swap and wallet events, and verify they came from Quidax."
+icon: "webhook"
+---
+
+Quidax sends a `POST` to your webhook URL each time an event you care about occurs — a deposit confirming, a withdrawal completing, an order executing, an address becoming available.
+
+## Setting your URL
+
+Log in to your merchant account, click your username in the navigation bar, then the user icon, and set your webhook URL there. It must be publicly reachable.
+
+While you are there, set your **signing secret** — you need it to verify requests.
+
+## Verifying a request
+
+Anyone can `POST` to a public URL. Verify the signature before acting on a payload.
+
+Genuine requests carry a `quidax-signature` header in the form `t=<timestamp>,s=<signature>`. The signature is an **HMAC SHA256** over `<timestamp>.<raw body>`, keyed with your webhook signing secret.
+
+```javascript
+const crypto = require('crypto');
+
+const [timestampSection, signatureSection] = req.headers['quidax-signature'].split(',');
+const [, timestamp] = timestampSection.split('=');
+const [, signature] = signatureSection.split('=');
+
+const payload = `${timestamp}.${JSON.stringify(req.body)}`;
+
+const expected = crypto
+  .createHmac('sha256', quidaxWebhookKey)
+  .update(payload)
+  .digest('hex');
+
+if (signature !== expected) {
+  return res.sendStatus(401);
+}
+
+res.sendStatus(200); // acknowledge first
+processEvent(req.body); // then do the work
+```
+
+<Warning>
+  The timestamp is part of the signed payload, so it must be included exactly as received. Signing the body alone will never match.
+</Warning>
+
+<Tip>
+  Compare signatures with a timing-safe comparison such as `crypto.timingSafeEqual` rather than `!==`. It costs nothing and closes a class of attack that a plain string compare leaves open.
+</Tip>
+
+## Responding
+
+Return **`200`**. Anything else — including `3xx` — counts as a failure and triggers a retry. The response body and headers are ignored.
+
+Acknowledge before you do any real work. A slow handler becomes a timeout, and a timeout becomes a duplicate.
+
+## Retries
+
+A failed delivery is retried on a fixed schedule:
+
+| Attempt | When |
+| --- | --- |
+| 1 | Immediately |
+| 2 | After 1 minute |
+| 3 | After 30 minutes |
+| 4 | After 1 hour |
+| 5 | After 24 hours |
+
+After the fifth attempt, delivery stops permanently.
+
+<Warning>
+  There is no sixth attempt and no manual replay. If your endpoint is down for more than 24 hours you will lose events, and the only recovery is to reconcile against the API. Alert on webhook failures rather than discovering the gap later.
+</Warning>
+
+## Be idempotent
+
+The same event can arrive more than once. Record what you have processed, keyed on the transaction or deposit ID, and check that record before giving value.
+
+## Always re-query
+
+After a webhook arrives, fetch the underlying resource and confirm it before acting.
+
+```bash
+curl 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me/deposits/<deposit_id>' \
+  -H 'accept: application/json' \
+  -H "Authorization: Bearer $QUIDAX_SECRET_KEY"
+```
+
+<Tip>
+  The webhook tells you *something happened*; the API tells you *what is true now*. Where money is involved, act on the second.
+</Tip>
+
+## Events
+
+<Tabs>
+  <Tab title="Deposits">
+    | Event | Fires when |
+    | --- | --- |
+    | `deposit.transaction.confirmation` | A confirmation is seen on-chain. |
+    | `deposit.successful` | Confirmed and credited. |
+    | `deposit.on_hold` | Held for review. |
+    | `deposit.rejected` | Rejected. |
+    | `deposit.failed_aml` | Failed AML screening. |
+
+    ```json
+    {
+      "event": "deposit.successful",
+      "data": {
+        "id": "xofy3d26",
+        "type": "coin_address",
+        "currency": "trx",
+        "amount": "3.0",
+        "fee": "0.0",
+        "txid": "c5aee052782c0f9419067b96c7a019ff21a7155878865c85e73ca76085736bab",
+        "status": "accepted",
+        "reason": null,
+        "created_at": "2024-04-02T13:16:17.000Z",
+        "done_at": null,
+        "wallet": {
+          "id": "060a4376-a043-4834-91f8-f59f05ccb174",
+          "name": "Tron",
+          "currency": "trx",
+          "balance": "5.0",
+          "locked": "0.0",
+          "user": {
+            "id": "cd613c4d-4005-45ed-9e75-0283bb335f12",
+            "sn": "QDX26RYDKVU",
+            "email": "test@gmail.com",
+            "reference": null
+          }
+        }
+      }
+    }
+    ```
+
+    <Note>
+      `status` in the payload is lowercase (`accepted`), while the status tables use uppercase (`ACCEPTED`). Compare case-insensitively.
+    </Note>
+  </Tab>
+
+  <Tab title="Withdrawals">
+    | Event | Fires when |
+    | --- | --- |
+    | `withdraw.successful` | The withdrawal completed. |
+    | `withdraw.rejected` | The withdrawal failed. |
+
+    The payload carries the withdrawal `id`, your `reference`, the `currency`, `amount`, `fee` and `txid` where one exists.
+  </Tab>
+
+  <Tab title="Orders and swaps">
+    | Event | Fires when |
+    | --- | --- |
+    | `order.done` | An order executed. |
+    | `order.cancelled` | An order was cancelled. |
+    | `swap.completed` | A swap completed. |
+    | `swap.failed` | A swap failed. |
+  </Tab>
+
+  <Tab title="Wallets">
+    | Event | Fires when |
+    | --- | --- |
+    | `wallet.updated` | A wallet balance changed. |
+    | `wallet.address.generated` | A blockchain address became available. |
+
+    `wallet.address.generated` is how you learn an address is ready — generation is asynchronous for some currencies, so listen for this rather than polling.
+
+    <Card title="Wallets and addresses" icon="qrcode" href="/wallets/addresses" horizontal />
+  </Tab>
+</Tabs>
+
+## Checklist
+
+<AccordionGroup>
+  <Accordion title="Verify every signature" icon="shield-check">
+    HMAC SHA256 over `<timestamp>.<body>` with your signing secret. Reject anything that does not match.
+  </Accordion>
+
+  <Accordion title="Respond 200 immediately" icon="bolt">
+    Acknowledge first, process after. `3xx` counts as a failure.
+  </Accordion>
+
+  <Accordion title="Process idempotently" icon="fingerprint">
+    Track what you have handled. Assume every event can arrive more than once.
+  </Accordion>
+
+  <Accordion title="Re-query before giving value" icon="magnifying-glass">
+    Confirm against the API rather than trusting the payload alone.
+  </Accordion>
+
+  <Accordion title="Alert on delivery failures" icon="bell">
+    Retries stop after 24 hours and cannot be replayed. A silent outage means silently lost events.
+  </Accordion>
+</AccordionGroup>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Deposits" icon="arrow-down" href="/wallets/deposits" horizontal />
+
+  <Card title="Withdrawals" icon="paper-plane" href="/wallets/withdrawals" horizontal />
+
+  <Card title="Conventions" icon="list-check" href="/wallets/conventions" horizontal />
+
+  <Card title="Quickstart" icon="rocket" href="/wallets/quickstart" horizontal />
+</CardGroup>

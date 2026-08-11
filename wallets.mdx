@@ -1,0 +1,96 @@
+---
+title: "Wallets"
+description: "Create and manage crypto and fiat wallets for your users, and move funds in and out."
+icon: "wallet"
+---
+
+The Wallets API gives your users their own crypto and fiat wallets on Quidax. Create sub-accounts, generate blockchain addresses, watch deposits arrive, send funds out, and trade — without running custody, node infrastructure or blockchain monitoring yourself.
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/wallets/quickstart">
+    Get a key, create a sub-account and generate your first address.
+  </Card>
+
+  <Card title="Authentication" icon="key" href="/wallets/authentication">
+    Keys, IP allowlisting and rate limits.
+  </Card>
+</CardGroup>
+
+## What you can build
+
+<Columns cols={2}>
+  <Card title="User wallets" icon="wallet" horizontal>
+    Give every customer their own wallets and deposit addresses.
+  </Card>
+
+  <Card title="Crypto collection" icon="arrow-down" horizontal>
+    Watch for incoming deposits and credit customers automatically.
+  </Card>
+
+  <Card title="Payouts" icon="paper-plane" horizontal>
+    Send crypto on-chain, internally between accounts, or to a bank.
+  </Card>
+
+  <Card title="Trading and swaps" icon="chart-candlestick" horizontal>
+    Buy, sell and convert on behalf of your users.
+  </Card>
+</Columns>
+
+## At a glance
+
+| | |
+| --- | --- |
+| **Base URL** | `https://openapi.quidax.io/exchange-open-api/api/v1` |
+| **Auth** | `Authorization: Bearer <secret_key>` |
+| **Accounts** | One parent account, unlimited sub-accounts |
+| **Assets** | BTC, ETH, USDT, USDC, XRP, LTC, BNB, SOL and many more |
+| **Fiat** | NGN, GHS, XAF, XOF |
+| **Rate limit** | 300 requests/minute, 20/second on address generation |
+
+<Card title="Supported assets and networks" icon="globe" href="/wallets/coverage" horizontal>
+  Every currency, the networks it runs on, and what you can do with each.
+</Card>
+
+## How it fits together
+
+<Steps>
+  <Step title="Create a sub-account">
+    One per customer. The parent account is addressed as `me`; sub-accounts by their user ID.
+
+    <Card title="Sub-accounts" icon="users" href="/wallets/sub-accounts" horizontal />
+  </Step>
+
+  <Step title="Generate an address">
+    Each sub-account gets wallets per currency, and you generate blockchain addresses against them.
+
+    <Card title="Wallets and addresses" icon="qrcode" href="/wallets/addresses" horizontal />
+  </Step>
+
+  <Step title="Receive deposits">
+    Funds arrive on-chain. Webhooks tell you when they are confirmed.
+
+    <Card title="Deposits" icon="arrow-down" href="/wallets/deposits" horizontal />
+  </Step>
+
+  <Step title="Move money out">
+    Send on-chain, internally between your own accounts, or to a bank account.
+
+    <Card title="Withdrawals" icon="paper-plane" href="/wallets/withdrawals" horizontal />
+  </Step>
+</Steps>
+
+## Reference
+
+<CardGroup cols={2}>
+  <Card title="Conventions" icon="list-check" href="/wallets/conventions" horizontal />
+
+  <Card title="Supported assets" icon="globe" href="/wallets/coverage" horizontal />
+
+  <Card title="Trading" icon="chart-candlestick" href="/wallets/trading" horizontal />
+
+  <Card title="Swap" icon="arrow-right-arrow-left" href="/wallets/swap" horizontal />
+
+  <Card title="Webhooks" icon="webhook" href="/wallets/webhooks" horizontal />
+
+  <Card title="Quidax coverage" icon="map" href="/get-started/coverage" horizontal />
+</CardGroup>

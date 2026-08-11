@@ -1,0 +1,148 @@
+---
+title: "Quickstart"
+description: "Get a key, create a user, generate an address and receive your first deposit."
+icon: "rocket"
+---
+
+This takes you from a new merchant account to a funded user wallet.
+
+<Steps>
+  <Step title="Get your secret key">
+    Log in to your merchant account, click your username, then the user icon, and open **API management**. Add an IP restriction if you can, enter your authentication code, and click **Create**.
+
+    ```bash
+    export QUIDAX_SECRET_KEY=your_secret_key
+    ```
+
+    <Warning>
+      This key can withdraw funds from your account and every sub-account under it. Server-side only, never in client code, never committed.
+    </Warning>
+
+    <Card title="Authentication" icon="key" href="/wallets/authentication" horizontal />
+  </Step>
+
+  <Step title="Confirm you can reach the API">
+    Fetch your parent account. It needs nothing set up beyond a valid key.
+
+    ```bash
+    curl 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me' \
+      -H 'accept: application/json' \
+      -H "Authorization: Bearer $QUIDAX_SECRET_KEY"
+    ```
+
+    A `401` means the key is wrong. A `301` means you used HTTP instead of HTTPS — fix that and rotate the key, because it travelled in the clear.
+  </Step>
+
+  <Step title="Create a sub-account">
+    One per customer.
+
+    ```bash
+    curl -X POST 'https://openapi.quidax.io/exchange-open-api/api/v1/users' \
+      -H 'accept: application/json' \
+      -H 'content-type: application/json' \
+      -H "Authorization: Bearer $QUIDAX_SECRET_KEY" \
+      -d '{
+        "email": "customer@example.com",
+        "first_name": "Ada",
+        "last_name": "Okoro",
+        "reference": "your-internal-user-id"
+      }'
+    ```
+
+    Put your own user ID in `reference`. It comes back on wallet and transaction payloads and saves you a mapping table.
+
+    Keep the returned `id` — that is the `user_id` every later call uses.
+  </Step>
+
+  <Step title="Generate a deposit address">
+    Always pass an explicit `network`.
+
+    ```bash
+    curl -X POST 'https://openapi.quidax.io/exchange-open-api/api/v1/users/<user_id>/wallets/usdt/addresses?network=trc20' \
+      -H 'accept: application/json' \
+      -H "Authorization: Bearer $QUIDAX_SECRET_KEY"
+    ```
+
+    Address generation is asynchronous for some currencies. If the address is not in the response, wait for the `wallet.address.generated` webhook rather than polling.
+
+    <Card title="Wallets and addresses" icon="qrcode" href="/wallets/addresses" horizontal />
+  </Step>
+
+  <Step title="Set up webhooks">
+    Set your webhook URL and signing secret in the dashboard, then verify the signature and respond `200` before doing any work.
+
+    Retries stop after 24 hours and cannot be replayed, so alert on failures.
+
+    <Card title="Webhooks" icon="webhook" href="/wallets/webhooks" horizontal />
+  </Step>
+
+  <Step title="Receive a deposit">
+    Send a small amount to the address. You will get `deposit.transaction.confirmation`, then `deposit.successful` once confirmed.
+
+    Re-query the deposit and check the status is `ACCEPTED` before crediting your customer.
+
+    <Card title="Deposits" icon="arrow-down" href="/wallets/deposits" horizontal />
+  </Step>
+
+  <Step title="Send it back out">
+    Withdraw on-chain, sweep internally to your parent account, or pay out to a bank.
+
+    ```bash
+    curl -X POST 'https://openapi.quidax.io/exchange-open-api/api/v1/users/<user_id>/withdraws' \
+      -H 'accept: application/json' \
+      -H 'content-type: application/json' \
+      -H "Authorization: Bearer $QUIDAX_SECRET_KEY" \
+      -d '{
+        "currency": "usdt",
+        "amount": "1",
+        "fund_uid": "<destination>",
+        "network": "trc20",
+        "reference": "<your_unique_reference>"
+      }'
+    ```
+
+    <Warning>
+      Validate the address first. On-chain withdrawals cannot be recovered if the destination is wrong.
+    </Warning>
+
+    <Card title="Withdrawals" icon="paper-plane" href="/wallets/withdrawals" horizontal />
+  </Step>
+</Steps>
+
+## Things to get right early
+
+<AccordionGroup>
+  <Accordion title="Use the right balance field" icon="scale-balanced">
+    A wallet has `balance` and `locked`. `locked` is committed to open orders and pending withdrawals. Spendable balance is `balance` — conflating them oversells a user's position.
+  </Accordion>
+
+  <Accordion title="Always send the network" icon="link-slash">
+    Omitting `network` uses the currency's default. For a multi-network asset that is rarely what you want, and a mismatch loses funds permanently.
+  </Accordion>
+
+  <Accordion title="Give value on ACCEPTED only" icon="shield-check">
+    A deposit that has been seen on-chain can still be held, rejected or fail AML screening.
+  </Accordion>
+
+  <Accordion title="Respect the rate limits" icon="gauge-high">
+    300 requests per minute overall, 20 per second on address generation. Over the limit returns `444` — queue bulk work and back off.
+  </Accordion>
+
+  <Accordion title="Round to the pair's precision" icon="ruler">
+    Orders fail if you submit more decimal places than a pair allows, or below the minimum order value.
+
+    <Card title="Precision by pair" icon="ruler" href="/wallets/conventions#precision" horizontal />
+  </Accordion>
+</AccordionGroup>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Sub-accounts" icon="users" href="/wallets/sub-accounts" horizontal />
+
+  <Card title="Trading" icon="chart-candlestick" href="/wallets/trading" horizontal />
+
+  <Card title="Swap" icon="arrow-right-arrow-left" href="/wallets/swap" horizontal />
+
+  <Card title="Conventions" icon="list-check" href="/wallets/conventions" horizontal />
+</CardGroup>

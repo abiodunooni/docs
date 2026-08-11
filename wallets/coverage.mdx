@@ -1,0 +1,137 @@
+---
+title: "Supported assets"
+description: "Every currency, the networks it runs on, and what you can do with each."
+icon: "globe"
+---
+
+Not every listed asset supports every action. Some can be traded but not sent or received, and some cannot have a wallet address generated at all. Check the Actions column before you build a flow around an asset.
+
+<Warning>
+  Retrieve the live list from the API rather than hard-coding this table. Assets and networks change, and a hard-coded list means a release every time one does.
+</Warning>
+
+## Stablecoins
+
+| Name | Code | Networks |
+| --- | --- | --- |
+| Tether USD | `usdt` | trc20, erc20, bep20, solana, lisk, ton, polygon, celo, arbitrum, optimism |
+| USD Coin | `usdc` | lisk, arbitrum, base, bep20, polygon, sol, erc20 |
+| Compliant Naira | `cngn` | bep20 |
+| Tether Gold | `xaut` | erc20 |
+| USAT | `usat` | erc20 |
+| AxCNH | `axcnh` | espace |
+
+<Note>
+  The stablecoin network list is broader than the general cryptocurrency table below — USDT and USDC support considerably more networks here. Confirm which are enabled on your account during onboarding.
+</Note>
+
+## Fiat currencies
+
+| Name | Code |
+| --- | --- |
+| Nigerian naira | `ngn` |
+| Ghanaian cedi | `ghs` |
+| Central African CFA franc | `xaf` |
+| West African CFA franc | `xof` |
+
+## Cryptocurrencies
+
+<Tabs>
+  <Tab title="Full support">
+    Trade, send, receive and generate addresses.
+
+    | Name | Code | Quoted against | Networks |
+    | --- | --- | --- | --- |
+    | Bitcoin | `btc` | usdt, ngn | btc |
+    | Litecoin | `ltc` | usdt, ngn | ltc |
+    | Dash | `dash` | usdt, ngn | dash |
+    | Tron | `trx` | usdt, ngn | trc20 |
+    | Quidax Token | `qdx` | usdt, ngn | bep20 |
+    | Ethereum | `eth` | usdt, ngn | erc20, bep20 |
+    | Ripple | `xrp` | usdt, ngn | ripple |
+    | Bitcoin Cash | `bch` | usdt | bch |
+    | Solana | `sol` | usdt | bep20 |
+    | Dogecoin | `doge` | usdt | doge |
+    | Tether | `usdt` | ngn | bep20, erc20, trc20 |
+    | USD Coin | `usdc` | usdt | bep20, erc20, trc20 |
+    | Polygon | `matic` | usdt | bep20, erc20, trc20 |
+    | Binance Coin | `bnb` | usdt | bep20 |
+    | Cardano | `ada` | usdt | cardano |
+    | Stellar | `xlm` | usdt | stellar |
+    | Polkadot | `dot` | usdt | bep20 |
+    | Chainlink | `link` | usdt | bep20 |
+    | Filecoin | `fil` | usdt | bep20 |
+    | Axie Infinity | `axs` | usdt | bep20 |
+    | PancakeSwap | `cake` | usdt | bep20 |
+    | Shiba Inu | `shib` | usdt | bep20 |
+    | Aave | `aave` | usdt | bep20 |
+    | Tezos | `xtz` | usdt | bep20 |
+    | Harmony | `one` | usdt | bep20 |
+    | Floki Inu | `floki` | usdt | bep20 |
+    | Babydoge | `babydoge` | usdt | bep20 |
+
+    <Note>
+      Bitcoin, Litecoin, Dash, Ripple, Bitcoin Cash and Dogecoin support **multiple** addresses per wallet. Most others allow a **single** address per blockchain — generating again returns the existing one rather than a new address.
+    </Note>
+  </Tab>
+
+  <Tab title="Trade only">
+    Buy and sell only. **Cannot be sent or received, and no wallet address can be generated.**
+
+    | Name | Code | Quoted against | Network |
+    | --- | --- | --- | --- |
+    | Decentraland | `mana` | usdt | bep20 |
+    | Fantom | `ftm` | usdt | bep20 |
+    | The Sandbox | `sand` | usdt | bep20 |
+    | Memecoin | `meme` | usdt | bep20 |
+    | CNHC Token | `cnhc` | usdt | bep20 |
+    | Conflux | `cfx` | usdt | bep20 |
+    | Apecoin | `ape` | usdt | bep20 |
+    | Pepecoin | `pepe` | usdt | bep20 |
+    | Enjin | `enj` | usdt | bep20 |
+    | Loopring | `lrc` | usdt | bep20 |
+    | Worldcoin | `wld` | usdt | bep20 |
+    | Arbitrum | `arb` | usdt | bep20 |
+    | Algorand | `algo` | usdt | bep20 |
+    | Ethereum Name Service | `ens` | usdt | bep20 |
+    | Ordinals | `ordi` | usdt | bep20 |
+
+    <Warning>
+      Do not offer deposit addresses for these assets. Your users cannot receive them, and there is no address to send to.
+    </Warning>
+  </Tab>
+</Tabs>
+
+## Networks
+
+<Warning>
+  The network must match the destination address. Sending an asset over a network the receiving wallet does not support loses the funds permanently — there is no recovery and no reversal.
+
+  Validate the address before initiating a withdrawal.
+</Warning>
+
+A currency's wallet lists every network it runs on, each with its own `deposits_enabled` and `withdraws_enabled` flag. Read those rather than assuming a network supports both directions.
+
+<Card title="Wallets and addresses" icon="qrcode" href="/wallets/addresses#read-the-network-flags" horizontal>
+  How to drive your network picker off the live flags.
+</Card>
+
+## Restrictions
+
+<CardGroup cols={2}>
+  <Card title="Prohibited countries" icon="ban" href="/get-started/coverage#prohibited-countries" horizontal />
+
+  <Card title="Restricted activity" icon="shield-check" href="/get-started/licences#restricted-activity" horizontal />
+</CardGroup>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Wallets and addresses" icon="qrcode" href="/wallets/addresses" horizontal />
+
+  <Card title="Conventions" icon="list-check" href="/wallets/conventions" horizontal />
+
+  <Card title="Trading" icon="chart-candlestick" href="/wallets/trading" horizontal />
+
+  <Card title="Quidax coverage" icon="map" href="/get-started/coverage" horizontal />
+</CardGroup>

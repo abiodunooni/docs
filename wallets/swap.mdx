@@ -1,0 +1,146 @@
+---
+title: "Swap"
+description: "Convert one currency to another at a quoted rate, without touching the order book."
+icon: "arrow-right-arrow-left"
+---
+
+Instant swap converts one cryptocurrency into another, or into fiat, at a quoted rate. Your user sees a price, accepts it, and the conversion happens — no order book, no partial fills.
+
+<Note>
+  Use swap for a "convert X to Y" experience. Use [Trading](/wallets/trading) when you want control over price and execution.
+</Note>
+
+## The flow
+
+<Steps>
+  <Step title="Get a quotation">
+    Request a temporary quote for the pair and amount. It comes back with the rate and what your user will receive.
+
+    `POST /users/{user_id}/temporary_swap_quotation`
+  </Step>
+
+  <Step title="Show it to your user">
+    Display the rate and what they will receive. The quote is short-lived.
+  </Step>
+
+  <Step title="Confirm">
+    Confirm the quotation to execute the swap.
+
+    `POST /users/{user_id}/swap_quotation/{quotation_id}/confirm`
+  </Step>
+
+  <Step title="Handle the outcome">
+    A webhook tells you whether it completed or failed.
+  </Step>
+</Steps>
+
+<Warning>
+  Quotations expire. If your user takes too long to confirm, refresh rather than submitting a stale quotation — the confirmation will fail.
+</Warning>
+
+## Getting a quotation
+
+| | |
+| --- | --- |
+| **Method** | `POST` |
+| **Path** | `/users/{user_id}/temporary_swap_quotation` |
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `from_currency` | string | The currency you are swapping from. |
+| `to_currency` | string | The currency you are swapping to. |
+| `from_amount` | string | The amount to swap, denominated in `from_currency`. |
+| `to_amount` | string | The amount to swap, denominated in `to_currency`. |
+
+Send **either** `from_amount` or `to_amount`, depending on which side your user fixed — "swap 10 USDT" or "get me 13,000 NGN".
+
+```bash
+curl -X POST 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me/temporary_swap_quotation' \
+  -H 'accept: application/json' \
+  -H 'content-type: application/json' \
+  -H "Authorization: Bearer $QUIDAX_SECRET_KEY" \
+  -d '{
+    "from_currency": "usdt",
+    "to_currency": "ngn",
+    "from_amount": "10"
+  }'
+```
+
+```json
+{
+  "status": "success",
+  "message": "Successful",
+  "data": {
+    "from_currency": "USDT",
+    "from_amount": 10,
+    "to_currency": "NGN",
+    "to_amount": 13311,
+    "quoted_price": 1331.1,
+    "quoted_currency": "NGN"
+  }
+}
+```
+
+Show your user `to_amount`. `quoted_price` is the rate behind it, in `quoted_currency`.
+
+<Note>
+  The quotation response carries no ID or expiry timestamp. Treat it as a short-lived preview and confirm promptly — do not cache it or show it on a page the user might leave open.
+</Note>
+
+### Quotation errors
+
+| Code | Meaning |
+| --- | --- |
+| `E0107` | Validation failed. The message names the field, for example `from_amount must be a valid number`. |
+| `E0104` | The sub-account does not exist. |
+| `E0605` | `from_currency` or `to_currency` is not a valid value. |
+
+<Card title="Error codes" icon="triangle-alert" href="/wallets/conventions#error-codes" horizontal />
+
+## Other endpoints
+
+| Action | Method | Path |
+| --- | --- | --- |
+| Refresh a quotation | `POST` | `/users/{user_id}/swap_quotation/{quotation_id}/refresh` |
+| Confirm a quotation | `POST` | `/users/{user_id}/swap_quotation/{quotation_id}/confirm` |
+| Create a swap transaction | `POST` | `/users/{user_id}/swap_transactions` |
+| Fetch all swap transactions | `GET` | `/users/{user_id}/swap_transactions` |
+| Fetch one swap transaction | `GET` | `/users/{user_id}/swap_transactions/{transaction_id}` |
+
+<Warning>
+  Only the quotation endpoint above is fully documented in the current source. The paths in this table are inferred from the endpoint names — confirm them before building against them.
+</Warning>
+
+<Tip>
+  Refresh rather than re-quote when a user hesitates. It keeps you on the same quotation record, which makes the eventual transaction easier to trace back to what the user was shown.
+</Tip>
+
+## Swap events
+
+| Event | Fires when |
+| --- | --- |
+| `swap.completed` | The swap completed successfully. |
+| `swap.failed` | The swap failed. |
+| `wallet.updated` | A wallet balance changed. |
+
+A completed swap usually produces two `wallet.updated` events — one for the currency debited, one for the currency credited.
+
+<Card title="Webhooks" icon="webhook" href="/wallets/webhooks" horizontal>
+  Payload shapes, signature verification and retries.
+</Card>
+
+<Warning>
+  Give value on `swap.completed` and re-query the transaction before you do. A quotation that was confirmed is not the same as a swap that settled.
+</Warning>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Trading" icon="chart-candlestick" href="/wallets/trading" horizontal />
+
+  <Card title="Supported assets" icon="globe" href="/wallets/coverage" horizontal />
+
+  <Card title="Webhooks" icon="webhook" href="/wallets/webhooks" horizontal />
+
+  <Card title="Conventions" icon="list-check" href="/wallets/conventions" horizontal />
+</CardGroup>

@@ -1,0 +1,205 @@
+---
+title: "Conventions"
+description: "Pagination, error codes, transaction statuses and precision rules."
+icon: "list-check"
+---
+
+The API follows normal REST patterns — resource-oriented URLs, JSON bodies and responses, standard verbs and status codes.
+
+## Base URL
+
+```
+https://openapi.quidax.io/exchange-open-api/api/v1
+```
+
+<Warning>
+  Older code samples in circulation use `https://www.quidax.com/api/v1` and `https://app.quidax.io/api/v1`. Use the `openapi.quidax.io` host above — if you have the others hard-coded anywhere, migrate them.
+</Warning>
+
+## Response format
+
+Every response uses the same envelope.
+
+```json
+{
+  "status": "success",
+  "message": "Successful",
+  "data": { }
+}
+```
+
+Errors use the same shape, with a machine-readable code nested inside `data`.
+
+```json
+{
+  "status": "error",
+  "message": "Invalid secret key.",
+  "data": {
+    "code": "E0001",
+    "message": "Invalid secret key."
+  }
+}
+```
+
+<Tip>
+  Branch on `data.code`, not on `message`. Messages are written for humans and get reworded; codes are stable.
+</Tip>
+
+### Error codes
+
+| Code | Meaning |
+| --- | --- |
+| `E0001` | Invalid secret key. |
+| `E0104` | The sub-account does not exist. |
+| `E0107` | Validation failed. The message names the offending field. |
+| `E0605` | A currency value is not valid. |
+| `110112` | The withdrawal with that reference does not exist. |
+
+<Note>
+  This list covers the codes visible in the current examples and is not exhaustive. Handle unknown codes gracefully rather than assuming you have seen them all.
+</Note>
+
+## Pagination
+
+List endpoints return a subset of results per call. Control the page size with `per_page`.
+
+| Parameter | Default | Maximum |
+| --- | --- | --- |
+| `per_page` | 50 | 100 |
+
+Paginated responses carry these headers:
+
+| Header | Meaning |
+| --- | --- |
+| `x-page` | Current page number |
+| `x-per-page` | Records returned per page |
+| `x-total-pages` | Total pages available for this request |
+| `x-next-page` | Cursor or page value for the next set. **Empty means you have reached the end.** |
+
+<Tip>
+  Loop until `x-next-page` is empty rather than counting up to `x-total-pages`. Records can be added while you paginate, and the cursor handles that correctly where a page counter does not.
+</Tip>
+
+## Errors
+
+| Code | Status | Meaning |
+| --- | --- | --- |
+| `400` | Bad request | Something in the request is wrong or missing. |
+| `401` | Unauthorized | The key is invalid or does not exist. |
+| `403` | Forbidden | The key lacks permission for this operation. |
+| `404` | Not found | The resource does not exist. |
+| `429` | Too many requests | You are over a rate limit. |
+| `444` | Rate limited | Returned by the rate limiter. Back off and retry. |
+| `5xx` | Server error | Something went wrong on our side. Retry. |
+
+## Transaction statuses
+
+<Tabs>
+  <Tab title="Deposits">
+    | Status | Meaning |
+    | --- | --- |
+    | `SUBMITTING` | Being submitted. |
+    | `SUBMITTED` | Submitted and awaiting processing. |
+    | `ON_HOLD` | Held for review. |
+    | `CHECKED` | Checks completed. |
+    | `ACCEPTED` | Confirmed and credited. |
+    | `CANCELED` | Cancelled before completion. |
+    | `REJECTED` | Rejected. |
+    | `FAILED` | Failed. |
+    | `FAILED_AML` | Failed anti-money-laundering screening. |
+
+    <Note>
+      Only `ACCEPTED` means the funds are credited and yours to give value against. Everything else is in flight or has stopped.
+    </Note>
+  </Tab>
+
+  <Tab title="Withdrawals">
+    | Status | Meaning |
+    | --- | --- |
+    | `PROCESSING` | Being processed. |
+    | `DONE` | Completed. |
+    | `REJECTED` | Failed. |
+  </Tab>
+
+  <Tab title="Orders">
+    | Status | Meaning |
+    | --- | --- |
+    | `WAIT` | Queued for execution. |
+    | `DONE` | Executed. |
+    | `CANCEL` | Cancelled. |
+  </Tab>
+</Tabs>
+
+## Minimum order values
+
+| Currency | Minimum |
+| --- | --- |
+| NGN | 1,000 |
+| USDT | 0.90 |
+
+Anything below throws an error, so validate in your own interface before submitting.
+
+## Precision
+
+Each trading pair caps the decimal places allowed for volume and price. Submitting more precision than a pair allows fails.
+
+For `BTC/USDT`: BTC volume takes 5 decimal places, USDT volume takes 2, and the price takes 2.
+
+<Accordion title="Precision by pair" icon="ruler">
+  | Pair | Base volume | Quote volume | Price |
+  | --- | --- | --- | --- |
+  | BTC/USDT | 5 | 2 | 2 |
+  | BTC/NGN | 5 | 0 | 0 |
+  | ETH/USDT | 4 | 2 | 2 |
+  | ETH/NGN | 4 | 0 | 0 |
+  | USDT/NGN | 2 | 0 | 2 |
+  | QDX/USDT | 0 | 2 | 6 |
+  | QDX/NGN | 0 | 0 | 2 |
+  | LTC/USDT | 3 | 2 | 2 |
+  | LTC/NGN | 3 | 0 | 0 |
+  | XRP/USDT | 0 | 2 | 4 |
+  | XRP/NGN | 0 | 0 | 2 |
+  | TRX/USDT | 0 | 2 | 5 |
+  | TRX/NGN | 0 | 0 | 2 |
+  | DASH/USDT | 3 | 2 | 2 |
+  | DASH/NGN | 3 | 0 | 0 |
+  | BNB/USDT | 3 | 2 | 1 |
+  | SOL/USDT | 2 | 2 | 2 |
+  | BCH/USDT | 3 | 2 | 2 |
+  | AAVE/USDT | 3 | 2 | 2 |
+  | AXS/USDT | 2 | 2 | 2 |
+  | ADA/USDT | 1 | 2 | 4 |
+  | DOT/USDT | 2 | 2 | 3 |
+  | FIL/USDT | 2 | 2 | 3 |
+  | LINK/USDT | 2 | 2 | 3 |
+  | CAKE/USDT | 2 | 2 | 3 |
+  | MATIC/USDT | 1 | 2 | 4 |
+  | XTZ/USDT | 1 | 2 | 3 |
+  | APE/USDT | 2 | 2 | 4 |
+  | USDC/USDT | 2 | 2 | 4 |
+  | BUSD/USDT | 2 | 2 | 4 |
+  | XLM/USDT | 0 | 2 | 4 |
+  | DOGE/USDT | 0 | 2 | 5 |
+  | ONE/USDT | 0 | 2 | 5 |
+  | MANA/USDT | 0 | 2 | 4 |
+  | SHIB/USDT | 0 | 2 | 8 |
+  | FLOKI/USDT | 0 | 2 | 10 |
+  | WKD/USDT | 0 | 2 | 11 |
+  | BABYDOGE/USDT | 0 | 2 | 13 |
+</Accordion>
+
+<Warning>
+  Precision values change as markets are adjusted. Round to these figures in your integration, but do not treat the table as permanent — handle a precision rejection gracefully rather than assuming it cannot happen.
+</Warning>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/wallets/authentication" horizontal />
+
+  <Card title="Supported assets" icon="globe" href="/wallets/coverage" horizontal />
+
+  <Card title="Trading" icon="chart-candlestick" href="/wallets/trading" horizontal />
+
+  <Card title="Webhooks" icon="webhook" href="/wallets/webhooks" horizontal />
+</CardGroup>

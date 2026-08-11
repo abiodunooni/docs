@@ -1,0 +1,239 @@
+---
+title: "Withdrawals"
+description: "Send crypto on-chain, move funds between accounts, and pay out to bank accounts."
+icon: "paper-plane"
+---
+
+One endpoint covers three different jobs, and which one you get depends on what you put in `fund_uid`:
+
+| `fund_uid` contains | Result |
+| --- | --- |
+| A blockchain address | On-chain withdrawal |
+| An account ID | Internal transfer, instant and free |
+| A bank account number | Fiat payout to a bank |
+
+<Warning>
+  Verify the destination before you submit. Once an on-chain withdrawal is sent, funds cannot be recovered if the address was wrong. There is no reversal.
+</Warning>
+
+## Creating a withdrawal
+
+| | |
+| --- | --- |
+| **Method** | `POST` |
+| **Path** | `/users/{user_id}/withdraws` |
+
+`user_id` is `me` for your parent account, or a sub-account's user ID — the account the funds leave from.
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `currency` | string | Yes | Currency to withdraw, for example `btc`, `usdt`, `ngn`. |
+| `amount` | string | Yes | Value to send to the recipient. |
+| `fund_uid` | string | Yes | Blockchain address, account ID, or bank account number. |
+| `reference` | string | Yes | Your unique reference for this withdrawal. |
+| `fund_uid2` | string | No | Destination tag, or bank code for NGN payouts. |
+| `network` | string | No | Blockchain network. Required for multi-network assets. |
+| `transaction_note` | string | No | Note for the recipient. |
+| `narration` | string | No | Narration for the recipient. |
+
+<Tabs>
+  <Tab title="On-chain">
+    ```bash
+    curl -X POST 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me/withdraws' \
+      -H 'accept: application/json' \
+      -H 'content-type: application/json' \
+      -H "Authorization: Bearer $QUIDAX_SECRET_KEY" \
+      -d '{
+        "currency": "usdt",
+        "amount": "25",
+        "fund_uid": "<wallet_address>",
+        "network": "trc20",
+        "reference": "<your_unique_reference>",
+        "narration": "Payout"
+      }'
+    ```
+
+    <Warning>
+      Always send `network` for a multi-network asset like USDT or USDC. Omitting it uses the currency's default network, and a mismatch between that default and the recipient's wallet loses the funds.
+    </Warning>
+  </Tab>
+
+  <Tab title="Internal">
+    Set `fund_uid` to the destination account's ID. No blockchain involved, so it is instant and carries no network fee.
+
+    ```bash
+    curl -X POST 'https://openapi.quidax.io/exchange-open-api/api/v1/users/<sub_account_id>/withdraws' \
+      -H 'accept: application/json' \
+      -H 'content-type: application/json' \
+      -H "Authorization: Bearer $QUIDAX_SECRET_KEY" \
+      -d '{
+        "currency": "usdt",
+        "amount": "10",
+        "fund_uid": "<destination_account_id>",
+        "reference": "<your_unique_reference>"
+      }'
+    ```
+
+    <Card title="Sub-accounts" icon="users" href="/wallets/sub-accounts#moving-funds-between-accounts" horizontal />
+  </Tab>
+
+  <Tab title="Bank payout">
+    For NGN, `fund_uid` is the **account number** and `fund_uid2` is the **bank code**.
+
+    ```bash
+    curl -X POST 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me/withdraws' \
+      -H 'accept: application/json' \
+      -H 'content-type: application/json' \
+      -H "Authorization: Bearer $QUIDAX_SECRET_KEY" \
+      -d '{
+        "currency": "ngn",
+        "amount": "1000",
+        "fund_uid": "0000000000",
+        "fund_uid2": "0000",
+        "reference": "<your_unique_reference>",
+        "narration": "Payout"
+      }'
+    ```
+
+    The response includes `fee` and `stamp_duty_fee` alongside the amount, so you can reconcile what actually left the account.
+  </Tab>
+</Tabs>
+
+<Tip>
+  `reference` must be unique per withdrawal. Generate it before you call, store it, and reuse it if you need to check whether a request that timed out actually landed.
+</Tip>
+
+## Cancelling
+
+A withdrawal can be cancelled within a **6-second window** after it is initiated.
+
+| | |
+| --- | --- |
+| **Method** | `POST` |
+| **Path** | `/users/{user_id}/withdraws/{withdraw_id}/cancel` |
+
+<Warning>
+  Six seconds is not a customer-facing undo. It exists to catch a programmatic mistake in the moments after submission — do not build a "cancel" button in your interface around it.
+</Warning>
+
+## Fetching withdrawals
+
+| Action | Method | Path |
+| --- | --- | --- |
+| All withdrawals | `GET` | `/users/{user_id}/withdraws` |
+| By your reference | `GET` | `/users/{user_id}/withdraws/reference/{reference}` |
+
+```bash
+curl 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me/withdraws/reference/<reference>' \
+  -H 'accept: application/json' \
+  -H "Authorization: Bearer $QUIDAX_SECRET_KEY"
+```
+
+```json
+{
+  "status": "success",
+  "message": "Successful",
+  "data": {
+    "id": "IT-89c82dcb3930420ab09a81572985a4ab",
+    "reference": "ffff",
+    "type": "internal_transfer",
+    "currency": "usdt",
+    "amount": "1.0000000000000000",
+    "fee": "0.0000000000000000",
+    "total": "1.0000000000000000",
+    "txId": null,
+    "narration": "We love you.",
+    "status": "done",
+    "reason": null,
+    "recipient": {
+      "type": "internal_transfer",
+      "details": {
+        "address": "test90999@gmail.com",
+        "name": "Qb3fwf0uk",
+        "destination_tag": "N/A"
+      }
+    },
+    "created_at": "Wed Feb 11 16:41:11 UTC 2026",
+    "done_at": "Wed Feb 11 16:41:11 UTC 2026"
+  }
+}
+```
+
+| Field | What it tells you |
+| --- | --- |
+| `type` | How it was routed — `internal_transfer`, `bank_account` or an on-chain type. |
+| `amount` / `fee` / `total` | What was sent, what it cost, and what left the wallet. |
+| `txId` | The blockchain transaction hash. `null` for internal transfers. |
+| `status` | `done`, `processing` or `rejected`, lowercase here. |
+| `reason` | Why it was rejected, when it was. |
+| `recipient` | The destination, shaped by `type`. |
+
+<Tip>
+  Look up by **your** reference rather than storing Quidax's ID. You generate the reference before the call, so you can still find the withdrawal if the original request timed out and you never saw a response.
+</Tip>
+
+<Note>
+  `status` is lowercase in payloads (`done`) but uppercase in the status tables (`DONE`). Compare case-insensitively.
+</Note>
+
+| Status | Meaning |
+| --- | --- |
+| `PROCESSING` | Being processed. |
+| `DONE` | Completed. |
+| `REJECTED` | Failed. Check `reason`. |
+
+Missing references return `110112`, not a `404` body you can branch on directly — read `data.code`.
+
+## Checking the destination first
+
+There is no address-validation endpoint in the current documentation. Validate before you send using what the API does give you:
+
+- **Fetch the wallet** for the currency and read its `networks` array. If the network you are about to send on has `withdraws_enabled: false`, stop.
+- **Check the address format** client-side against the network's expected pattern.
+- **Send a small test amount** first for a new destination, particularly a large payout.
+
+<Warning>
+  On-chain withdrawals cannot be recovered if the address or network is wrong. Since there is no validation endpoint to lean on, the checks above are the only protection between your customer and a permanent loss.
+</Warning>
+
+## Withdrawal fees
+
+Fetch the current fee for a currency before quoting a customer.
+
+```bash
+curl 'https://app.quidax.io/api/v1/fee?currency=usdt' \
+  -H 'accept: application/json' \
+  -H "Authorization: Bearer $QUIDAX_SECRET_KEY"
+```
+
+<Note>
+  The fee endpoint is documented against the `app.quidax.io` host rather than `openapi.quidax.io`. That is how it appears in the source material — confirm which host your account should use before relying on it in production.
+</Note>
+
+Fees are available for `btc`, `ltc`, `xrp`, `dash`, `trx`, `doge`, `matic`, `bnb`, `busd`, `usdt`, `usdc` and `floki`.
+
+<Warning>
+  Fetch fees rather than hard-coding them. Network conditions change what a withdrawal costs, and a stale fee means either absorbing the difference or a rejected withdrawal.
+</Warning>
+
+## Withdrawal events
+
+| Event | Fires when |
+| --- | --- |
+| `withdraw.successful` | The withdrawal completed. |
+| `withdraw.rejected` | The withdrawal failed. |
+| `wallet.updated` | The wallet balance changed. |
+
+<Card title="Webhooks" icon="webhook" href="/wallets/webhooks" horizontal />
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Deposits" icon="arrow-down" href="/wallets/deposits" horizontal />
+
+  <Card title="Sub-accounts" icon="users" href="/wallets/sub-accounts" horizontal />
+
+  <Card title="Supported assets" icon="globe" href="/wallets/coverage" horizontal />
+
+  <Card title="Conventions" icon="list-check" href="/wallets/conventions" horizontal />
+</CardGroup>

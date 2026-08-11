@@ -1,0 +1,89 @@
+---
+title: "Sub-accounts"
+description: "Create and manage an account for each of your users."
+icon: "users"
+---
+
+Sub-accounts give each of your users their own account under yours. Each one has its own wallets, generates its own addresses, receives its own deposits, and has transactions you can track independently.
+
+Your own account is the **parent**, addressed as `me`. Every endpoint that takes a `user_id` accepts either.
+
+| `user_id` | Acts on |
+| --- | --- |
+| `me` | Your parent account |
+| A sub-account's user ID | That sub-account |
+
+## What you can do
+
+| Action | Method | Path |
+| --- | --- | --- |
+| Create a sub-account | `POST` | `/users` |
+| Fetch all sub-accounts | `GET` | `/users` |
+| Fetch the parent account | `GET` | `/users/me` |
+| Fetch one sub-account | `GET` | `/users/{user_id}` |
+| Edit a sub-account | `PUT` | `/users/{user_id}` |
+
+```bash
+curl 'https://openapi.quidax.io/exchange-open-api/api/v1/users/me' \
+  -H 'accept: application/json' \
+  -H "Authorization: Bearer $QUIDAX_SECRET_KEY"
+```
+
+A sub-account carries an `id`, an `sn` (the Quidax serial number), `email`, `reference`, `first_name`, `last_name` and `display_name`.
+
+<Tip>
+  Set `reference` to your own user ID when you create a sub-account. It comes back on wallet and transaction payloads, which saves you maintaining a mapping table between your IDs and Quidax's.
+</Tip>
+
+## Moving funds between accounts
+
+An internal withdrawal moves funds from a sub-account to the parent, or between accounts, without touching a blockchain. It settles instantly and costs no network fee.
+
+To do it, create a withdrawal from the source account with `fund_uid` set to the **destination account's ID** rather than a blockchain address.
+
+```bash
+curl -X POST 'https://openapi.quidax.io/exchange-open-api/api/v1/users/<sub_account_id>/withdraws' \
+  -H 'accept: application/json' \
+  -H 'content-type: application/json' \
+  -H "Authorization: Bearer $QUIDAX_SECRET_KEY" \
+  -d '{
+    "currency": "usdt",
+    "amount": "10",
+    "fund_uid": "<parent_account_id>",
+    "reference": "<your_unique_reference>"
+  }'
+```
+
+<Tip>
+  Sweeping customer balances to your parent account is the standard pattern for consolidating treasury. Because it never touches a chain, it is instant and free — do not route these through an on-chain withdrawal.
+</Tip>
+
+<Warning>
+  `fund_uid` is doing double duty here: a blockchain address sends on-chain, an account ID sends internally. A malformed account ID that happens to look like an address is a real risk — validate before you send.
+</Warning>
+
+<Card title="Withdrawals" icon="paper-plane" href="/wallets/withdrawals" horizontal>
+  Full withdrawal parameters, including on-chain and bank payouts.
+</Card>
+
+## Compliance
+
+Sub-accounts represent real people or businesses, and the same country and activity restrictions apply to them as to you.
+
+<CardGroup cols={2}>
+  <Card title="Prohibited countries" icon="ban" href="/get-started/coverage#prohibited-countries" horizontal />
+
+  <Card title="Restricted activity" icon="shield-check" href="/get-started/licences#restricted-activity" horizontal />
+</CardGroup>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Wallets and addresses" icon="qrcode" href="/wallets/addresses" horizontal />
+
+  <Card title="Deposits" icon="arrow-down" href="/wallets/deposits" horizontal />
+
+  <Card title="Withdrawals" icon="paper-plane" href="/wallets/withdrawals" horizontal />
+
+  <Card title="Quickstart" icon="rocket" href="/wallets/quickstart" horizontal />
+</CardGroup>
