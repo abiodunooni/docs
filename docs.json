@@ -123,6 +123,7 @@
               "ramp/widget",
               "ramp/on-ramp",
               "ramp/off-ramp",
+              "ramp/custodial-wallet",
               "ramp/rates-and-markup",
               "ramp/refunds",
               "ramp/webhooks"
@@ -133,7 +134,8 @@
             "pages": [
               "ramp/testing",
               "ramp/errors",
-              "ramp/security"
+              "ramp/security",
+              "ramp/dashboard"
             ]
           }
         ]
@@ -289,6 +291,15 @@
                   "api-reference/ramp/off-ramp/refresh-an-off-ramp-transaction",
                   "api-reference/ramp/off-ramp/add-a-payout-account",
                   "api-reference/ramp/off-ramp/confirm-an-off-ramp-transaction"
+                ]
+              },
+              {
+                "group": "Custodial wallet",
+                "pages": [
+                  "api-reference/ramp/custodial-wallet/get-a-custodial-wallet",
+                  "api-reference/ramp/custodial-wallet/initiate-a-withdrawal",
+                  "api-reference/ramp/custodial-wallet/fetch-a-withdrawal",
+                  "api-reference/ramp/custodial-wallet/list-withdrawals"
                 ]
               },
               {
