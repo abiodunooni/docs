@@ -59,6 +59,8 @@ Every payload has the same shape: an `event` name and a `data` object.
 | `sell_transaction.processing` | `processing` |
 | `sell_transaction.successful` | `completed` |
 | `sell_transaction.failed` | `needs_attention` |
+| `custodial_withdraw.success` | `completed` |
+| `custodial_withdraw.failed` | `failed` |
 
 ## Verify the signature
 
@@ -246,6 +248,7 @@ Subscribe to all three events for each direction you support, and be explicit ab
 | `*_transaction.processing` | Store idempotently and return `2xx`. **Do not credit the customer.** May arrive more than once. |
 | `*_transaction.successful` | Terminal success. **Credit the customer exactly once**, and verify the balance moved. |
 | `*_transaction.failed` | **Do not credit.** Record `error_message` and trigger your support escalation. |
+| `custodial_withdraw.*` | Terminal state of a withdrawal from your custodial wallet. Key on `public_id` or `merchant_reference`. |
 
 <AccordionGroup>
   <Accordion title="buy_transaction.processing" icon="arrow-down">
@@ -395,6 +398,38 @@ Subscribe to all three events for each direction you support, and be explicit ab
     }
     ```
   </Accordion>
+
+  <Accordion title="custodial_withdraw.success" icon="arrow-up-from-bracket">
+    A withdrawal from your custodial wallet settled on-chain. `status` is `completed` and `txid` is populated.
+
+    ```json
+    {
+      "event": "custodial_withdraw.success",
+      "data": {
+        "public_id": "wd_123456",
+        "amount": "10.0",
+        "fee": "1.0",
+        "currency": "usdt",
+        "network": "trc20",
+        "status": "completed",
+        "merchant_reference": "partner-withdraw-123",
+        "address": "TQ8kQv7z3L8v2YV8Dg3rUznG3YmFQGq2Pp",
+        "destination_tag": null,
+        "txid": "provider-transaction-id",
+        "created_at": "2026-08-13T00:00:00Z",
+        "updated_at": "2026-08-13T00:05:00Z"
+      }
+    }
+    ```
+
+    <Card title="Custodial wallet" icon="vault" href="/ramp/custodial-wallet" horizontal />
+  </Accordion>
+
+  <Accordion title="custodial_withdraw.failed" icon="circle-x">
+    The withdrawal could not be completed. `status` is `failed` and `txid` stays `null`. The funds remain in your custodial wallet.
+
+    Do not retry by generating a new `merchant_reference` until you have established why it failed — an insufficient balance and a rejected address need different responses.
+  </Accordion>
 </AccordionGroup>
 
 ## Payload fields
@@ -448,6 +483,21 @@ Subscribe to all three events for each direction you support, and be explicit ab
     | `data.fiat_payout.currency` | string | Payout currency. |
     | `data.fiat_payout.processor_fee` | string | Fee charged on the payout. |
     | `data.fiat_payout.completed_at` | string or null | `null` until completion. |
+  </Tab>
+
+  <Tab title="Withdrawals">
+    | Field | Type | Description |
+    | --- | --- | --- |
+    | `data.public_id` | string | Quidax identifier for the withdrawal. |
+    | `data.amount` | string | Amount sent to the recipient, excluding the fee. |
+    | `data.fee` | string | Network fee, charged on top of `amount`. |
+    | `data.currency` | string | Asset withdrawn. |
+    | `data.network` | string | Network used. |
+    | `data.status` | string | `completed` or `failed`. |
+    | `data.merchant_reference` | string | Your reference for the withdrawal. |
+    | `data.address` | string | Destination address. |
+    | `data.destination_tag` | string or null | Memo or tag, where one was sent. |
+    | `data.txid` | string or null | Blockchain transaction ID. `null` on failure. |
   </Tab>
 
   <Tab title="Refunds">

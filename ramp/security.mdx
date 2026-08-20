@@ -21,7 +21,41 @@ curl 'https://ramp-be.quidax.io/api/v1/merchants/purchase_limits/buy?currency_sy
   -H "x-private-key: $RAMP_SECRET_KEY"
 ```
 
-Generate keys in the merchant dashboard under **Settings → Preferences → API Keys**. The private key never belongs in browser or mobile code, a repository, or your logs.
+Generate keys in the merchant dashboard under **Settings → API Keys & Webhooks**. The private key never belongs in browser or mobile code, a repository, or your logs.
+
+Coordinate with your merchant success manager before rotating keys on a live integration. The secret key also signs your webhooks, so a rotation invalidates signatures generated with the old key — verify against both during the rollover.
+
+## Restrict access by IP
+
+A leaked key is only useful from somewhere Ramp accepts it. IP whitelisting, under **Settings → Security**, limits API requests to addresses you approve. IPv4, IPv6 and CIDR ranges are all supported, and requests from anywhere else return `403`.
+
+<Steps>
+  <Step title="Add every production egress address">
+    Not just your API servers. A NAT gateway, a load balancer and a background worker can each egress from a different address, and any one you miss goes dark the moment you enable the list.
+  </Step>
+
+  <Step title="Label each entry">
+    "Production API server" tells the next person what they are looking at. An unlabelled address is one nobody dares remove.
+  </Step>
+
+  <Step title="Verify before you close the session">
+    Make a real API call from an approved address after turning whitelisting on. Enabling it with an incomplete list locks out your own integration.
+  </Step>
+</Steps>
+
+<Note>
+  At least one address must exist before whitelisting can be enabled.
+</Note>
+
+## Audit logs
+
+**Settings → Audit Logs** records sign-ins and configuration changes, each with an event ID, event name and timestamp. Filter by period, or export a date range.
+
+Key generation, markup changes and whitelist edits all land here — which is what turns "the rate changed on Tuesday" or "our calls started failing at 14:00" into a specific change and the person who made it. Pull it into your own log retention if your compliance programme requires it.
+
+<Card title="Merchant dashboard" icon="gauge" href="/ramp/dashboard" horizontal>
+  Where each of these settings lives, and what else the dashboard covers.
+</Card>
 
 ## Verifying webhooks
 
@@ -34,7 +68,7 @@ export function verifyRampSignature(rawBody: string, header?: string): boolean {
   if (!header) return false;
 
   const expected = crypto
-    .createHmac("sha512", process.env.RAMP_SECRET_KEY!)
+    .createHmac("sha256", process.env.RAMP_SECRET_KEY!)
     .update(rawBody)
     .digest("hex");
 

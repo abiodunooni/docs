@@ -21,7 +21,7 @@ Every Ramp transaction has two legs: a fiat leg and a crypto leg. Ramp converts 
       </Step>
 
       <Step title="Refresh if the quote goes stale">
-        Quotes are held for roughly 10 seconds. If your customer takes longer to decide, refresh to recalculate.
+        Quotes are held for roughly 10 seconds. If your customer takes longer to decide, refresh to recalculate. A deposit that lands after expiry is re-quoted at the rate current on arrival.
       </Step>
 
       <Step title="Confirm the transaction">
@@ -195,7 +195,11 @@ Every Ramp transaction has two legs: a fiat leg and a crypto leg. Ramp converts 
   <Accordion title="Quotes and rates" icon="clock">
     A quote is held for roughly 10 seconds once a transaction is initiated. Refresh the transaction to recalculate if your customer takes longer.
 
-    Quoted rates include the transaction fee and any markup you have configured. Stamp duty, where it applies, is deducted from the converted amount afterwards and is not in the quote.
+    Quoted rates include the transaction fee and any markup you have configured, and `to_amount` is net of the Ramp fee. Stamp duty, where it applies, is deducted from the converted amount afterwards and is not in the quote.
+
+    **If funds arrive after the quote has expired**, Ramp does not reject the deposit or hold it. It re-quotes at the rate current when the deposit lands and settles on that figure. Ramp does not absorb rate movement — whoever commits a number to the customer does.
+
+    Quotes are also one-directional: you price from the amount being sold, and Ramp returns what the customer receives. There is no way to name a target payout amount and have Ramp derive the input. See [Guaranteeing a fiat amount](/ramp/rates-and-markup#guaranteeing-a-fiat-amount-to-your-customer).
   </Accordion>
 
   <Accordion title="Virtual accounts" icon="building-columns">

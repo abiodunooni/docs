@@ -113,6 +113,22 @@ You can start on the widget and move to the API later. Your business verificatio
   Markets, assets, networks, minimums and transaction tiers.
 </Card>
 
+## Ramp or the Wallets API?
+
+Both convert between fiat and crypto, and the difference is **whose money moves**.
+
+| | Ramp | Wallets API |
+| --- | --- | --- |
+| Whose balance | Your customer's transaction | Your own Quidax balance |
+| Fiat destination | Your customer's bank or mobile money account | Your own account |
+| Customer identity | Named on every transaction, and checked against the fiat account | Not applicable |
+
+If you need to pay local currency out to **your customers**, that is Ramp — an off-ramp transaction naming the recipient. The Wallets API on-ramps and off-ramps against your own balance, which makes it a treasury tool rather than a payout rail.
+
+<Card title="Wallets" icon="wallet" href="/wallets" horizontal>
+  Sub-accounts, addresses, trading and payouts on your own balance.
+</Card>
+
 ## How a transaction works
 
 <Columns cols={2}>
@@ -179,6 +195,10 @@ You can start on the widget and move to the API later. Your business verificatio
   <Card title="Coverage and limits" icon="globe" href="/ramp/coverage" horizontal />
 
   <Card title="Rates and markup" icon="percent" href="/ramp/rates-and-markup" horizontal />
+
+  <Card title="Custodial wallet" icon="vault" href="/ramp/custodial-wallet" horizontal />
+
+  <Card title="Merchant dashboard" icon="gauge" href="/ramp/dashboard" horizontal />
 
   <Card title="Webhooks" icon="webhook" href="/ramp/webhooks" horizontal />
 

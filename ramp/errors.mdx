@@ -27,7 +27,10 @@ Every Ramp response uses the same envelope, whether it succeeded or failed.
 | `ok` | 200 | The request succeeded. |
 | `bad_request` | 400 | The request was invalid, incomplete, duplicated or could not be processed. |
 | `forbidden` | 403 | Authentication failed, usually an invalid private key. |
-| `not_found` | 404 | The transaction or refund does not exist. |
+| `not_found` | 404 | The transaction, refund, withdrawal or wallet does not exist. |
+| `conflict` | 409 | A `merchant_reference` was reused with different details. Withdrawals only. |
+| `unprocessable_entity` | 422 | A business rule rejected the request. Withdrawals only. |
+| `internal_server_error` | 500 | Unexpected server error. Safe to retry with the same `merchant_reference`. |
 
 <Tip>
   Branch on `status` rather than parsing `message`. Messages are written for humans and may be reworded; the status values are stable.
@@ -81,6 +84,23 @@ Every Ramp response uses the same envelope, whether it succeeded or failed.
     | `Deposit not found` | `bad_request` | No mobile money deposit has been initiated for this transaction. |
   </Accordion>
 
+  <Accordion title="Custodial withdrawals" icon="arrow-up-from-bracket">
+    | Message | Status | What to do |
+    | --- | --- | --- |
+    | `Insufficient wallet balance` | `unprocessable_entity` | Check `amount + fee` against the wallet's `balance`. `locked_balance` is not available. |
+    | `Invalid amount` | `unprocessable_entity` | Below the minimum, above the limit, or malformed. Amounts are decimal strings with at most five decimal places. |
+    | `Invalid address` | `unprocessable_entity` | The address is malformed or not valid for the selected network. |
+    | `Invalid network` | `unprocessable_entity` | Use `trc20`, `bep20`, `erc20`, `solana` or `celo`. |
+    | `Currency is not allowed` | `unprocessable_entity` | The asset is not enabled for withdrawal on your account. |
+    | `Wallet not found` | `unprocessable_entity` | No custodial wallet exists for that currency. |
+    | `Wallet is inactive` | `unprocessable_entity` | The wallet is disabled. Contact support. |
+    | `Destination tag is required for this network` | `unprocessable_entity` | Send `destination_tag`. Exchange deposit addresses usually need one. |
+    | `Daily limit reached` | `unprocessable_entity` | Withdrawal volume for the day is exhausted. Retry tomorrow or contact support. |
+    | Reference conflict | `conflict` | The `merchant_reference` was reused with **different** details. Reusing it with identical details returns the original withdrawal instead. |
+
+    <Card title="Custodial wallet" icon="vault" href="/ramp/custodial-wallet" horizontal />
+  </Accordion>
+
   <Accordion title="Fetching and filtering" icon="magnifying-glass">
     | Message | Status | What to do |
     | --- | --- | --- |
@@ -113,6 +133,17 @@ Credit your customer only on `completed`. `needs_attention` means Quidax is work
 Leg statuses sit on the nested objects: `fiat_deposit.status`, `crypto_payout.status`, `crypto_deposit.status` and `fiat_payout.status`. A transaction can be `needs_attention` with `fiat_deposit.status` of `success` and `crypto_payout.status` of `failed`.
 
 `error_message` on a fetched transaction carries the reason where one is available, and is `null` otherwise.
+
+## Withdrawal statuses
+
+Custodial withdrawals use their own, shorter set. There is no `needs_attention` — a withdrawal either lands or fails, and a failed one leaves the funds in your wallet.
+
+| Status | Terminal | Meaning |
+| --- | --- | --- |
+| `pending` | No | Created and awaiting processing. |
+| `processing` | No | Being processed. |
+| `completed` | Yes | Settled on-chain. `txid` is populated. |
+| `failed` | Yes | Could not be completed. Funds remain in your custodial wallet. |
 
 ## Failure modes worth handling
 

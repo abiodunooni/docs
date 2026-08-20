@@ -25,7 +25,7 @@ A complete on-ramp and off-ramp round trip costs a few dollars in fees and sprea
 
 <Steps>
   <Step title="Generate a production API key">
-    In the merchant dashboard, go to **Settings > Preferences > API Keys** and select **Generate new API key**. Store the private key server-side only.
+    In the merchant dashboard, go to **Settings > API Keys & Webhooks** and select **Generate new API keys**. Store the secret key server-side only.
   </Step>
 
   <Step title="Configure your webhook endpoint">
@@ -77,9 +77,15 @@ Run this sequence end to end before opening the flow to any real cohort. Use the
 
 | Area | Where | What to confirm |
 | --- | --- | --- |
-| API keys | **Settings > Preferences > API Keys** | Generate and manage your production private key. |
-| Transactions | **Transactions > Transaction Monitoring** | Search by reference and confirm status, amount, currency and timestamps. |
-| Balances | **Wallets** | Confirm the purchased asset was credited, where you settle to a merchant custodial wallet. |
+| API keys | **Settings > API Keys & Webhooks** | Generate and manage your production keys, and set the webhook URL. |
+| Transactions | **Transaction Monitoring** | Search by reference and confirm status, amount, currency and timestamps. |
+| Balances | **Wallet** | Confirm the purchased asset was credited, where you settle to a merchant custodial wallet. |
+| Markup | **Settings > Preference** | Confirm the markup is what you intend before you take live traffic. |
+| Earnings | **Earnings** | Confirm markup accrues after the first transaction. |
+
+<Card title="Merchant dashboard" icon="gauge" href="/ramp/dashboard" horizontal>
+  Every page above, and what to look for on each.
+</Card>
 
 ## Cover every flow you support
 
@@ -89,6 +95,7 @@ Repeat the sequence for each direction and currency you are approved for.
 - **On-ramp, GHS** — cover both `next_step` values, `PIN` and `OTP`.
 - **On-ramp, custodial mode** — omit `wallet_address` and confirm the asset lands in your merchant wallet rather than on-chain.
 - **Off-ramp** — create, fetch institutions, attach the payout account, confirm, send, confirm the payout lands.
+- **Custodial withdrawal** — if you withdraw from the merchant wallet, send a small amount on-chain, confirm the total debit is `amount + fee`, and confirm `custodial_withdraw.success` arrives with a `txid`.
 
 Check that `processor_fee`, `vat`, `blockchain_fee` and `stamp_charge` all land where you expect.
 
@@ -120,6 +127,12 @@ Most launch problems hide in paths nobody exercised. These cost nothing, because
 
   <Accordion title="Expired quotes" icon="clock">
     Let a transaction sit for more than 10 seconds before confirming, and check your refresh path recalculates correctly and shows the customer the new figure.
+
+    Then let one sit longer and fund it anyway. Ramp re-quotes at the rate current on arrival rather than rejecting the deposit, so confirm your ledger records the settled amount and not the figure you last displayed.
+  </Accordion>
+
+  <Accordion title="Withdrawal idempotency" icon="rotate">
+    Submit the same `merchant_reference` twice with an identical body and confirm you get the original withdrawal back rather than a second transfer. Then submit it with a different amount and confirm you get `409` and handle it as a conflict, not as a retryable error.
   </Accordion>
 
   <Accordion title="Mobile money branches" icon="mobile">

@@ -1,0 +1,303 @@
+---
+title: "Custodial wallet"
+description: "Your merchant balance on Ramp: check it, withdraw from it, and reconcile against it."
+icon: "vault"
+---
+
+When you run Ramp in custodial mode, converted assets land in a **merchant custodial wallet** rather than on a customer's address. That wallet is your operating balance: on-ramp proceeds credit it, off-ramp payouts are funded from it, and you move funds out of it with the withdrawals API.
+
+<Note>
+  Custodial mode is set per transaction, by omitting `wallet_address` when you create an on-ramp transaction. See [Choose a settlement mode](/ramp/on-ramp#choose-a-settlement-mode).
+</Note>
+
+```
+on-ramp settles in → balance accrues → you withdraw on-chain
+```
+
+All requests go to `https://ramp-be.quidax.io/api/v1/merchants` and carry your secret key in the `x-private-key` header.
+
+## Check the balance
+
+```bash
+curl 'https://ramp-be.quidax.io/api/v1/merchants/custodial/wallets/usdt' \
+  -H "x-private-key: $RAMP_SECRET_KEY"
+```
+
+```json Response
+{
+  "status": "ok",
+  "message": "Custodial wallet found",
+  "data": {
+    "public_id": "<wallet-public-id>",
+    "currency_code": "usdt",
+    "currency_name": "Tether",
+    "balance": "1500.0",
+    "locked_balance": "25.0",
+    "status": "balanced",
+    "active": true,
+    "created_at": "2026-01-15T10:30:00.000Z",
+    "updated_at": "2026-10-01T12:00:00.000Z"
+  }
+}
+```
+
+| Field | What it is |
+| --- | --- |
+| `public_id` | Public wallet identifier. |
+| `currency_code` | Currency code, normalised to lowercase. |
+| `currency_name` | Display name of the currency. |
+| `balance` | Available balance, as a decimal string. |
+| `locked_balance` | Reserved against transactions in flight. Not available to withdraw. |
+| `status` | Reconciliation status: `balanced` or `imbalanced`. |
+| `active` | Whether the wallet is active. |
+
+<Warning>
+  `balance` and `locked_balance` are separate figures. What you can actually withdraw is `balance`, and it does not include anything currently locked against in-flight transactions.
+</Warning>
+
+<Card title="Get a custodial wallet" icon="code" href="/api-reference/ramp/custodial-wallet/get-a-custodial-wallet" horizontal />
+
+## Withdraw to a blockchain address
+
+Withdrawals move USDT out of the custodial wallet to an address you control or specify.
+
+```bash
+curl -X POST 'https://ramp-be.quidax.io/api/v1/merchants/custodial/withdraws/initiate' \
+  -H 'content-type: application/json' \
+  -H "x-private-key: $RAMP_SECRET_KEY" \
+  -d '{
+    "currency": "usdt",
+    "network": "trc20",
+    "amount": "10.0",
+    "address": "TQ8kQv7z3L8v2YV8Dg3rUznG3YmFQGq2Pp",
+    "merchant_reference": "partner-withdraw-123"
+  }'
+```
+
+```json Response
+{
+  "status": "ok",
+  "message": "Custodial withdraw successfully initiated",
+  "data": {
+    "public_id": "wd_123456",
+    "amount": "10.0",
+    "fee": "1.0",
+    "currency": "usdt",
+    "network": "trc20",
+    "kind": "blockchain",
+    "source": "api",
+    "status": "pending",
+    "merchant_reference": "partner-withdraw-123",
+    "address": "TQ8kQv7z3L8v2YV8Dg3rUznG3YmFQGq2Pp",
+    "destination_tag": null,
+    "txid": null,
+    "created_at": "2026-08-13T00:00:00Z",
+    "updated_at": "2026-08-13T00:00:00Z"
+  }
+}
+```
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `currency` | Yes | Currency code. Use `usdt`. |
+| `network` | Yes | `trc20`, `bep20`, `erc20`, `solana` or `celo`. |
+| `amount` | Yes | Decimal string, for example `"100.50"`. This is what the **recipient receives**. |
+| `address` | Yes | Recipient's blockchain address. Must be valid for the network you chose. |
+| `merchant_reference` | Yes | Your own unique reference for the withdrawal. |
+| `destination_tag` | Conditional | Only where the destination requires a memo, tag or destination ID. |
+
+<Warning>
+  A `200` means the request was **accepted**, not that the funds have settled on-chain. `status` comes back `pending`. Wait for `custodial_withdraw.success` before treating the transfer as done.
+</Warning>
+
+<Card title="Initiate a withdrawal" icon="code" href="/api-reference/ramp/custodial-wallet/initiate-a-withdrawal" horizontal />
+
+## Fees and amounts
+
+The network fee is charged **on top of** `amount`, not deducted from it.
+
+```
+Total wallet deduction = amount + network fee
+```
+
+A 10 USDT withdrawal on TRC20 debits 11 USDT:
+
+```
+Recipient receives:      10 USDT
+Network fee:              1 USDT
+Total wallet deduction:  11 USDT
+```
+
+| Network code | Network | Fee |
+| --- | --- | --- |
+| `trc20` | Tron | 1.0 USDT |
+| `bep20` | BNB Smart Chain | 0.02 USDT |
+| `erc20` | Ethereum | 2.0 USDT |
+| `solana` | Solana | 0.025 USDT |
+| `celo` | Celo | 0.005 USDT |
+
+<Note>
+  Fees follow the published fee schedule and may change. The `fee` on the withdrawal response is the figure actually applied.
+</Note>
+
+Amounts carry a maximum of **five decimal places**, and anything beyond that is **truncated, not rounded**:
+
+```
+10.123456 becomes 10.12345
+```
+
+<Tip>
+  Round to five places yourself before submitting. If your ledger holds more precision than Ramp does, the truncated remainder stays in your wallet and shows up later as a small unexplained balance.
+</Tip>
+
+## Track a withdrawal
+
+```bash
+curl 'https://ramp-be.quidax.io/api/v1/merchants/custodial/withdraws/partner-withdraw-123' \
+  -H "x-private-key: $RAMP_SECRET_KEY"
+```
+
+Look it up by your own `merchant_reference`. A completed withdrawal carries the provider `txid`.
+
+| Status | Meaning |
+| --- | --- |
+| `pending` | Created and awaiting processing. |
+| `processing` | Being processed. |
+| `completed` | Successfully completed. |
+| `failed` | Could not be completed. |
+
+```
+Success:  pending → processing → completed
+Failure:  pending → processing → failed
+```
+
+To reconcile a period rather than a single transfer, list withdrawals and filter. Results come back newest first.
+
+```bash
+curl 'https://ramp-be.quidax.io/api/v1/merchants/custodial/withdraws?status=processing&currency=usdt&network=bep20&start_date=2026-07-01&end_date=2026-07-31&per_page=25&page=1' \
+  -H "x-private-key: $RAMP_SECRET_KEY"
+```
+
+| Parameter | Default | Description |
+| --- | --- | --- |
+| `status` | — | `pending`, `processing`, `completed` or `failed`. |
+| `currency` | — | Currency code, for example `usdt`. |
+| `network` | — | Network code, for example `bep20`. |
+| `start_date` | — | Inclusive start date, `YYYY-MM-DD`. |
+| `end_date` | — | Inclusive end date, `YYYY-MM-DD`. |
+| `per_page` | `25` | Results per page. Maximum `50`. |
+| `page` | `1` | One-based page number. |
+
+`start_date` and `end_date` must be sent together, and both dates are included in the range.
+
+<Card title="List withdrawals" icon="code" href="/api-reference/ramp/custodial-wallet/list-withdrawals" horizontal />
+
+## Idempotency
+
+`merchant_reference` must be unique per withdrawal, and it is what makes a retry safe.
+
+| You send | You get |
+| --- | --- |
+| The same reference with the **same** details | The existing withdrawal. Nothing new is created. |
+| The same reference with **different** details | `409 Conflict`. |
+
+<Warning>
+  A timeout is not a failure. Retry with the same `merchant_reference` and the same body — that returns the original withdrawal instead of sending a second one. Generating a fresh reference on retry is how a double-spend happens.
+</Warning>
+
+## Webhooks
+
+Two events fire when a withdrawal reaches a terminal state.
+
+| Event | Meaning |
+| --- | --- |
+| `custodial_withdraw.success` | `status` is `completed` and `txid` is populated. |
+| `custodial_withdraw.failed` | `status` is `failed`. The funds remain in your wallet. |
+
+```json custodial_withdraw.success
+{
+  "event": "custodial_withdraw.success",
+  "data": {
+    "public_id": "wd_123456",
+    "amount": "10.0",
+    "fee": "1.0",
+    "currency": "usdt",
+    "network": "trc20",
+    "status": "completed",
+    "merchant_reference": "partner-withdraw-123",
+    "address": "TQ8kQv7z3L8v2YV8Dg3rUznG3YmFQGq2Pp",
+    "destination_tag": null,
+    "txid": "provider-transaction-id",
+    "created_at": "2026-08-13T00:00:00Z",
+    "updated_at": "2026-08-13T00:05:00Z"
+  }
+}
+```
+
+They are signed like every other Ramp webhook: HMAC-SHA256 over the raw request body, in `X-Ramp-Signature`. Verify before acting, and key your idempotency on `public_id` or `merchant_reference`.
+
+<Card title="Webhooks" icon="webhook" href="/ramp/webhooks" horizontal>
+  Signature verification, retries and every event payload.
+</Card>
+
+## Errors
+
+Withdrawals use the standard envelope, and add two statuses you will not see elsewhere in Ramp.
+
+```json
+{
+  "status": "unprocessable_entity",
+  "message": "Insufficient wallet balance",
+  "data": null
+}
+```
+
+| HTTP | When |
+| --- | --- |
+| `403` | Missing or invalid private key, unauthorised account, or a blocked IP address. |
+| `404` | Withdrawal or custodial wallet not found. |
+| `409` | `merchant_reference` reused with different details. |
+| `422` | Invalid request or a business rule rejected it. |
+| `500` | Unexpected server error. |
+
+Common `422` messages: `Invalid amount`, `Invalid address`, `Invalid network`, `Currency is not allowed`, `Wallet not found`, `Wallet is inactive`, `Insufficient wallet balance`, `Destination tag is required for this network`, `Daily limit reached`.
+
+<Tip>
+  `Insufficient wallet balance` accounts for the fee as well as the amount. Check `amount + fee` against `balance`, not against `balance + locked_balance`.
+</Tip>
+
+## Running on a custodial balance
+
+<AccordionGroup>
+  <Accordion title="Credit customers from the webhook, not the balance" icon="user-check">
+    The wallet is a single pooled balance with no per-customer breakdown. Your ledger is what attributes it. Credit a customer on `buy_transaction.successful` for their transaction, then use the wallet balance to check the pool matches the sum of your ledger — not the other way round.
+  </Accordion>
+
+  <Accordion title="Watch the float" icon="gauge-high">
+    Off-ramp payouts are funded from this balance, so a wallet that runs dry stalls payouts. Alert on a floor that covers your expected payout volume plus network fees, rather than checking it by hand.
+  </Accordion>
+
+  <Accordion title="Pick the network for cost, not habit" icon="network-wired">
+    The spread between networks is wide — 2.0 USDT on ERC20 against 0.02 on BEP20. On a treasury sweep it is noise; on frequent small withdrawals it is most of the cost.
+  </Accordion>
+
+  <Accordion title="Reconcile three ways" icon="scale-balanced">
+    Wallet activity in the dashboard, the withdrawals list over a date range, and your own ledger should agree. The list endpoint with `start_date` and `end_date` is what makes that a job rather than a spreadsheet.
+  </Accordion>
+
+  <Accordion title="Validate the address and tag before you send" icon="link">
+    An on-chain withdrawal to a wrong-but-valid address is not recoverable. Validate against the network you selected, and where the destination needs a memo or tag, send `destination_tag` — an exchange deposit without one is a support case at the other end.
+  </Accordion>
+</AccordionGroup>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="On-ramp" icon="arrow-down" href="/ramp/on-ramp" horizontal />
+
+  <Card title="Merchant dashboard" icon="gauge" href="/ramp/dashboard" horizontal />
+
+  <Card title="Webhooks" icon="webhook" href="/ramp/webhooks" horizontal />
+
+  <Card title="API reference" icon="code" href="/api-reference/ramp/custodial-wallet/get-a-custodial-wallet" horizontal />
+</CardGroup>

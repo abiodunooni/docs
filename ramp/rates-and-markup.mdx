@@ -123,14 +123,99 @@ curl 'https://ramp-be.quidax.io/api/v1/merchants/purchase_quotes/sell?token=usdt
 Quotes fetched this way are indicative. The binding rate is the one returned when you create or refresh a transaction.
 
 <Note>
-  During periods of currency volatility the quote window still applies. If a customer does not complete payment inside it, Ramp re-quotes rather than absorbing the movement.
+  **The fee is already deducted.** `to_amount` on a quote is net of the Ramp fee — the `fee` field tells you what came out, it is not a charge to add on top. Show `to_amount` as the figure your customer receives.
 </Note>
+
+### What happens when a quote expires
+
+The 10-second window governs the *quoted* rate, not the transaction. A deposit that arrives after the quote it was priced against has expired is neither rejected nor held:
+
+<Steps>
+  <Step title="Ramp re-quotes at the rate current when the deposit arrives">
+    The transaction is repriced against the live rate at that moment.
+  </Step>
+
+  <Step title="The transaction settles on the new rate">
+    Your customer receives what the re-quoted rate produces, which may be more or less than the original figure.
+  </Step>
+</Steps>
+
+<Warning>
+  This is the behaviour to design around if you show your customer a figure before they act. Ramp does not absorb rate movement between the quote and the deposit — whoever commits to the customer absorbs it. See [Guaranteeing a fiat amount](#guaranteeing-a-fiat-amount-to-your-customer).
+</Warning>
+
+## Guaranteeing a fiat amount to your customer
+
+A common pattern, especially in remittance and payout flows, prices the transaction in the **fiat the recipient receives**:
+
+1. You quote the customer a receive amount in NGN.
+2. The customer sends USDC on-chain.
+3. You instruct a payout of the NGN amount quoted in step 1.
+
+Step 2 depends on a person acting, so no 10-second window can hold across all three. The workable design is to **guarantee your customer the fiat figure and take whatever crypto amount Ramp needs at settlement** — you absorb the rate movement, and Ramp never has to commit to a rate it cannot hold.
+
+<Warning>
+  **Ramp cannot derive the token amount from a target fiat amount.** The sell quote endpoint takes `token_amount` and returns `to_amount` in fiat. There is no reverse direction: you cannot specify the NGN you want paid out and have Ramp compute the USDC required. Off-ramp transactions are created the same way, from the asset amount.
+</Warning>
+
+So the derivation is yours to do. The shape that works:
+
+<Steps>
+  <Step title="Quote the customer from your own pricing">
+    Your pricing engine produces the NGN figure you commit to, using your own rate and margin. This is the number the customer sees and the only one you guarantee.
+  </Step>
+
+  <Step title="Derive the token amount at settlement, not at quote time">
+    When the deposit lands, fetch a sell quote for a nominal `token_amount` to read the effective rate, divide your committed NGN by it, then fetch a second quote for the token amount you calculated and check its `to_amount` covers your commitment. Fees and stamp duty do not scale with the amount, so verify against the second quote rather than trusting the arithmetic.
+  </Step>
+
+  <Step title="Create the off-ramp transaction for that token amount">
+    Ramp converts and pays out. Your customer receives the amount you promised.
+  </Step>
+
+  <Step title="Book the difference">
+    The gap between the crypto the customer sent and the crypto the payout consumed is your spread on that transaction — positive or negative. It belongs in your own P&L, not in reconciliation against Ramp.
+  </Step>
+</Steps>
+
+<Note>
+  Quote and settle in the same operation, close together. The exposure you are carrying runs from the moment you commit a figure to your customer until the deposit lands, so a re-quote at settlement keeps it as short as it can be.
+</Note>
+
+Two consequences worth planning for:
+
+- **Price your buffer deliberately.** You are short the rate between quote and settlement. Size the margin your pricing engine adds to cover normal movement over that window, rather than discovering it on volatile days.
+- **Decide what happens on a large adverse move.** If the crypto received no longer covers the NGN you quoted, you either pay the shortfall or go back to the customer. Pick one before it happens, and put a threshold on it.
+
+## Layering your own revenue model
+
+You can take margin on Ramp in two ways, and they combine.
+
+<Columns cols={2}>
+  <Card title="Configured markup" icon="percent">
+    A percentage you set in the dashboard, priced inside the quoted rate. Ramp collects it on every transaction and it accrues as a balance you withdraw.
+
+    Simplest to run: one number across the quote, the transaction and your revenue, and nothing to reconcile.
+  </Card>
+
+  <Card title="Your own pricing on top" icon="calculator">
+    Treat the Ramp rate as wholesale, quote your customer from your own pricing engine, and keep the difference.
+
+    More work, but it is what a flow like the fiat-guaranteed pattern above requires, because your quote has to exist before Ramp prices anything.
+  </Card>
+</Columns>
+
+<Tip>
+  If you run your own pricing engine, you can still configure a markup — but pick one place for your margin. Margin in both means your effective spread is the product of two numbers that change independently, and nobody can tell you what it is on a given day.
+</Tip>
 
 ## Building for it
 
 <AccordionGroup>
-  <Accordion title="Do not add your margin in your own code" icon="calculator">
-    Configure it in the dashboard instead. Adding a margin client-side means the amount you quote and the amount Ramp settles diverge, and every reconciliation has to account for the gap. A configured markup keeps one number across the quote, the transaction and your revenue.
+  <Accordion title="Prefer a configured markup to margin in your own code" icon="calculator">
+    Where your product can quote the customer from a live Ramp rate, configure the markup in the dashboard. Adding margin in application code means the amount you quote and the amount Ramp settles diverge, and every reconciliation has to account for the gap. A configured markup keeps one number across the quote, the transaction and your revenue.
+
+    The exception is a flow that has to commit a fiat figure before Ramp prices anything, like [guaranteeing a fiat amount](#guaranteeing-a-fiat-amount-to-your-customer). There the pricing has to be yours — but keep the margin in one place rather than splitting it across both.
   </Accordion>
 
   <Accordion title="Quote close to the moment of commitment" icon="clock">

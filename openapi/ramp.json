@@ -40,6 +40,10 @@
     {
       "name": "Banks",
       "description": "Supported institutions and account verification."
+    },
+    {
+      "name": "Custodial wallet",
+      "description": "Your merchant balance, and withdrawals from it."
     }
   ],
   "components": {
@@ -668,6 +672,149 @@
             "format": "date-time"
           }
         }
+      },
+      "WithdrawalNetwork": {
+        "type": "string",
+        "description": "Blockchain network the withdrawal is sent on.",
+        "enum": [
+          "trc20",
+          "bep20",
+          "erc20",
+          "solana",
+          "celo"
+        ],
+        "example": "trc20"
+      },
+      "WithdrawalStatus": {
+        "type": "string",
+        "description": "Lifecycle state of a withdrawal. Successful: `pending` to `processing` to `completed`. Failed: `pending` to `processing` to `failed`.",
+        "enum": [
+          "pending",
+          "processing",
+          "completed",
+          "failed"
+        ],
+        "example": "pending"
+      },
+      "CustodialWallet": {
+        "type": "object",
+        "properties": {
+          "public_id": {
+            "type": "string",
+            "description": "Public wallet identifier."
+          },
+          "currency_code": {
+            "type": "string",
+            "description": "Currency code, normalised to lowercase.",
+            "example": "usdt"
+          },
+          "currency_name": {
+            "type": "string",
+            "description": "Display name of the currency.",
+            "example": "Tether"
+          },
+          "balance": {
+            "type": "string",
+            "description": "Available balance, as a decimal string. This is what you can withdraw.",
+            "example": "1500.0"
+          },
+          "locked_balance": {
+            "type": "string",
+            "description": "Balance reserved against transactions in flight. Not available to withdraw.",
+            "example": "25.0"
+          },
+          "status": {
+            "type": "string",
+            "description": "Reconciliation status of the wallet.",
+            "enum": [
+              "balanced",
+              "imbalanced"
+            ]
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether the wallet is active."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CustodialWithdrawal": {
+        "type": "object",
+        "properties": {
+          "public_id": {
+            "type": "string",
+            "description": "Public withdrawal identifier.",
+            "example": "wd_123456"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Amount sent to the recipient, excluding the network fee.",
+            "example": "10.0"
+          },
+          "fee": {
+            "type": "string",
+            "description": "Network fee, charged on top of `amount`.",
+            "example": "1.0"
+          },
+          "currency": {
+            "type": "string",
+            "example": "usdt"
+          },
+          "network": {
+            "$ref": "#/components/schemas/WithdrawalNetwork"
+          },
+          "kind": {
+            "type": "string",
+            "description": "Withdrawal type, typically `blockchain`.",
+            "example": "blockchain"
+          },
+          "source": {
+            "type": "string",
+            "description": "Origin of the withdrawal, typically `api`.",
+            "example": "api"
+          },
+          "status": {
+            "$ref": "#/components/schemas/WithdrawalStatus"
+          },
+          "merchant_reference": {
+            "type": "string",
+            "description": "The unique reference you generated.",
+            "example": "partner-withdraw-123"
+          },
+          "address": {
+            "type": "string",
+            "description": "Destination blockchain address."
+          },
+          "destination_tag": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Destination memo or tag, where the destination requires one."
+          },
+          "txid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Blockchain transaction ID. `null` until the withdrawal completes."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
       }
     },
     "responses": {
@@ -711,6 +858,36 @@
             "example": {
               "status": "bad_request",
               "message": "Invalid amount",
+              "data": null
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "The merchant reference was reused with different details.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "status": "conflict",
+              "message": "Merchant reference already used with different details",
+              "data": null
+            }
+          }
+        }
+      },
+      "UnprocessableEntity": {
+        "description": "The request failed a business validation rule.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "status": "unprocessable_entity",
+              "message": "Insufficient wallet balance",
               "data": null
             }
           }
@@ -3049,6 +3226,374 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/custodial/wallets/{currency}": {
+      "get": {
+        "tags": [
+          "Custodial wallet"
+        ],
+        "summary": "Get a custodial wallet",
+        "description": "Returns your merchant custodial wallet for a currency.\n\nThis is the balance that on-ramp transactions settle into when you omit `wallet_address`, and that off-ramp payouts are funded from.\n\n`balance` is what you can withdraw. `locked_balance` is reserved against transactions in flight and is not available.",
+        "operationId": "get-custodial-wallet",
+        "parameters": [
+          {
+            "name": "currency",
+            "in": "path",
+            "required": true,
+            "description": "Currency code. Values are normalised to lowercase.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "usdt"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Custodial wallet found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/CustodialWallet"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "status": "ok",
+                  "message": "Custodial wallet found",
+                  "data": {
+                    "public_id": "0f2b9d4e-4c1a-4f2b-9d4e-4c1a4f2b9d4e",
+                    "currency_code": "usdt",
+                    "currency_name": "Tether",
+                    "balance": "1500.0",
+                    "locked_balance": "25.0",
+                    "status": "balanced",
+                    "active": true,
+                    "created_at": "2026-01-15T10:30:00.000Z",
+                    "updated_at": "2026-10-01T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/custodial/withdraws/initiate": {
+      "post": {
+        "tags": [
+          "Custodial wallet"
+        ],
+        "summary": "Initiate a withdrawal",
+        "description": "Sends USDT from your custodial wallet to a blockchain address.\n\n`amount` is what the **recipient receives**. The network fee is charged on top, so the total debited from your wallet is `amount + fee`.\n\nAmounts carry a maximum of five decimal places and are **truncated, not rounded** — `10.123456` becomes `10.12345`.\n\nA `200` means the request was accepted, not that the transfer settled. The withdrawal returns `pending`; wait for the `custodial_withdraw.success` webhook before treating it as done.\n\n`merchant_reference` must be unique. Resending it with identical details returns the existing withdrawal, which makes retries safe. Resending it with different details returns `409`.",
+        "operationId": "initiate-custodial-withdrawal",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "currency",
+                  "network",
+                  "amount",
+                  "address",
+                  "merchant_reference"
+                ],
+                "properties": {
+                  "currency": {
+                    "type": "string",
+                    "description": "Currency code. Use `usdt`.",
+                    "example": "usdt"
+                  },
+                  "network": {
+                    "$ref": "#/components/schemas/WithdrawalNetwork"
+                  },
+                  "amount": {
+                    "type": "string",
+                    "description": "Amount the recipient receives, as a decimal string. The network fee is charged on top. Maximum five decimal places, truncated beyond that.",
+                    "example": "10.0"
+                  },
+                  "address": {
+                    "type": "string",
+                    "description": "Recipient's blockchain address. Must be valid for the selected network.",
+                    "example": "TQ8kQv7z3L8v2YV8Dg3rUznG3YmFQGq2Pp"
+                  },
+                  "merchant_reference": {
+                    "type": "string",
+                    "description": "Unique reference you generate for this withdrawal.",
+                    "example": "partner-withdraw-123"
+                  },
+                  "destination_tag": {
+                    "type": "string",
+                    "description": "Required only where the destination needs a memo, tag or destination ID."
+                  }
+                }
+              },
+              "example": {
+                "currency": "usdt",
+                "network": "trc20",
+                "amount": "10.0",
+                "address": "TQ8kQv7z3L8v2YV8Dg3rUznG3YmFQGq2Pp",
+                "merchant_reference": "partner-withdraw-123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Withdrawal accepted for processing.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/CustodialWithdrawal"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "status": "ok",
+                  "message": "Custodial withdraw successfully initiated",
+                  "data": {
+                    "public_id": "wd_123456",
+                    "amount": "10.0",
+                    "fee": "1.0",
+                    "currency": "usdt",
+                    "network": "trc20",
+                    "kind": "blockchain",
+                    "source": "api",
+                    "status": "pending",
+                    "merchant_reference": "partner-withdraw-123",
+                    "address": "TQ8kQv7z3L8v2YV8Dg3rUznG3YmFQGq2Pp",
+                    "destination_tag": null,
+                    "txid": null,
+                    "created_at": "2026-08-13T00:00:00Z",
+                    "updated_at": "2026-08-13T00:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/custodial/withdraws/{merchant_reference}": {
+      "get": {
+        "tags": [
+          "Custodial wallet"
+        ],
+        "summary": "Fetch a withdrawal",
+        "description": "Returns one withdrawal by the `merchant_reference` you generated when you initiated it.\n\nA completed withdrawal carries the provider `txid`. Withdrawals still in flight return `pending` or `processing`.",
+        "operationId": "get-custodial-withdrawal",
+        "parameters": [
+          {
+            "name": "merchant_reference",
+            "in": "path",
+            "required": true,
+            "description": "The unique reference you generated when initiating the withdrawal.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "partner-withdraw-123"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Withdrawal found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/CustodialWithdrawal"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "status": "ok",
+                  "message": "Custodial withdraw found",
+                  "data": {
+                    "public_id": "wd_123456",
+                    "amount": "10.0",
+                    "fee": "1.0",
+                    "currency": "usdt",
+                    "network": "trc20",
+                    "kind": "blockchain",
+                    "source": "api",
+                    "status": "completed",
+                    "merchant_reference": "partner-withdraw-123",
+                    "address": "TQ8kQv7z3L8v2YV8Dg3rUznG3YmFQGq2Pp",
+                    "destination_tag": null,
+                    "txid": "provider-transaction-id",
+                    "created_at": "2026-08-13T00:00:00Z",
+                    "updated_at": "2026-08-13T00:05:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/custodial/withdraws": {
+      "get": {
+        "tags": [
+          "Custodial wallet"
+        ],
+        "summary": "List withdrawals",
+        "description": "Returns your custodial withdrawals, newest first.\n\nUse it to reconcile a period against your own ledger. `start_date` and `end_date` must be sent together, and both dates are included in the range.",
+        "operationId": "list-custodial-withdrawals",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by withdrawal status.",
+            "schema": {
+              "$ref": "#/components/schemas/WithdrawalStatus"
+            }
+          },
+          {
+            "name": "currency",
+            "in": "query",
+            "description": "Filter by currency code, for example `usdt`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "network",
+            "in": "query",
+            "description": "Filter by network code, for example `bep20`.",
+            "schema": {
+              "$ref": "#/components/schemas/WithdrawalNetwork"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/StartDate"
+          },
+          {
+            "$ref": "#/components/parameters/EndDate"
+          },
+          {
+            "$ref": "#/components/parameters/PerPage"
+          },
+          {
+            "$ref": "#/components/parameters/Page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Withdrawals fetched successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/CustodialWithdrawal"
+                          }
+                        },
+                        "meta": {
+                          "$ref": "#/components/schemas/PaginationMeta"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "status": "ok",
+                  "message": "Custodial withdraws fetched successfully",
+                  "data": [
+                    {
+                      "public_id": "3a1f8c02-77d5-4a1e-9c33-6b0f2e5d81aa",
+                      "amount": "10.0",
+                      "fee": "0.02",
+                      "currency": "usdt",
+                      "network": "bep20",
+                      "kind": "blockchain",
+                      "source": "api",
+                      "status": "processing",
+                      "merchant_reference": "withdraw-123",
+                      "address": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+                      "destination_tag": null,
+                      "txid": null,
+                      "created_at": "2026-07-15T12:00:00.000Z",
+                      "updated_at": "2026-07-15T12:01:00.000Z"
+                    }
+                  ],
+                  "meta": {
+                    "page": 1,
+                    "per_page": 25,
+                    "total_count": 1,
+                    "total_pages": 1,
+                    "next_page": null
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
           }
         }
       }

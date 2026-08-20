@@ -1,0 +1,170 @@
+---
+title: "Merchant dashboard"
+description: "Where to find keys, transactions, balances, earnings, markup, IP whitelisting and audit logs."
+icon: "gauge"
+---
+
+The merchant dashboard is where you configure everything that is not a runtime decision, and where your operations team looks when a customer asks what happened to a transaction.
+
+<Card title="Open the dashboard" icon="arrow-up-right-from-square" href="https://ramp-merchant.quidax.io" horizontal>
+  ramp-merchant.quidax.io
+</Card>
+
+| I want to | Go to |
+| --- | --- |
+| Generate keys or set a webhook URL | **Settings > API Keys & Webhooks** |
+| Check the custodial balance | **Wallet** |
+| Look up a transaction | **Transaction Monitoring** |
+| See what your markup has earned | **Earnings** |
+| Change your markup | **Settings > Preference** |
+| Restrict API access by IP | **Settings > Security** |
+| Review account activity | **Settings > Audit Logs** |
+
+## API keys and webhooks
+
+**Settings > API Keys & Webhooks**
+
+<Steps>
+  <Step title="Generate keys">
+    Select **Generate new API keys** if you need fresh production credentials. Store the **public key** and **secret key** securely — the secret key is server-side only and must never reach client code.
+  </Step>
+
+  <Step title="Set your webhook URL">
+    Under **Notification URL**, enter your HTTPS endpoint in the **Webhook URL** field and select **Update URL**.
+  </Step>
+
+  <Step title="Confirm delivery">
+    Run a transaction and confirm your handler receives and processes the expected events before you rely on them.
+  </Step>
+</Steps>
+
+<Warning>
+  The secret key also signs your webhooks. Rotating it invalidates signatures generated with the old key, so verify against both during a rollover. Coordinate with your Quidax merchant success manager before rotating keys on a live integration.
+</Warning>
+
+## Wallet
+
+**Wallet**
+
+Your custodial balance. On-ramp proceeds settle in here, and off-ramp payouts are funded from it.
+
+| | |
+| --- | --- |
+| **Total balance** | Everything held in the wallet. |
+| **Available balance** | What you can currently use or withdraw. |
+| **Locked balance** | Reserved against transactions in flight. |
+
+**Wallet activity** lists every credit, debit, lock and release, each with a reference, amount, source, type, timestamp and status. Search and date filters narrow it, and records can be exported.
+
+<Card title="Custodial wallet" icon="vault" href="/ramp/custodial-wallet" horizontal>
+  The same balance through the API, plus withdrawals.
+</Card>
+
+## Transaction monitoring
+
+**Transaction Monitoring**
+
+Every Ramp transaction processed for you. Search by your `merchant_reference` or the Quidax `TRX-...` reference, then open a transaction to see its type, status, amount, currency, references and timestamps.
+
+For a successful custodial on-ramp, confirm all five:
+
+- The transaction status is successful.
+- The amount and currency match what you initiated.
+- Your `merchant_reference` and the Quidax `TRX-...` reference are recorded separately.
+- The `successful` webhook was received.
+- The asset was credited to your custodial wallet.
+
+<Tip>
+  Give your support team access to this page and to both references on your own order record. Most "where is my money" tickets are answered here in under a minute, without an escalation to Quidax.
+</Tip>
+
+## Earnings
+
+**Earnings**
+
+Your accumulated markup, by currency. These balances are **separate from the custodial wallet** — the wallet is operating funds, Earnings is revenue.
+
+Select **Withdraw** to draw down eligible earnings.
+
+<Card title="Rates and markup" icon="percent" href="/ramp/rates-and-markup" horizontal>
+  How markup is priced into the quote, and how it accrues.
+</Card>
+
+## Markup
+
+**Settings > Preference**
+
+There is no API for markup. It is a commercial setting, so it changes in one place under whatever approval your team requires.
+
+<Tabs>
+  <Tab title="Global markup">
+    Applies to any market without a market-specific markup.
+
+    1. Enter a value under **Percentage markup on buy rate (On-Ramp)**.
+    2. Enter a value under **Percentage markup on sell rate (Off-Ramp)**.
+    3. Select **Save Changes**.
+  </Tab>
+
+  <Tab title="Market-specific markup">
+    Overrides the global markup for one market.
+
+    1. Under **Market-specific markups**, select **Add new markup**.
+    2. Choose the market.
+    3. Enter the on-ramp and off-ramp percentages.
+    4. Select **Yes, add markup**.
+
+    Markets without a specific markup continue to use the global one.
+  </Tab>
+</Tabs>
+
+<Note>
+  The maximum markup is **10%**. A change takes effect on the next quote, so you never ship code to move your pricing.
+</Note>
+
+## IP whitelisting
+
+**Settings > Security**
+
+Restricts API requests to approved addresses or ranges.
+
+<Steps>
+  <Step title="Add your addresses">
+    Under **IP whitelisting**, select **Manage IPs**, then **Add IP address**. IPv4, IPv6 and CIDR notation are supported. Give each entry a label that identifies it, such as "Production API server".
+  </Step>
+
+  <Step title="Add every production egress address">
+    Repeat for each one. A NAT gateway, a load balancer and a background worker can all egress from different addresses.
+  </Step>
+
+  <Step title="Turn it on">
+    Return to **Security** and select **Turn on whitelisting**. At least one address must exist before you can enable it.
+  </Step>
+</Steps>
+
+<Warning>
+  Verify access from an approved address **before you end the session**. Enabling whitelisting with an incomplete list locks out your own integration, and requests from a blocked address return `403`.
+</Warning>
+
+## Audit logs
+
+**Settings > Audit Logs**
+
+A record of account activity, including sign-ins and configuration changes. Each entry carries an **Event ID**, **Event** and **Timestamp**.
+
+Filter by all time, the last 24 hours, 7 days, 30 days, or a custom period. To export: select **Export**, choose a date range, optionally narrow to a single event type, and select **Export** again.
+
+<Tip>
+  Markup changes, key generation and whitelist edits all land here. When a rate or an access problem starts on a particular day, the audit log usually names the change and who made it.
+</Tip>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Custodial wallet" icon="vault" href="/ramp/custodial-wallet" horizontal />
+
+  <Card title="Rates and markup" icon="percent" href="/ramp/rates-and-markup" horizontal />
+
+  <Card title="Security" icon="shield-check" href="/ramp/security" horizontal />
+
+  <Card title="Testing" icon="flask" href="/ramp/testing" horizontal />
+</CardGroup>

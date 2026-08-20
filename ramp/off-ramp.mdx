@@ -55,7 +55,13 @@ curl -X POST 'https://ramp-be.quidax.io/api/v1/merchants/custodial/off_ramp_tran
 }
 ```
 
-The asset amount you send determines the fiat the customer receives. `to_amount` reflects the rate with fees and any markup already applied.
+The asset amount you send determines the fiat the customer receives. `to_amount` reflects the rate with fees and any markup already applied, and the Ramp fee is already deducted from it — it is what the customer gets, not a gross figure to net down.
+
+<Warning>
+  Off-ramp is priced **from the asset amount only**. There is no way to specify a target fiat payout and have Ramp derive the token amount required, on this endpoint or on the sell quote.
+
+  If your product commits to a fiat figure before the customer sends anything, you derive the token amount yourself and absorb the rate movement. See [Guaranteeing a fiat amount to your customer](/ramp/rates-and-markup#guaranteeing-a-fiat-amount-to-your-customer).
+</Warning>
 
 <Card title="Create an off-ramp transaction" icon="code" href="/api-reference/ramp/off-ramp/create-an-off-ramp-transaction" horizontal />
 
@@ -68,7 +74,9 @@ curl -X PUT 'https://ramp-be.quidax.io/api/v1/merchants/custodial/off_ramp_trans
   -d '{ "from_currency": "usdt", "to_currency": "ghs", "from_amount": "3" }'
 ```
 
-Refresh before the customer sends anything. Once the deposit address is live, the quote is fixed.
+Refresh before the customer sends anything.
+
+If the deposit arrives after the quote has expired, Ramp neither rejects it nor holds the funds — it re-quotes at the rate current when the deposit lands and settles on that. Plan for the rate at settlement, not the rate you last showed.
 
 ## 3. Fetch supported institutions
 
