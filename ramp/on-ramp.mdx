@@ -339,6 +339,12 @@ curl -X POST 'https://ramp-be.quidax.io/api/v1/merchants/custodial/auto_swap/ini
 
 Static accounts are available for NGN on request. The customer's BVN is required, and the name on it is what Ramp checks incoming deposits against.
 
+<Note>
+  `bank_account.bank_code` here names the bank the static virtual account is issued at. Confirm the value with your merchant success manager when static accounts are enabled for you — do not reuse a code from the off-ramp [institutions endpoint](/ramp/off-ramp#3-fetch-supported-institutions) without checking, and do not assume the CBN 3-digit code.
+</Note>
+
+{/* TODO — confirm with the team: which namespace `bank_account.bank_code` takes on auto-swap, whether it is the same list as GET /custodial/banks, and which banks can issue static accounts. The `035` in the sample above is unverified. */}
+
 <Card title="Create an auto-swap account" icon="code" href="/api-reference/ramp/on-ramp/create-an-auto-swap-account" horizontal />
 
 ## Identifiers and amounts

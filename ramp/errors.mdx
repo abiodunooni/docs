@@ -145,6 +145,43 @@ Custodial withdrawals use their own, shorter set. There is no `needs_attention` 
 | `completed` | Yes | Settled on-chain. `txid` is populated. |
 | `failed` | Yes | Could not be completed. Funds remain in your custodial wallet. |
 
+## When a transaction needs attention
+
+`needs_attention` is not a failure and not a terminal state. Money is held, not lost, and the resolution depends on which leg stalled.
+
+<AccordionGroup>
+  <Accordion title="The crypto deposit was more or less than the initiated amount" icon="equals">
+    Quidax **holds the stablecoin** and waits for your decision. Nothing is converted, paid out or refunded until you answer.
+
+    You have two options:
+
+    | Your decision | What Quidax does |
+    | --- | --- |
+    | **Approve** | Processes the transaction at the amount actually received |
+    | **Reject** | Refunds the deposit to your customer |
+
+    This is a merchant decision by design — only you know whether crediting a customer who sent 99.4 USDT instead of 100 is acceptable in your product. Build an operational path for it before launch, because the transaction sits until someone answers.
+  </Accordion>
+
+  <Accordion title="The receiving bank rejected the fiat payout" icon="building-columns">
+    Quidax retries the payout. If the customer's bank cannot receive the funds at all, Quidax asks you for an alternative bank account.
+
+    The crypto side is already settled at this point, so the transaction is not unwound — it is redirected. Keep a way to reach the customer for new payout details after a transaction is confirmed.
+  </Accordion>
+
+  <Accordion title="The wrong asset or network was sent" icon="link-slash">
+    Handled case by case. Contact support with the `merchant_reference` and the transaction hash.
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+  **Resolution is manual today.** There is no endpoint to approve or reject a held deposit, and no way to submit an alternative payout account through the API. Resolution runs through your merchant success manager or support.
+</Warning>
+
+{/* TODO — confirm with the team: the resolution SLA for a held deposit awaiting merchant decision, the channel merchants should use to send the approve/reject decision, and whether an API-driven path is planned. */}
+
+Meanwhile: hold the customer's order rather than failing it, alert on `needs_attention` instead of letting it sit in a queue, and never credit the customer until `completed`.
+
 ## Failure modes worth handling
 
 <AccordionGroup>
@@ -171,7 +208,7 @@ Custodial withdrawals use their own, shorter set. There is no `needs_attention` 
   </Accordion>
 
   <Accordion title="The wrong asset or network was sent" icon="link-slash">
-    On off-ramp, sending a different asset, a different amount, or using the wrong network can push the transaction into `needs_attention` for manual review. Contact support with the references.
+    On off-ramp, sending a different asset, a different amount, or using the wrong network can push the transaction into `needs_attention` for manual review. The funds are held, not lost — see [when a transaction needs attention](#when-a-transaction-needs-attention) for what happens next and what Quidax needs from you.
   </Accordion>
 
   <Accordion title="A payout was reversed after acceptance" icon="rotate-left">

@@ -61,7 +61,7 @@ When an on-ramp deposit cannot be converted — a name mismatch, a failed payout
 
     A failed verification returns `400` in real time. Show the returned `account_name` back to your customer for confirmation before moving on.
 
-    Get `bank_code` values from the institutions endpoint:
+    Get `bank_code` values from the institutions endpoint. Use each entry's `code` verbatim — it is Ramp's own identifier, not the CBN or NIBSS code, and the values below are illustrative:
 
     ```bash
     curl 'https://ramp-be.quidax.io/api/v1/merchants/custodial/banks?country=NG' \

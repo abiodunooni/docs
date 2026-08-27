@@ -137,7 +137,7 @@ Practical steps that make either model safer:
 - Register the account on a mailbox your organisation controls, not an individual's inbox.
 - Store the password and the authenticator recovery details in your team's password manager.
 - Make sure at least two people can restore the second factor if a device is lost.
-- Agree in advance who approves and executes withdrawals, and document it.
+- Agree in advance who approves and executes withdrawals, and document it. See [Segregation of duties](#segregation-of-duties).
 - Review who has access whenever someone joins or leaves the team.
 
 ## Two-factor authentication
@@ -164,6 +164,73 @@ Two-factor authentication protects your dashboard and the actions that move fund
 
 <Note>
   On the Wallets and Orderbook platform, two-factor authentication is checked when you create API keys and when you process withdrawals. Setting it up early means both are ready when you need them.
+</Note>
+
+## Segregation of duties
+
+The Wallets and Orderbook platform has no built-in dual approval. Dashboard actions are taken from a single login, so the platform cannot enforce a four-eyes check on a withdrawal on its own.
+
+You can still build a maker-checker flow around the second factor. A dashboard withdrawal needs two things, and they do not have to sit with the same person: access to the dashboard, and a current six-digit code from the authenticator app.
+
+| Role | Holds | Does |
+| --- | --- | --- |
+| **Maker** | The dashboard password | Signs in, prepares the withdrawal, enters the destination and the amount |
+| **Checker** | The authenticator device | Reviews what has been prepared, and supplies the code only if it is correct |
+
+Separating the two means no single person can move funds out unaided.
+
+<Warning>
+  This is a procedural control, not an enforced one. The platform records the action against one account, so its logs cannot evidence that two people were involved. Keep your own record of who initiated and who approved each withdrawal if you need to demonstrate the split to an auditor.
+</Warning>
+
+If your control framework requires enforced dual approval, raise it during onboarding. Until multi-user access ships, [transaction limits](#transaction-limits) and a deliberately small group of people with dashboard access are the controls available alongside a maker-checker split.
+
+## Transaction limits
+
+Quidax can configure transaction limits on your account as an additional control on the value moving through the dashboard and the API.
+
+| Control | What it does |
+| --- | --- |
+| Maximum transaction amount | Caps the value of any single transaction |
+| Cumulative daily limit | Caps the total value processed in a day |
+
+A transaction that would breach a configured limit is rejected rather than queued.
+
+{/* TODO — confirm with the team: which dimensions are configurable (per currency? per direction? dashboard and API, or API only?), and the exact error returned when a limit is breached. Ramp returns `Daily limit reached`; the Core API equivalent is unconfirmed. */}
+
+Limits are set by Quidax and agreed with you during commercial review — you cannot change them yourself from the dashboard. Bring your expected transaction size, daily volume and currencies to onboarding so the right values are in place before you go live, and revisit them when your volume changes.
+
+<Card title="Onboarding" icon="clipboard-check" href="/get-started/onboarding" horizontal />
+
+## Notifications and reporting
+
+Quidax sends an email when a transaction is performed on your account, so activity is visible without anyone signing in to check. Notifications go to the registered account email address.
+
+| You want | Use |
+| --- | --- |
+| To be told when something happens on the account | Transaction emails |
+| Notification inside your own systems | [Webhooks](/wallets/webhooks) |
+| Scheduled reporting or reconciliation | The [deposit](/wallets/deposits) and [withdrawal](/wallets/withdrawals) history endpoints |
+
+{/* TODO — confirm with the team: exactly which events trigger an email, and whether recipients are configurable beyond the registered account address. */}
+
+<Note>
+  There is no per-user notification routing, because there is one login. If several people need visibility, register the account on a shared mailbox or forward the notifications to a distribution list.
+</Note>
+
+## What is not available yet
+
+The Wallets and Orderbook platform is a single-login product today. The consequences are worth designing around before you go live.
+
+| Not available | What it means | Work around it with |
+| --- | --- | --- |
+| Multiple users | One set of credentials covers everyone who needs access | An [ownership model](#account-ownership) agreed up front |
+| Roles and permissions | You cannot separate the person who needs API keys from the person who processes withdrawals | Limiting who holds the password and the authenticator |
+| Per-user activity attribution | Dashboard records show the account, not the individual | Your own record of who did what |
+| Enforced dual approval | The platform does not require a second person to approve a payment | A [maker-checker split](#segregation-of-duties) |
+
+<Note>
+  Multi-user access, with team permissions and per-user activity, is on the roadmap. Your account team can tell you where it currently sits.
 </Note>
 
 ## Account security

@@ -103,6 +103,14 @@ curl 'https://ramp-be.quidax.io/api/v1/merchants/custodial/banks?country=GH' \
 
 Pass `country=NG` for Nigeria. Fetch the list rather than hard-coding it, so newly supported institutions reach your integration without a release.
 
+<Warning>
+  **`code` is Ramp's own institution identifier. It is not the CBN or NIBSS bank code.**
+
+  Take the value verbatim from this endpoint. Do not translate it from another namespace, do not assume a fixed width, and do not build your mapping from a 3-digit list you hold elsewhere — Access Bank is `044` to NIP and a different value here. Codes in this page and the API reference are illustrative; the endpoint is authoritative.
+
+  Key your own bank mapping on `public_id`, which is stable, and treat `code` as the value you pass through unchanged.
+</Warning>
+
 <Tip>
   Mobile money providers and banks come back in the same list. For a GHS consumer flow you usually want to surface the mobile money entries first, since they settle faster and reach more customers.
 </Tip>
@@ -175,6 +183,24 @@ curl -X POST 'https://ramp-be.quidax.io/api/v1/merchants/custodial/off_ramp_tran
   Where `tag` is not `null`, the customer must include it. Omitting a required tag or memo means the deposit is not credited automatically.
 </Warning>
 
+## Deposit detection
+
+Ramp watches the assigned address and moves the transaction to `processing` when the deposit is accepted. Detection is asynchronous — nothing about your on-chain send is gated on it.
+
+| | |
+| --- | --- |
+| Typical detection | Under a minute from confirmation on the network |
+| What it includes | Network confirmations, plus screening to confirm the funds are not from a sanctioned source |
+| Longer than that | Usually an upstream provider delay. Quidax Engineering investigates; the deposit is not lost |
+
+{/* TODO — confirm with the team: p50/p95/p99 detection latency for the major networks, and the worst observed. Merchants with a deadline on their own side keep asking for percentiles, and "usually under a minute" does not answer it. */}
+
+<Warning>
+  Detection latency is a typical figure, not a guarantee, and Quidax does not publish a percentile SLA for it. Do not couple a deadline on your side — a signing window, a held quote, a customer-facing timer — to Ramp detecting the deposit. Send, record the transaction hash, and let `sell_transaction.processing` tell you when it landed.
+</Warning>
+
+If your flow has a hard timing constraint, raise it with your merchant success manager during onboarding rather than designing around the figure above.
+
 ## 6. Track it to completion
 
 | Event | State |
@@ -239,6 +265,22 @@ If you show customers a net figure before they commit, subtract stamp duty yours
 An off-ramp transaction that never receives its deposit is **abandoned after 24 hours**. That is generous compared with the 36-minute on-ramp window, because the customer has to make an on-chain transfer, but it still means a deposit address does not stay live indefinitely.
 
 Abandonment does not emit a webhook. Poll the transaction or reconcile with the list endpoints if you need to detect it.
+
+## Payout timing and cutoffs
+
+**NGN payouts have no customer-facing cutoff window.** They are processed in real time, including at weekends and outside normal banking hours. There is no overnight queue and no Monday-morning batch, so you can promise your customers same-session settlement regardless of when they transact.
+
+| Situation | What happens |
+| --- | --- |
+| Payout submitted at any hour, any day | Processed in real time |
+| NIBSS or the receiving bank is unavailable | Ramp retries once the service is back. No action needed from you |
+| The receiving bank rejects the payout | Ramp retries, or asks you for an alternative account. See [when a transaction needs attention](/ramp/errors#when-a-transaction-needs-attention) |
+
+<Note>
+  A retry after an outage means the transaction stays open longer than the typical figure, without failing. Do not time out an off-ramp on your side and tell the customer it failed — wait for `sell_transaction.successful` or `sell_transaction.failed`.
+</Note>
+
+{/* TODO — confirm with the team: whether GHS mobile money has provider-side windows, and whether the no-cutoff position holds for every NGN payout rail or only the primary one. Confirmed for NGN as of this writing. */}
 
 ## Payout reversals
 

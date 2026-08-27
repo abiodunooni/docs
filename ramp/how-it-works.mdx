@@ -211,9 +211,11 @@ Every Ramp transaction has two legs: a fiat leg and a crypto leg. Ramp converts 
   </Accordion>
 
   <Accordion title="Settlement timing" icon="stopwatch">
-    On-ramp fiat is typically confirmed in under 30 seconds, with the stablecoin send bound by the network's block time. Off-ramp payouts are typically under 2 minutes for NGN and under 5 minutes for GHS mobile money.
+    On-ramp fiat is typically confirmed in under 30 seconds, with the stablecoin send bound by the network's block time. Off-ramp payouts are typically under 2 minutes for NGN and under 5 minutes for GHS mobile money. Crypto deposits on off-ramp are typically detected in under a minute.
 
-    Most local rails have processing hours while blockchains run continuously. Transactions submitted outside those hours are queued and processed when the next window opens.
+    NGN payouts have no customer-facing cutoff window — they are processed in real time, including at weekends and outside banking hours. If NIBSS or the receiving bank is unavailable, Ramp retries once the service is back, with no action needed from you.
+
+    <Card title="Payout timing and cutoffs" icon="stopwatch" href="/ramp/off-ramp#payout-timing-and-cutoffs" horizontal />
   </Accordion>
 </AccordionGroup>
 

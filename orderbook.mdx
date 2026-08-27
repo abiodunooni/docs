@@ -22,6 +22,42 @@ Order Book is where you buy and sell on Quidax directly. You place orders agains
   </Card>
 </CardGroup>
 
+## What you can do in the dashboard
+
+Order Book sits in the same dashboard as the rest of your Quidax business account, so trading is one of several things you do from it.
+
+<Columns cols={2}>
+  <Card title="Trade" icon="chart-candlestick" horizontal>
+    Buy and sell against the live book with market and limit orders.
+  </Card>
+
+  <Card title="Convert" icon="arrow-right-arrow-left" horizontal>
+    Swap one currency for another at a quoted rate.
+  </Card>
+
+  <Card title="Fund and cash out" icon="building-columns" horizontal>
+    Deposit naira into your trading balance, and withdraw it to a bank account.
+  </Card>
+
+  <Card title="Withdraw crypto" icon="paper-plane" horizontal>
+    Send on-chain, or move funds internally between your accounts.
+  </Card>
+
+  <Card title="Issue API keys" icon="key" horizontal>
+    Create the credentials that cover both Wallets and Orderbook.
+  </Card>
+
+  <Card title="Set your webhook" icon="webhook" horizontal>
+    Point transaction events at your own endpoint.
+  </Card>
+</Columns>
+
+<Warning>
+  **Withdrawals and API key creation both need a six-digit code from your authenticator app.** Set up two-factor authentication as your first action on the dashboard, and make sure whoever holds the authenticator is reachable before your first withdrawal.
+</Warning>
+
+<Card title="Two-factor authentication" icon="shield-check" href="/get-started/create-an-account#two-factor-authentication" horizontal />
+
 ## Order types
 
 <Tabs>
@@ -172,6 +208,25 @@ Two rules cause most rejected orders.
 
 An order can fill across several trades — a large limit order may be matched by many smaller counterparties. `DONE` means the whole order completed, not that it was a single trade.
 
+## Controls and governance
+
+Order Book runs on your Quidax business account, so the controls that govern it are account-level rather than specific to trading. They apply equally to Wallets.
+
+| Control | What it gives you |
+| --- | --- |
+| [Two-factor authentication](/get-started/create-an-account#two-factor-authentication) | A six-digit code is required to withdraw funds or create API keys |
+| [Segregation of duties](/get-started/create-an-account#segregation-of-duties) | A maker-checker split, by separating who initiates a withdrawal from who holds the authenticator |
+| [Transaction limits](/get-started/create-an-account#transaction-limits) | A maximum single transaction amount and a cumulative daily limit, configured by Quidax |
+| [Notifications](/get-started/create-an-account#notifications-and-reporting) | Email when a transaction is performed, and webhooks for your own systems |
+
+<Note>
+  The platform has one login today, with no roles, permissions or per-user activity. If your control framework depends on those, read [what is not available yet](/get-started/create-an-account#what-is-not-available-yet) before you design your process around the dashboard.
+</Note>
+
+<Card title="Account controls" icon="user-check" href="/get-started/create-an-account#account-ownership" horizontal>
+  Ownership models, dual approval, limits and notifications.
+</Card>
+
 ## Order book or swap?
 
 | | Order Book | [Swap](/wallets/swap) |
@@ -193,4 +248,6 @@ If you just want to turn one currency into another and get on with your day, use
   <Card title="Coverage and limits" icon="globe" href="/wallets/coverage" horizontal />
 
   <Card title="How we price" icon="tag" href="/get-started/pricing" horizontal />
+
+  <Card title="Account controls" icon="user-check" href="/get-started/create-an-account#account-ownership" horizontal />
 </CardGroup>
