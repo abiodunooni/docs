@@ -1,4 +1,342 @@
 ---
 title: "Cancel a withdrawal"
-openapi: "/openapi/wallets.json POST /users/{user_id}/withdraws/{withdrawal_id}/cancel"
 ---
+
+This endpoint is used to cancel initiated withdrawal.
+
+# OpenAPI definition
+
+```json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API 3.0",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "https://openapi.quidax.io/exchange-open-api/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "x-bearer-format": "bearer",
+        "x-default": "api_key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/users/{user_id}/withdraws/{withdrawal_id}/cancel": {
+      "post": {
+        "summary": "Cancel withdrawal",
+        "description": "This endpoint is used to cancel initiated withdrawal.",
+        "operationId": "cancel-withdrawal",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "The account user id.",
+            "schema": {
+              "type": "string",
+              "default": "me"
+            },
+            "required": true
+          },
+          {
+            "name": "withdrawal_id",
+            "in": "path",
+            "description": "An ID for the withdrawal to cancel",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"success\",\n  \"message\": \"Successful\",\n  \"data\": {\n    \"id\": \"CW-36ebbb20fc93456d8503625e9dee9829\",\n    \"reference\": \"cmnnnncc\",\n    \"type\": \"coin_address\",\n    \"currency\": \"usdt\",\n    \"amount\": \"1.4538000000000000\",\n    \"fee\": \"0.5000000000000000\",\n    \"total\": \"1.9538000000000000\",\n    \"txId\": \"\",\n    \"narration\": null,\n    \"status\": \"cancelled\",\n    \"reason\": null,\n    \"wallet\": {\n      \"id\": null,\n      \"currency\": \"usdt\",\n      \"balance\": \"2.453800\",\n      \"locked\": \"0.0000000000\",\n      \"staked\": \"0.0000000000\",\n      \"converted_balance\": \"3348.946240\",\n      \"reference_currency\": \"NGN\",\n      \"is_crypto\": \"1\",\n      \"created_at\": \"2026-02-10T11:48:38.000Z\",\n      \"updated_at\": \"2026-02-26T10:41:48.000Z\",\n      \"deposit_address\": \"bc1qel75acv9tdwqdx86tla6yyxagp2fvq2tntxntp\",\n      \"destination_tag\": null\n    },\n    \"user\": {\n      \"id\": \"24rhpmow\",\n      \"sn\": \"Qw1os7uj7\",\n      \"email\": \"test@gmail.com\",\n      \"reference\": null,\n      \"first_name\": \"test\",\n      \"last_name\": \"tester\",\n      \"display_name\": \"Adigun Efon Exchange\",\n      \"created_at\": \"2026-02-09T13:22:14.000Z\",\n      \"updated_at\": \"2026-02-13T10:45:42.000Z\"\n    },\n    \"recipient\": {\n      \"type\": \"coin_address\",\n      \"details\": {\n        \"address\": \"0xEBd827CC80D8BD95B42824467D45A6faAe91A05e\",\n        \"name\": \"N/A\",\n        \"destination_tag\": \"\"\n      }\n    },\n    \"transaction_note\": null,\n    \"created_at\": \"2026-02-26T10:38:47Z\",\n    \"done_at\": \"2026-02-26T10:38:47Z\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "CW-36ebbb20fc93456d8503625e9dee9829"
+                        },
+                        "reference": {
+                          "type": "string",
+                          "example": "cmnnnncc"
+                        },
+                        "type": {
+                          "type": "string",
+                          "example": "coin_address"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "usdt"
+                        },
+                        "amount": {
+                          "type": "string",
+                          "example": "1.4538000000000000"
+                        },
+                        "fee": {
+                          "type": "string",
+                          "example": "0.5000000000000000"
+                        },
+                        "total": {
+                          "type": "string",
+                          "example": "1.9538000000000000"
+                        },
+                        "txId": {
+                          "type": "string",
+                          "example": ""
+                        },
+                        "narration": {},
+                        "status": {
+                          "type": "string",
+                          "example": "cancelled"
+                        },
+                        "reason": {},
+                        "wallet": {
+                          "type": "object",
+                          "properties": {
+                            "id": {},
+                            "currency": {
+                              "type": "string",
+                              "example": "usdt"
+                            },
+                            "balance": {
+                              "type": "string",
+                              "example": "2.453800"
+                            },
+                            "locked": {
+                              "type": "string",
+                              "example": "0.0000000000"
+                            },
+                            "staked": {
+                              "type": "string",
+                              "example": "0.0000000000"
+                            },
+                            "converted_balance": {
+                              "type": "string",
+                              "example": "3348.946240"
+                            },
+                            "reference_currency": {
+                              "type": "string",
+                              "example": "NGN"
+                            },
+                            "is_crypto": {
+                              "type": "string",
+                              "example": "1"
+                            },
+                            "created_at": {
+                              "type": "string",
+                              "example": "2026-02-10T11:48:38.000Z"
+                            },
+                            "updated_at": {
+                              "type": "string",
+                              "example": "2026-02-26T10:41:48.000Z"
+                            },
+                            "deposit_address": {
+                              "type": "string",
+                              "example": "bc1qel75acv9tdwqdx86tla6yyxagp2fvq2tntxntp"
+                            },
+                            "destination_tag": {}
+                          }
+                        },
+                        "user": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "24rhpmow"
+                            },
+                            "sn": {
+                              "type": "string",
+                              "example": "Qw1os7uj7"
+                            },
+                            "email": {
+                              "type": "string",
+                              "example": "test@gmail.com"
+                            },
+                            "reference": {},
+                            "first_name": {
+                              "type": "string",
+                              "example": "test"
+                            },
+                            "last_name": {
+                              "type": "string",
+                              "example": "tester"
+                            },
+                            "display_name": {
+                              "type": "string",
+                              "example": "Adigun Efon Exchange"
+                            },
+                            "created_at": {
+                              "type": "string",
+                              "example": "2026-02-09T13:22:14.000Z"
+                            },
+                            "updated_at": {
+                              "type": "string",
+                              "example": "2026-02-13T10:45:42.000Z"
+                            }
+                          }
+                        },
+                        "recipient": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "example": "coin_address"
+                            },
+                            "details": {
+                              "type": "object",
+                              "properties": {
+                                "address": {
+                                  "type": "string",
+                                  "example": "0xEBd827CC80D8BD95B42824467D45A6faAe91A05e"
+                                },
+                                "name": {
+                                  "type": "string",
+                                  "example": "N/A"
+                                },
+                                "destination_tag": {
+                                  "type": "string",
+                                  "example": ""
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "transaction_note": {},
+                        "created_at": {
+                          "type": "string",
+                          "example": "2026-02-26T10:38:47Z"
+                        },
+                        "done_at": {
+                          "type": "string",
+                          "example": "2026-02-26T10:38:47Z"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"withdrawal entry with the id : vvv doesn't exist\",\n  \"data\": {\n    \"code\": \"110112\",\n    \"message\": \"withdrawal entry with the id : vvv doesn't exist\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "withdrawal entry with the id : vvv doesn't exist"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "example": "110112"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "withdrawal entry with the id : vvv doesn't exist"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"Sub-account with ID: mef doesn't exist\",\n  \"data\": {\n    \"code\": \"E0104\",\n    \"message\": \"Sub-account with ID: mef doesn't exist\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Sub-account with ID: mef doesn't exist"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "example": "E0104"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Sub-account with ID: mef doesn't exist"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "6981ba5faf9470ee082aeece:6981ba5faf9470ee082aef06"
+}
+```

@@ -1,4 +1,11 @@
 ---
 title: "Fetch a withdrawal by reference"
-openapi: "/openapi/wallets.json GET /users/{user_id}/withdraws/reference/{reference}"
 ---
+
+Fetch a withdrawal using the unique reference supplied when it was created.
+
+## Endpoint
+
+`GET /users/{user_id}/withdraws/reference/{reference}`
+
+Use this endpoint after a timeout before retrying a withdrawal. If the withdrawal is found, do not submit it again. A missing reference means the original request was not recorded.

@@ -1,4 +1,398 @@
 ---
 title: "Fetch a deposit"
-openapi: "/openapi/wallets.json GET /users/{user_id}/deposits/{deposit_id}"
 ---
+
+Get details of a deposits.
+
+# OpenAPI definition
+
+```json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API 3.0",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "https://openapi.quidax.io/exchange-open-api/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "x-bearer-format": "bearer",
+        "x-default": "api_key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/users/{user_id}/deposits/{deposit_id}": {
+      "get": {
+        "summary": "Fetch a Deposit",
+        "description": "Get details of a deposits.",
+        "operationId": "deposits-1",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "The User ID. Use 'me' if fetching wallets of main authenticated user, use the user_id if fetching for Sub-account linked to the authenticated user.",
+            "schema": {
+              "type": "string",
+              "default": "me"
+            },
+            "required": true
+          },
+          {
+            "name": "deposit_id",
+            "in": "path",
+            "description": "An ID for the deposit to fetch",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"success\",\n  \"message\": \"Successful\",\n  \"data\": {\n    \"id\": \"a46bb02a55e54b0da91a69c3cd6b3309\",\n    \"type\": \"coin_address\",\n    \"currency\": \"USDT\",\n    \"amount\": \"1.0000000000000000\",\n    \"fee\": \"0.0000000000000000\",\n    \"txid\": \"0x009f3ae59ef9b1efcca3d5724051fcfdb4543ba81c70b9ad397f3eafe44c7042\",\n    \"status\": \"accepted\",\n    \"reason\": null,\n    \"wallet\": {\n      \"id\": \"206735f39627480d820912cbf8c50a95\",\n      \"name\": \"USDT\",\n      \"currency\": \"usdt\",\n      \"balance\": \"4.726900\",\n      \"locked\": \"0.0000000000\",\n      \"staked\": \"0.0000000000\",\n      \"user\": {\n        \"id\": \"24rhpmow\",\n        \"sn\": \"Qw1os7uj7\",\n        \"email\": \"jolalekan+merchant@quidax.com\",\n        \"reference\": null,\n        \"first_name\": \"test\",\n        \"last_name\": \"tester\",\n        \"display_name\": \"Adigun Efon Exchange\",\n        \"created_at\": \"2026-02-09T13:22:14.000Z\",\n        \"updated_at\": \"2026-02-13T10:45:42.000Z\"\n      },\n      \"converted_balance\": \"6595.207225\",\n      \"reference_currency\": \"NGN\",\n      \"is_crypto\": true,\n      \"created_at\": \"2026-02-10T11:48:38.000Z\",\n      \"updated_at\": \"2026-02-13T09:55:03.000Z\",\n      \"blockchain_enabled\": true,\n      \"default_network\": \"bep20\",\n      \"networks\": [\n        {\n          \"id\": \"bep20\",\n          \"name\": \"Binance Smart Chain\",\n          \"deposits_enabled\": true,\n          \"withdraws_enabled\": true\n        },\n        {\n          \"id\": \"polygon\",\n          \"name\": \"Polygon Network\",\n          \"deposits_enabled\": true,\n          \"withdraws_enabled\": true\n        },\n        {\n          \"id\": \"trc20\",\n          \"name\": \"Tron Network\",\n          \"deposits_enabled\": true,\n          \"withdraws_enabled\": true\n        },\n        {\n          \"id\": \"erc20\",\n          \"name\": \"Ethereum Network\",\n          \"deposits_enabled\": true,\n          \"withdraws_enabled\": true\n        },\n        {\n          \"id\": \"solana\",\n          \"name\": \"Solana Network\",\n          \"deposits_enabled\": true,\n          \"withdraws_enabled\": true\n        },\n        {\n          \"id\": \"ton network\",\n          \"name\": \"Ton Network\",\n          \"deposits_enabled\": true,\n          \"withdraws_enabled\": true\n        },\n        {\n          \"id\": \"celo\",\n          \"name\": \"CELO\",\n          \"deposits_enabled\": true,\n          \"withdraws_enabled\": true\n        },\n        {\n          \"id\": \"optimism\",\n          \"name\": \"OP Mainnet\",\n          \"deposits_enabled\": true,\n          \"withdraws_enabled\": true\n        },\n        {\n          \"id\": \"arbitrum\",\n          \"name\": \"Arbitrum One\",\n          \"deposits_enabled\": true,\n          \"withdraws_enabled\": false\n        },\n        {\n          \"id\": \"lisk\",\n          \"name\": \"LISK\",\n          \"deposits_enabled\": true,\n          \"withdraws_enabled\": true\n        }\n      ],\n      \"deposit_address\": \"bc1qel75acv9tdwqdx86tla6yyxagp2fvq2tntxntp\",\n      \"destination_tag\": null\n    },\n    \"user\": {\n      \"id\": \"24rhpmow\",\n      \"sn\": \"Qw1os7uj7\",\n      \"email\": \"jolalekan+merchant@quidax.com\",\n      \"reference\": null,\n      \"first_name\": \"test\",\n      \"last_name\": \"tester\",\n      \"display_name\": \"Adigun Efon Exchange\",\n      \"created_at\": \"2026-02-09T13:22:14.000Z\",\n      \"updated_at\": \"2026-02-13T10:45:42.000Z\"\n    },\n    \"created_at\": \"2026-02-10T11:48:57Z\",\n    \"done_at\": null,\n    \"payment_transaction\": {\n      \"status\": \"confirmed\",\n      \"confirmations\": 1,\n      \"required_confirmations\": 1\n    },\n    \"payment_address\": {\n      \"id\": \"5aa8fa21383743a1b9a0bdb3b00ad8cd\",\n      \"reference\": null,\n      \"currency\": \"USDT\",\n      \"address\": \"0xf145464EB467582b4dE10B20edAff9F164F42d06\",\n      \"network\": null,\n      \"user\": null,\n      \"destination_tag\": null,\n      \"total_payments\": \"4.0000000010000000\",\n      \"created_at\": \"2026-02-10T11:35:12.000Z\",\n      \"updated_at\": \"2026-02-10T11:35:12.000Z\"\n    }\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "a46bb02a55e54b0da91a69c3cd6b3309"
+                        },
+                        "type": {
+                          "type": "string",
+                          "example": "coin_address"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "USDT"
+                        },
+                        "amount": {
+                          "type": "string",
+                          "example": "1.0000000000000000"
+                        },
+                        "fee": {
+                          "type": "string",
+                          "example": "0.0000000000000000"
+                        },
+                        "txid": {
+                          "type": "string",
+                          "example": "0x009f3ae59ef9b1efcca3d5724051fcfdb4543ba81c70b9ad397f3eafe44c7042"
+                        },
+                        "status": {
+                          "type": "string",
+                          "example": "accepted"
+                        },
+                        "reason": {},
+                        "wallet": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "206735f39627480d820912cbf8c50a95"
+                            },
+                            "name": {
+                              "type": "string",
+                              "example": "USDT"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "example": "usdt"
+                            },
+                            "balance": {
+                              "type": "string",
+                              "example": "4.726900"
+                            },
+                            "locked": {
+                              "type": "string",
+                              "example": "0.0000000000"
+                            },
+                            "staked": {
+                              "type": "string",
+                              "example": "0.0000000000"
+                            },
+                            "user": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "example": "24rhpmow"
+                                },
+                                "sn": {
+                                  "type": "string",
+                                  "example": "Qw1os7uj7"
+                                },
+                                "email": {
+                                  "type": "string",
+                                  "example": "jolalekan+merchant@quidax.com"
+                                },
+                                "reference": {},
+                                "first_name": {
+                                  "type": "string",
+                                  "example": "test"
+                                },
+                                "last_name": {
+                                  "type": "string",
+                                  "example": "tester"
+                                },
+                                "display_name": {
+                                  "type": "string",
+                                  "example": "Adigun Efon Exchange"
+                                },
+                                "created_at": {
+                                  "type": "string",
+                                  "example": "2026-02-09T13:22:14.000Z"
+                                },
+                                "updated_at": {
+                                  "type": "string",
+                                  "example": "2026-02-13T10:45:42.000Z"
+                                }
+                              }
+                            },
+                            "converted_balance": {
+                              "type": "string",
+                              "example": "6595.207225"
+                            },
+                            "reference_currency": {
+                              "type": "string",
+                              "example": "NGN"
+                            },
+                            "is_crypto": {
+                              "type": "boolean",
+                              "example": true,
+                              "default": true
+                            },
+                            "created_at": {
+                              "type": "string",
+                              "example": "2026-02-10T11:48:38.000Z"
+                            },
+                            "updated_at": {
+                              "type": "string",
+                              "example": "2026-02-13T09:55:03.000Z"
+                            },
+                            "blockchain_enabled": {
+                              "type": "boolean",
+                              "example": true,
+                              "default": true
+                            },
+                            "default_network": {
+                              "type": "string",
+                              "example": "bep20"
+                            },
+                            "networks": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "example": "bep20"
+                                  },
+                                  "name": {
+                                    "type": "string",
+                                    "example": "Binance Smart Chain"
+                                  },
+                                  "deposits_enabled": {
+                                    "type": "boolean",
+                                    "example": true,
+                                    "default": true
+                                  },
+                                  "withdraws_enabled": {
+                                    "type": "boolean",
+                                    "example": true,
+                                    "default": true
+                                  }
+                                }
+                              }
+                            },
+                            "deposit_address": {
+                              "type": "string",
+                              "example": "bc1qel75acv9tdwqdx86tla6yyxagp2fvq2tntxntp"
+                            },
+                            "destination_tag": {}
+                          }
+                        },
+                        "user": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "24rhpmow"
+                            },
+                            "sn": {
+                              "type": "string",
+                              "example": "Qw1os7uj7"
+                            },
+                            "email": {
+                              "type": "string",
+                              "example": "jolalekan+merchant@quidax.com"
+                            },
+                            "reference": {},
+                            "first_name": {
+                              "type": "string",
+                              "example": "test"
+                            },
+                            "last_name": {
+                              "type": "string",
+                              "example": "tester"
+                            },
+                            "display_name": {
+                              "type": "string",
+                              "example": "Adigun Efon Exchange"
+                            },
+                            "created_at": {
+                              "type": "string",
+                              "example": "2026-02-09T13:22:14.000Z"
+                            },
+                            "updated_at": {
+                              "type": "string",
+                              "example": "2026-02-13T10:45:42.000Z"
+                            }
+                          }
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "example": "2026-02-10T11:48:57Z"
+                        },
+                        "done_at": {},
+                        "payment_transaction": {
+                          "type": "object",
+                          "properties": {
+                            "status": {
+                              "type": "string",
+                              "example": "confirmed"
+                            },
+                            "confirmations": {
+                              "type": "integer",
+                              "example": 1,
+                              "default": 0
+                            },
+                            "required_confirmations": {
+                              "type": "integer",
+                              "example": 1,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "payment_address": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "5aa8fa21383743a1b9a0bdb3b00ad8cd"
+                            },
+                            "reference": {},
+                            "currency": {
+                              "type": "string",
+                              "example": "USDT"
+                            },
+                            "address": {
+                              "type": "string",
+                              "example": "0xf145464EB467582b4dE10B20edAff9F164F42d06"
+                            },
+                            "network": {},
+                            "user": {},
+                            "destination_tag": {},
+                            "total_payments": {
+                              "type": "string",
+                              "example": "4.0000000010000000"
+                            },
+                            "created_at": {
+                              "type": "string",
+                              "example": "2026-02-10T11:35:12.000Z"
+                            },
+                            "updated_at": {
+                              "type": "string",
+                              "example": "2026-02-10T11:35:12.000Z"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"Deposit with ID: 'nnbvn' doesn't exist.\",\n  \"data\": {\n    \"code\": \"E0204\",\n    \"message\": \"Deposit with ID: 'nnbvn' doesn't exist.\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Deposit with ID: 'nnbvn' doesn't exist."
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "example": "E0204"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Deposit with ID: 'nnbvn' doesn't exist."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "6981ba5faf9470ee082aeece:6981ba5faf9470ee082aef02"
+}
+```

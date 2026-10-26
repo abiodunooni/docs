@@ -1,4 +1,455 @@
 ---
 title: "Fetch deposits across all sub-accounts"
-openapi: "/openapi/wallets.json GET /users/deposits/all"
 ---
+
+Fetch all deposits made by sub-users.
+
+> 📘 Understanding the sections below is required to fully comprehend how Quidax handles pagination.
+>
+> [How Quidax handles pagination](https://docs.quidax.com/docs/pagination)
+
+# OpenAPI definition
+
+```json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API 3.0",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "https://openapi.quidax.io/exchange-open-api/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "x-bearer-format": "bearer",
+        "x-default": "api_key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/users/deposits/all": {
+      "get": {
+        "summary": "Fetch deposits made by sub-users",
+        "description": "Fetch all deposits made by sub-users.",
+        "operationId": "fetch-all-deposits-1",
+        "parameters": [
+          {
+            "name": "currency",
+            "in": "query",
+            "description": "Allowed Currencies values: usdt, btc, ltc, eth, xrp, usdt, dash, trx, doge, xrp, bnb, matic, shib, axs, safemoon, cake, xlm, aave, link.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "btc",
+                "usdt",
+                "eth",
+                "xaut",
+                "usat",
+                "xrp",
+                "dash",
+                "ltc",
+                "trx",
+                "doge",
+                "bnb",
+                "pol",
+                "usdc",
+                "aave",
+                "shib",
+                "link",
+                "cake",
+                "xlm",
+                "ada",
+                "bch",
+                "floki",
+                "sol",
+                "cfx",
+                "ton",
+                "sui",
+                "zk",
+                "lsk",
+                "axcnh",
+                "qdx",
+                "cngn"
+              ],
+              "default": "btc"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "Allowed State values: submitting, canceled, submitted, rejected, failed, accepted, checked.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "submitting",
+                "canceled",
+                "submitted",
+                "rejected",
+                "failed",
+                "accepted",
+                "checked."
+              ]
+            }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "description": "A timestamp from which to start listing transaction, e.g. 2017-09-24T00:00:05.000Z, 2017-09-21",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "description": "A timestamp at which to stop listing transaction e.g. 2017-09-24T00:00:05.000Z, 2017-09-21",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"success\",\n  \"message\": \"Successful\",\n  \"data\": [\n    {\n      \"id\": \"757e7bd0790b4945abf2d0dc714256fc\",\n      \"type\": \"coin_address\",\n      \"currency\": \"USDT\",\n      \"amount\": \"1.0000000000000000\",\n      \"fee\": \"0.0000000000000000\",\n      \"txid\": \"0x0b88a4bde5bbb44da361b9012f7fa42afbf5052dd86f467681567053e140f2e5\",\n      \"status\": \"accepted\",\n      \"reason\": null,\n      \"wallet\": {\n        \"id\": \"4dd376f662844dce82cd8638af35f908\",\n        \"name\": \"USDT\",\n        \"currency\": \"usdt\",\n        \"balance\": \"1.000000\",\n        \"locked\": \"0.0000000000\",\n        \"staked\": \"0.0000000000\",\n        \"user\": {\n          \"id\": \"okbj9k38\",\n          \"sn\": \"Qvp1qdic2\",\n          \"email\": \"test2@gmail.com\",\n          \"reference\": null,\n          \"first_name\": \"test\",\n          \"last_name\": \"testerf\",\n          \"display_name\": null,\n          \"created_at\": \"2026-02-13T10:41:07.000Z\",\n          \"updated_at\": \"2026-02-13T10:47:55.000Z\"\n        },\n        \"converted_balance\": \"1.000000\",\n        \"reference_currency\": \"USDT\",\n        \"is_crypto\": true,\n        \"created_at\": \"2026-02-18T16:36:32.000Z\",\n        \"updated_at\": \"2026-02-18T16:36:33.000Z\",\n        \"blockchain_enabled\": true,\n        \"default_network\": \"bep20\",\n        \"networks\": [\n          {\n            \"id\": \"bep20\",\n            \"name\": \"Binance Smart Chain\",\n            \"deposits_enabled\": true,\n            \"withdraws_enabled\": true\n          },\n          {\n            \"id\": \"polygon\",\n            \"name\": \"Polygon Network\",\n            \"deposits_enabled\": true,\n            \"withdraws_enabled\": true\n          },\n          {\n            \"id\": \"trc20\",\n            \"name\": \"Tron Network\",\n            \"deposits_enabled\": true,\n            \"withdraws_enabled\": true\n          },\n          {\n            \"id\": \"erc20\",\n            \"name\": \"Ethereum Network\",\n            \"deposits_enabled\": true,\n            \"withdraws_enabled\": true\n          },\n          {\n            \"id\": \"solana\",\n            \"name\": \"Solana Network\",\n            \"deposits_enabled\": true,\n            \"withdraws_enabled\": true\n          },\n          {\n            \"id\": \"ton network\",\n            \"name\": \"Ton Network\",\n            \"deposits_enabled\": true,\n            \"withdraws_enabled\": true\n          },\n          {\n            \"id\": \"celo\",\n            \"name\": \"CELO\",\n            \"deposits_enabled\": true,\n            \"withdraws_enabled\": true\n          },\n          {\n            \"id\": \"optimism\",\n            \"name\": \"OP Mainnet\",\n            \"deposits_enabled\": true,\n            \"withdraws_enabled\": true\n          },\n          {\n            \"id\": \"arbitrum\",\n            \"name\": \"Arbitrum One\",\n            \"deposits_enabled\": true,\n            \"withdraws_enabled\": false\n          },\n          {\n            \"id\": \"lisk\",\n            \"name\": \"LISK\",\n            \"deposits_enabled\": true,\n            \"withdraws_enabled\": true\n          }\n        ],\n        \"deposit_address\": \"bc1qfdzr0gsfxjpe8ah46t6npk0eyhq2p5047dnj0z\",\n        \"destination_tag\": null\n      },\n      \"user\": {\n        \"id\": \"okbj9k38\",\n        \"sn\": \"Qvp1qdic2\",\n        \"email\": \"test2@gmail.com\",\n        \"reference\": null,\n        \"first_name\": \"test\",\n        \"last_name\": \"testerf\",\n        \"display_name\": null,\n        \"created_at\": \"2026-02-13T10:41:07.000Z\",\n        \"updated_at\": \"2026-02-13T10:47:55.000Z\"\n      },\n      \"created_at\": \"2026-02-18T16:36:30Z\",\n      \"done_at\": null,\n      \"payment_transaction\": {\n        \"status\": \"confirmed\",\n        \"confirmations\": 1,\n        \"required_confirmations\": 1\n      },\n      \"payment_address\": {\n        \"id\": \"66afede22eea49508253215e0c136a74\",\n        \"reference\": null,\n        \"currency\": \"USDT\",\n        \"address\": \"0xcf15f42f933DFBB724AC3e70Edb4Fb11d6Fc4691\",\n        \"network\": null,\n        \"user\": null,\n        \"destination_tag\": null,\n        \"total_payments\": \"1.0000000000000000\",\n        \"created_at\": \"2026-02-18T16:30:42.000Z\",\n        \"updated_at\": \"2026-02-18T16:30:42.000Z\"\n      }\n    }\n  ]\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successful"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "757e7bd0790b4945abf2d0dc714256fc"
+                          },
+                          "type": {
+                            "type": "string",
+                            "example": "coin_address"
+                          },
+                          "currency": {
+                            "type": "string",
+                            "example": "USDT"
+                          },
+                          "amount": {
+                            "type": "string",
+                            "example": "1.0000000000000000"
+                          },
+                          "fee": {
+                            "type": "string",
+                            "example": "0.0000000000000000"
+                          },
+                          "txid": {
+                            "type": "string",
+                            "example": "0x0b88a4bde5bbb44da361b9012f7fa42afbf5052dd86f467681567053e140f2e5"
+                          },
+                          "status": {
+                            "type": "string",
+                            "example": "accepted"
+                          },
+                          "reason": {},
+                          "wallet": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "example": "4dd376f662844dce82cd8638af35f908"
+                              },
+                              "name": {
+                                "type": "string",
+                                "example": "USDT"
+                              },
+                              "currency": {
+                                "type": "string",
+                                "example": "usdt"
+                              },
+                              "balance": {
+                                "type": "string",
+                                "example": "1.000000"
+                              },
+                              "locked": {
+                                "type": "string",
+                                "example": "0.0000000000"
+                              },
+                              "staked": {
+                                "type": "string",
+                                "example": "0.0000000000"
+                              },
+                              "user": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "example": "okbj9k38"
+                                  },
+                                  "sn": {
+                                    "type": "string",
+                                    "example": "Qvp1qdic2"
+                                  },
+                                  "email": {
+                                    "type": "string",
+                                    "example": "test2@gmail.com"
+                                  },
+                                  "reference": {},
+                                  "first_name": {
+                                    "type": "string",
+                                    "example": "test"
+                                  },
+                                  "last_name": {
+                                    "type": "string",
+                                    "example": "testerf"
+                                  },
+                                  "display_name": {},
+                                  "created_at": {
+                                    "type": "string",
+                                    "example": "2026-02-13T10:41:07.000Z"
+                                  },
+                                  "updated_at": {
+                                    "type": "string",
+                                    "example": "2026-02-13T10:47:55.000Z"
+                                  }
+                                }
+                              },
+                              "converted_balance": {
+                                "type": "string",
+                                "example": "1.000000"
+                              },
+                              "reference_currency": {
+                                "type": "string",
+                                "example": "USDT"
+                              },
+                              "is_crypto": {
+                                "type": "boolean",
+                                "example": true,
+                                "default": true
+                              },
+                              "created_at": {
+                                "type": "string",
+                                "example": "2026-02-18T16:36:32.000Z"
+                              },
+                              "updated_at": {
+                                "type": "string",
+                                "example": "2026-02-18T16:36:33.000Z"
+                              },
+                              "blockchain_enabled": {
+                                "type": "boolean",
+                                "example": true,
+                                "default": true
+                              },
+                              "default_network": {
+                                "type": "string",
+                                "example": "bep20"
+                              },
+                              "networks": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "string",
+                                      "example": "bep20"
+                                    },
+                                    "name": {
+                                      "type": "string",
+                                      "example": "Binance Smart Chain"
+                                    },
+                                    "deposits_enabled": {
+                                      "type": "boolean",
+                                      "example": true,
+                                      "default": true
+                                    },
+                                    "withdraws_enabled": {
+                                      "type": "boolean",
+                                      "example": true,
+                                      "default": true
+                                    }
+                                  }
+                                }
+                              },
+                              "deposit_address": {
+                                "type": "string",
+                                "example": "bc1qfdzr0gsfxjpe8ah46t6npk0eyhq2p5047dnj0z"
+                              },
+                              "destination_tag": {}
+                            }
+                          },
+                          "user": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "example": "okbj9k38"
+                              },
+                              "sn": {
+                                "type": "string",
+                                "example": "Qvp1qdic2"
+                              },
+                              "email": {
+                                "type": "string",
+                                "example": "test2@gmail.com"
+                              },
+                              "reference": {},
+                              "first_name": {
+                                "type": "string",
+                                "example": "test"
+                              },
+                              "last_name": {
+                                "type": "string",
+                                "example": "testerf"
+                              },
+                              "display_name": {},
+                              "created_at": {
+                                "type": "string",
+                                "example": "2026-02-13T10:41:07.000Z"
+                              },
+                              "updated_at": {
+                                "type": "string",
+                                "example": "2026-02-13T10:47:55.000Z"
+                              }
+                            }
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "example": "2026-02-18T16:36:30Z"
+                          },
+                          "done_at": {},
+                          "payment_transaction": {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "type": "string",
+                                "example": "confirmed"
+                              },
+                              "confirmations": {
+                                "type": "integer",
+                                "example": 1,
+                                "default": 0
+                              },
+                              "required_confirmations": {
+                                "type": "integer",
+                                "example": 1,
+                                "default": 0
+                              }
+                            }
+                          },
+                          "payment_address": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "example": "66afede22eea49508253215e0c136a74"
+                              },
+                              "reference": {},
+                              "currency": {
+                                "type": "string",
+                                "example": "USDT"
+                              },
+                              "address": {
+                                "type": "string",
+                                "example": "0xcf15f42f933DFBB724AC3e70Edb4Fb11d6Fc4691"
+                              },
+                              "network": {},
+                              "user": {},
+                              "destination_tag": {},
+                              "total_payments": {
+                                "type": "string",
+                                "example": "1.0000000000000000"
+                              },
+                              "created_at": {
+                                "type": "string",
+                                "example": "2026-02-18T16:30:42.000Z"
+                              },
+                              "updated_at": {
+                                "type": "string",
+                                "example": "2026-02-18T16:30:42.000Z"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "invalid currency": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"Invalid currency: usdtb\",\n  \"data\": {\n    \"code\": \"110112\",\n    \"message\": \"Invalid currency: usdtb\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid currency: usdtb"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "example": "110112"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Invalid currency: usdtb"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "6981ba5faf9470ee082aeece:6981ba5faf9470ee082aef32"
+}
+```

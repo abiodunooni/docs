@@ -1,4 +1,328 @@
 ---
 title: "Fetch a swap transaction"
-openapi: "/openapi/wallets.json GET /users/{user_id}/swap_transactions/{swap_transaction_id}"
 ---
+
+This endpoint is used to fetch an instant swap transaction.
+
+# OpenAPI definition
+
+```json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API 3.0",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "https://openapi.quidax.io/exchange-open-api/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "x-bearer-format": "bearer",
+        "x-default": "api_key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/users/{user_id}/swap_transactions/{swap_transaction_id}": {
+      "get": {
+        "summary": "Fetch Swap Transaction",
+        "description": "This endpoint is used to fetch an instant swap transaction.",
+        "operationId": "fetch-swap-transaction",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "default": "me"
+            },
+            "required": true
+          },
+          {
+            "name": "swap_transaction_id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n      \"id\": \"67d4cc0b-7cfa-46fb-a3a0-b5OO1121ac831\",\n      \"from_currency\": \"USDT\",\n      \"to_currency\": \"NGN\",\n      \"from_amount\": \"1.0\",\n      \"received_amount\": \"1619.82\",\n      \"execution_price\": \"1,619.82\",\n      \"status\": \"completed\",\n      \"created_at\": \"2024-12-21T12:16:18.000Z\",\n      \"updated_at\": \"2024-12-21T12:16:43.000Z\",\n      \"swap_quotation\": {\n        \"id\": \"1bfe772b-6795-4d9a-bfa9-aopea349d9758\",\n        \"from_currency\": \"USDT\",\n        \"to_currency\": \"NGN\",\n        \"quoted_price\": \"1619.8224\",\n        \"quoted_currency\": \"NGN\",\n        \"from_amount\": \"1.0\",\n        \"to_amount\": \"1619.82\",\n        \"confirmed\": true,\n        \"expires_at\": \"2024-12-21T12:16:32.000Z\",\n        \"created_at\": \"2024-12-21T12:10:22.000Z\",\n        \"updated_at\": \"2024-12-21T12:16:18.000Z\",\n        \"user\": {\n          \"id\": \"23azi7kk\",\n          \"sn\": \"QDXOOXIRPXXKS\",\n          \"email\": \"test@gmail.com\",\n          \"reference\": null,\n          \"first_name\": \"Test\",\n          \"last_name\": \"User\",\n          \"display_name\": \"testdata\",\n          \"created_at\": \"2021-04-09T09:48:14.000Z\",\n          \"updated_at\": \"2025-01-08T13:09:44.000Z\"\n        }\n      },\n      \"user\": {\n        \"id\": \"23azi7kk\",\n        \"sn\": \"QDXOOXIRPXXKS\",\n        \"email\": \"test@gmail.com\",\n        \"reference\": null,\n        \"first_name\": \"Test\",\n        \"last_name\": \"User\",\n        \"display_name\": \"testdata\",\n        \"created_at\": \"2021-04-09T09:48:14.000Z\",\n        \"updated_at\": \"2025-01-08T13:09:44.000Z\"\n      }\n    }"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "67d4cc0b-7cfa-46fb-a3a0-b5OO1121ac831"
+                    },
+                    "from_currency": {
+                      "type": "string",
+                      "example": "USDT"
+                    },
+                    "to_currency": {
+                      "type": "string",
+                      "example": "NGN"
+                    },
+                    "from_amount": {
+                      "type": "string",
+                      "example": "1.0"
+                    },
+                    "received_amount": {
+                      "type": "string",
+                      "example": "1619.82"
+                    },
+                    "execution_price": {
+                      "type": "string",
+                      "example": "1,619.82"
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "completed"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "example": "2024-12-21T12:16:18.000Z"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "example": "2024-12-21T12:16:43.000Z"
+                    },
+                    "swap_quotation": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "1bfe772b-6795-4d9a-bfa9-aopea349d9758"
+                        },
+                        "from_currency": {
+                          "type": "string",
+                          "example": "USDT"
+                        },
+                        "to_currency": {
+                          "type": "string",
+                          "example": "NGN"
+                        },
+                        "quoted_price": {
+                          "type": "string",
+                          "example": "1619.8224"
+                        },
+                        "quoted_currency": {
+                          "type": "string",
+                          "example": "NGN"
+                        },
+                        "from_amount": {
+                          "type": "string",
+                          "example": "1.0"
+                        },
+                        "to_amount": {
+                          "type": "string",
+                          "example": "1619.82"
+                        },
+                        "confirmed": {
+                          "type": "boolean",
+                          "example": true,
+                          "default": true
+                        },
+                        "expires_at": {
+                          "type": "string",
+                          "example": "2024-12-21T12:16:32.000Z"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "example": "2024-12-21T12:10:22.000Z"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "example": "2024-12-21T12:16:18.000Z"
+                        },
+                        "user": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "23azi7kk"
+                            },
+                            "sn": {
+                              "type": "string",
+                              "example": "QDXOOXIRPXXKS"
+                            },
+                            "email": {
+                              "type": "string",
+                              "example": "test@gmail.com"
+                            },
+                            "reference": {},
+                            "first_name": {
+                              "type": "string",
+                              "example": "Test"
+                            },
+                            "last_name": {
+                              "type": "string",
+                              "example": "User"
+                            },
+                            "display_name": {
+                              "type": "string",
+                              "example": "testdata"
+                            },
+                            "created_at": {
+                              "type": "string",
+                              "example": "2021-04-09T09:48:14.000Z"
+                            },
+                            "updated_at": {
+                              "type": "string",
+                              "example": "2025-01-08T13:09:44.000Z"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "23azi7kk"
+                        },
+                        "sn": {
+                          "type": "string",
+                          "example": "QDXOOXIRPXXKS"
+                        },
+                        "email": {
+                          "type": "string",
+                          "example": "test@gmail.com"
+                        },
+                        "reference": {},
+                        "first_name": {
+                          "type": "string",
+                          "example": "Test"
+                        },
+                        "last_name": {
+                          "type": "string",
+                          "example": "User"
+                        },
+                        "display_name": {
+                          "type": "string",
+                          "example": "testdata"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "example": "2021-04-09T09:48:14.000Z"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "example": "2025-01-08T13:09:44.000Z"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "swap_transaction does not exists": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"Swap transaction not found.\",\n  \"data\": {\n    \"code\": \"E0605\",\n    \"message\": \"Swap transaction not found.\"\n  }\n}"
+                  },
+                  "sub-account does not exists": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"Sub-account with ID: mebb doesn't exist\",\n  \"data\": {\n    \"code\": \"E0104\",\n    \"message\": \"Sub-account with ID: mebb doesn't exist\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "oneOf": [
+                    {
+                      "title": "swap_transaction does not exists",
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "example": "error"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Swap transaction not found."
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "E0605"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Swap transaction not found."
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "title": "sub-account does not exists",
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "example": "error"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Sub-account with ID: mebb doesn't exist"
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "E0104"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Sub-account with ID: mebb doesn't exist"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "6981ba5faf9470ee082aeece:6981ba5faf9470ee082aef41"
+}
+```

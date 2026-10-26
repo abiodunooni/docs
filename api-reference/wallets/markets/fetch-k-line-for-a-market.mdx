@@ -1,4 +1,261 @@
 ---
 title: "Fetch k-line for a market"
-openapi: "/openapi/wallets.json GET /markets/{market}/k"
 ---
+
+Returns the k-line (OHLC) data for a specific market.
+
+# OpenAPI definition
+
+```json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API 3.0",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "https://openapi.quidax.io/exchange-open-api/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "x-bearer-format": "bearer",
+        "x-default": "api_key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/markets/{market}/k": {
+      "get": {
+        "summary": "Fetch k-line for a market",
+        "description": "Returns the k-line (OHLC) data for a specific market.",
+        "operationId": "fetch-k-line-for-a-market",
+        "parameters": [
+          {
+            "name": "market",
+            "in": "path",
+            "description": "Allowed Currencies values: qdxusdt, btcusdt, btcngn, ethngn, qdxngn, xrpngn, dashngn, ltcngn, usdtngn, btcghs, usdtghs, trxngn, dogeusdt, bnbusdt, maticusdt, safemoonusdt, aaveusdt, shibusdt, dotusdt, linkusdt, cakeusdt, xlmusdt, xrpusdt, ltcusdt, ethusdt, trxusdt, axsusdt, wsgusdt, afenusdt, blsusdt, dashusdt.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "btcngn",
+                "usdtngn",
+                "ethngn",
+                "xautngn",
+                "usdcngn",
+                "trxngn",
+                "dashngn",
+                "ltcngn",
+                "xrpngn",
+                "solngn",
+                "qdxngn",
+                "btcusdt",
+                "ethusdt",
+                "xautusdt",
+                "trxusdt",
+                "usdcusdt",
+                "bnbusdt",
+                "dogeusdt",
+                "usatusdt",
+                "ltcusdt",
+                "linkusdt",
+                "polusdt",
+                "xrpusdt",
+                "dotusdt",
+                "aaveusdt",
+                "dashusdt",
+                "shibusdt",
+                "xlmusdt",
+                "cakeusdt",
+                "adausdt",
+                "bchusdt",
+                "slpusdt",
+                "flokiusdt",
+                "solusdt",
+                "cfxusdt",
+                "pepeusdt",
+                "bonkusdt",
+                "algousdt",
+                "wifusdt",
+                "tonusdt",
+                "rndrusdt",
+                "xyousdt",
+                "hypeusdt",
+                "fartcoinusdt",
+                "cngnngn",
+                "suiusdt",
+                "usdtghs",
+                "lskusdt",
+                "axcnhusdt",
+                "axcnhngn",
+                "usdtcngn",
+                "qdxusdt",
+                "usdtxaf",
+                "usdtxof",
+                "usdtzar",
+                "usdtkes",
+                "axsusdt",
+                "filusdt",
+                "babydogeusdt",
+                "oneusdt",
+                "xtzusdt",
+                "sushiusdt",
+                "zilusdt",
+                "manausdt",
+                "sandusdt",
+                "apeusdt",
+                "enjusdt",
+                "lrcusdt",
+                "wldusdt",
+                "memeusdt",
+                "ordiusdt",
+                "ensusdt",
+                "arbusdt",
+                "myrousdt",
+                "magatrumpusdt",
+                "jupusdt",
+                "blurusdt",
+                "coqusdt",
+                "fetusdt",
+                "aiusdt",
+                "bobusdt",
+                "bomeusdt",
+                "stxusdt",
+                "mogusdt",
+                "injusdt",
+                "mntusdt",
+                "beamusdt",
+                "mewusdt",
+                "gnousdt",
+                "wavesusdt",
+                "trumpusdt",
+                "pnutusdt",
+                "ethghs",
+                "etcusdt",
+                "ethbtc",
+                "ltcbtc",
+                "bchbtc",
+                "cngnusdt",
+                "watsonusdt",
+                "wlfiusdt",
+                "usdtusd",
+                "btcghs",
+                "nochillusdt",
+                "katausdt",
+                "slerfusdt",
+                "nosusdt",
+                "nearusdt",
+                "strkusdt",
+                "zkusdt",
+                "susdt"
+              ],
+              "default": "btcngn"
+            },
+            "required": true
+          },
+          {
+            "name": "timestamp",
+            "in": "query",
+            "description": "An integer represents the seconds elapsed since Unix epoch. If set, only k-line data after that time will be returned. Type: Integer.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "description": "Time period of K line. You can choose between 1, 5, 15, 30, 60, 120, 240, 360, 720, 1440, 4320, 10080. Default to 1.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit the number of returned data points. Type: Integer. Allowed values: 1..10000. Default is 30",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"success\",\n  \"message\": \"Successful\",\n  \"data\": [\n    [\n      1770989640000,\n      \"93812502\",\n      \"93812502\",\n      \"93812502\",\n      \"93812502\",\n      \"0.00126185\"\n    ],\n    [\n      1770989580000,\n      \"93694580\",\n      \"93694580\",\n      \"93694580\",\n      \"93694580\",\n      \"0\"\n    ],\n    [\n      1770989520000,\n      \"93694580\",\n      \"93694580\",\n      \"93694580\",\n      \"93694580\",\n      \"0\"\n    ],\n    [\n      1770989460000,\n      \"93694580\",\n      \"93694580\",\n      \"93694580\",\n      \"93694580\",\n      \"0.00043\"\n    ],\n    [\n      1770989400000,\n      \"93495379\",\n      \"93495379\",\n      \"93495379\",\n      \"93495379\",\n      \"0\"\n    ],\n    [\n      1770989340000,\n      \"93495379\",\n      \"93495379\",\n      \"93495379\",\n      \"93495379\",\n      \"0\"\n    ],\n    [\n      1770989280000,\n      \"93495379\",\n      \"93495379\",\n      \"93495379\",\n      \"93495379\",\n      \"0.00021822\"\n    ],\n    [\n      1770989220000,\n      \"93505767\",\n      \"93503979\",\n      \"93505767\",\n      \"93503979\",\n      \"0.00062249\"\n    ],\n    [\n      1770989160000,\n      \"94273031\",\n      \"94273031\",\n      \"94273031\",\n      \"94273031\",\n      \"0.04162121\"\n    ],\n    [\n      1770989100000,\n      \"93167640\",\n      \"93167640\",\n      \"93167640\",\n      \"93167640\",\n      \"0\"\n    ]\n  ]\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successful"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "example": 1770989640000,
+                          "default": 0
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false,
+        "security": []
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "6981ba5faf9470ee082aeece:6981ba5faf9470ee082aeef5"
+}
+```

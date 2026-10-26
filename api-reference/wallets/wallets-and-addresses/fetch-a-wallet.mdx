@@ -1,4 +1,14 @@
 ---
 title: "Fetch a wallet"
-openapi: "/openapi/wallets.json GET /users/{user_id}/wallets/{currency}"
 ---
+
+Get a single wallet linked to an authenticated user or sub-account.
+
+## Endpoint
+
+`GET /users/{user_id}/wallets/{currency}`
+
+- `user_id`: use `me` for the authenticated parent account or a sub-account ID.
+- `currency`: the wallet currency code, such as `BTC`, `ETH`, or `USDT`.
+
+The response returns the wallet balance and wallet metadata in the standard Quidax response envelope.

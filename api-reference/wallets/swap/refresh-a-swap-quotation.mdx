@@ -1,4 +1,512 @@
 ---
 title: "Refresh a swap quotation"
-openapi: "/openapi/wallets.json POST /users/{user_id}/swap_quotation/{quotation_id}/refresh"
 ---
+
+This endpoint is used to refresh an instant swap quotation.
+
+# OpenAPI definition
+
+```json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API 3.0",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "https://openapi.quidax.io/exchange-open-api/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "x-bearer-format": "bearer",
+        "x-default": "api_key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/users/{user_id}/swap_quotation/{quotation_id}/refresh": {
+      "post": {
+        "summary": "Refresh Instant Swap Quotation",
+        "description": "This endpoint is used to refresh an instant swap quotation.",
+        "operationId": "refresh-instant-swap",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "The User ID. Use 'me' if fetching wallets of main authenticated user, use the user_id if fetching for Sub-account linked to the authenticated user",
+            "schema": {
+              "type": "string",
+              "default": "me"
+            },
+            "required": true
+          },
+          {
+            "name": "quotation_id",
+            "in": "path",
+            "description": "ID of a swap quotation",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "from_currency": {
+                    "type": "string",
+                    "description": "the currency you are swapping from",
+                    "default": "usdt",
+                    "enum": [
+                      "btc",
+                      "ngn",
+                      "usdt",
+                      "eth",
+                      "xaut",
+                      "usdc",
+                      "trx",
+                      "dash",
+                      "ltc",
+                      "xrp",
+                      "sol",
+                      "qdx",
+                      "bnb",
+                      "doge",
+                      "usat",
+                      "link",
+                      "pol",
+                      "dot",
+                      "aave",
+                      "shib",
+                      "xlm",
+                      "cake",
+                      "ada",
+                      "bch",
+                      "slp",
+                      "floki",
+                      "cfx",
+                      "pepe",
+                      "bonk",
+                      "algo",
+                      "wif",
+                      "ton",
+                      "rndr",
+                      "xyo",
+                      "hype",
+                      "fartcoin",
+                      "cngn",
+                      "sui",
+                      "ghs",
+                      "lsk",
+                      "axcnh",
+                      "xaf",
+                      "xof",
+                      "zar",
+                      "kes",
+                      "axs",
+                      "fil",
+                      "babydoge",
+                      "one",
+                      "xtz",
+                      "sushi",
+                      "zil",
+                      "mana",
+                      "sand",
+                      "ape",
+                      "enj",
+                      "lrc",
+                      "wld",
+                      "meme",
+                      "ordi",
+                      "ens",
+                      "arb",
+                      "myro",
+                      "magatrump",
+                      "jup",
+                      "blur",
+                      "coq",
+                      "fet",
+                      "ai",
+                      "bob",
+                      "bome",
+                      "stx",
+                      "mog",
+                      "inj",
+                      "mnt",
+                      "beam",
+                      "mew",
+                      "gno",
+                      "waves",
+                      "trump",
+                      "pnut",
+                      "etc",
+                      "watson",
+                      "wlfi",
+                      "usd",
+                      "nochill",
+                      "kata",
+                      "slerf",
+                      "nos",
+                      "near",
+                      "strk",
+                      "zk",
+                      "s"
+                    ]
+                  },
+                  "to_currency": {
+                    "type": "string",
+                    "description": "the currency you are swapping to.",
+                    "default": "ngn",
+                    "enum": [
+                      "btc",
+                      "ngn",
+                      "usdt",
+                      "eth",
+                      "xaut",
+                      "usdc",
+                      "trx",
+                      "dash",
+                      "ltc",
+                      "xrp",
+                      "sol",
+                      "qdx",
+                      "bnb",
+                      "doge",
+                      "usat",
+                      "link",
+                      "pol",
+                      "dot",
+                      "aave",
+                      "shib",
+                      "xlm",
+                      "cake",
+                      "ada",
+                      "bch",
+                      "slp",
+                      "floki",
+                      "cfx",
+                      "pepe",
+                      "bonk",
+                      "algo",
+                      "wif",
+                      "ton",
+                      "rndr",
+                      "xyo",
+                      "hype",
+                      "fartcoin",
+                      "cngn",
+                      "sui",
+                      "ghs",
+                      "lsk",
+                      "axcnh",
+                      "xaf",
+                      "xof",
+                      "zar",
+                      "kes",
+                      "axs",
+                      "fil",
+                      "babydoge",
+                      "one",
+                      "xtz",
+                      "sushi",
+                      "zil",
+                      "mana",
+                      "sand",
+                      "ape",
+                      "enj",
+                      "lrc",
+                      "wld",
+                      "meme",
+                      "ordi",
+                      "ens",
+                      "arb",
+                      "myro",
+                      "magatrump",
+                      "jup",
+                      "blur",
+                      "coq",
+                      "fet",
+                      "ai",
+                      "bob",
+                      "bome",
+                      "stx",
+                      "mog",
+                      "inj",
+                      "mnt",
+                      "beam",
+                      "mew",
+                      "gno",
+                      "waves",
+                      "trump",
+                      "pnut",
+                      "etc",
+                      "watson",
+                      "wlfi",
+                      "usd",
+                      "nochill",
+                      "kata",
+                      "slerf",
+                      "nos",
+                      "near",
+                      "strk",
+                      "zk",
+                      "s"
+                    ]
+                  },
+                  "from_amount": {
+                    "type": "string",
+                    "description": "the amount you want to swap."
+                  },
+                  "to_amount": {
+                    "type": "string",
+                    "description": "the amount you want to swap."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"success\",\n  \"message\": \"Successful\",\n  \"data\": {\n    \"id\": \"jfdja5nm\",\n    \"from_currency\": \"NGN\",\n    \"to_currency\": \"SOL\",\n    \"quoted_price\": \"258578.803258812875\",\n    \"quoted_currency\": \"NGN\",\n    \"from_amount\": \"100.0\",\n    \"to_amount\": \"0.000386\",\n    \"confirmed\": false,\n    \"expires_at\": \"2024-05-18T09:03:17.000Z\",\n    \"created_at\": \"2024-05-18T09:00:59.000Z\",\n    \"updated_at\": \"2024-05-18T09:03:02.000Z\",\n    \"user\": {\n      \"id\": \"23azi7bj\",\n      \"sn\": \"QDXXIRPXXKS\",\n      \"email\": \"johnsonoye123@gmail.com\",\n      \"reference\": null,\n      \"first_name\": \"Oye\",\n      \"last_name\": \"Olalekan\",\n      \"display_name\": \"appstate\",\n      \"created_at\": \"2021-04-09T09:48:14.000Z\",\n      \"updated_at\": \"2024-03-12T10:34:34.000Z\"\n    }\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "jfdja5nm"
+                        },
+                        "from_currency": {
+                          "type": "string",
+                          "example": "NGN"
+                        },
+                        "to_currency": {
+                          "type": "string",
+                          "example": "SOL"
+                        },
+                        "quoted_price": {
+                          "type": "string",
+                          "example": "258578.803258812875"
+                        },
+                        "quoted_currency": {
+                          "type": "string",
+                          "example": "NGN"
+                        },
+                        "from_amount": {
+                          "type": "string",
+                          "example": "100.0"
+                        },
+                        "to_amount": {
+                          "type": "string",
+                          "example": "0.000386"
+                        },
+                        "confirmed": {
+                          "type": "boolean",
+                          "example": false,
+                          "default": true
+                        },
+                        "expires_at": {
+                          "type": "string",
+                          "example": "2024-05-18T09:03:17.000Z"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "example": "2024-05-18T09:00:59.000Z"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "example": "2024-05-18T09:03:02.000Z"
+                        },
+                        "user": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "23azi7bj"
+                            },
+                            "sn": {
+                              "type": "string",
+                              "example": "QDXXIRPXXKS"
+                            },
+                            "email": {
+                              "type": "string",
+                              "example": "johnsonoye123@gmail.com"
+                            },
+                            "reference": {},
+                            "first_name": {
+                              "type": "string",
+                              "example": "Oye"
+                            },
+                            "last_name": {
+                              "type": "string",
+                              "example": "Olalekan"
+                            },
+                            "display_name": {
+                              "type": "string",
+                              "example": "appstate"
+                            },
+                            "created_at": {
+                              "type": "string",
+                              "example": "2021-04-09T09:48:14.000Z"
+                            },
+                            "updated_at": {
+                              "type": "string",
+                              "example": "2024-03-12T10:34:34.000Z"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"10.0 is below 50.0 NGN\",\n  \"data\": {\n    \"code\": \"E0616\",\n    \"message\": \"10.0 is below 50.0 NGN\"\n  }\n}"
+                  },
+                  "invalid amount": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"Validation failed: validAmount: Either from_amount or to_amount must be provided, but not both.\",\n  \"data\": {\n    \"code\": \"E0107\",\n    \"message\": \"Validation failed: validAmount: Either from_amount or to_amount must be provided, but not both.\"\n  }\n}"
+                  },
+                  "Unable to refresh quotation": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"Unable to refresh quotation: Reason: Quotation has not expired yet\",\n  \"data\": {\n    \"code\": \"E0107\",\n    \"message\": \"Unable to refresh quotation: Reason: Quotation has not expired yet\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "example": "error"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "10.0 is below 50.0 NGN"
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "E0616"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "10.0 is below 50.0 NGN"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "title": "invalid amount",
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "example": "error"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Validation failed: validAmount: Either from_amount or to_amount must be provided, but not both."
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "E0107"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Validation failed: validAmount: Either from_amount or to_amount must be provided, but not both."
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "title": "Unable to refresh quotation",
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "example": "error"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Unable to refresh quotation: Reason: Quotation has not expired yet"
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "E0107"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Unable to refresh quotation: Reason: Quotation has not expired yet"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "6981ba5faf9470ee082aeece:6981ba5faf9470ee082aef40"
+}
+```
