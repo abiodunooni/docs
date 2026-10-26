@@ -1,4 +1,351 @@
 ---
 title: "Confirm a swap quotation"
-openapi: "/openapi/wallets.json POST /users/{user_id}/swap_quotation/{quotation_id}/confirm"
 ---
+
+## ---\\ntitle: "Confirm a swap quotation"\\n---\\n\\n--- agentTools: projectIndex: [https://docs.quidax.io/llms.txt](https://docs.quidax.io/llms.txt)
+
+# Confirm Instant Swap
+
+This endpoint is used to confirm an instant swap quotation. After confirmation, the system enqueues the instant swap for execution and sends webhooks with the final status, either success or failure, once the trade is completed or has failed.
+
+# OpenAPI definition
+
+````json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API 3.0",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "https://openapi.quidax.io/exchange-open-api/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "x-bearer-format": "bearer",
+        "x-default": "api_key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/users/{user_id}/swap_quotation/{quotation_id}/confirm": {
+      "post": {
+        "summary": "Confirm Instant Swap",
+        "description": "This endpoint is used to confirm an instant swap quotation. After confirmation, the system enqueues the instant swap for execution and sends webhooks with the final status, either success or failure, once the trade is completed or has failed.",
+        "operationId": "confirm-swap",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "The User ID. Use 'me' if fetching wallets of main authenticated user, use the user_id if fetching for Sub-account linked to the authenticated user",
+            "schema": {
+              "type": "string",
+              "default": "me"
+            },
+            "required": true
+          },
+          {
+            "name": "quotation_id",
+            "in": "path",
+            "description": "ID of a swap quotation",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"success\",\n  \"message\": \"Successful\",\n  \"data\": {\n    \"id\": \"ib2m2s7i\",\n    \"from_currency\": \"USDT\",\n    \"to_currency\": \"SOL\",\n    \"from_amount\": \"3.254\",\n    \"received_amount\": \"0.019281934593118\",\n    \"execution_price\": \"0.0059256\",\n    \"status\": \"initiated\",\n    \"created_at\": \"2024-04-10T12:38:13.108Z\",\n    \"updated_at\": \"2024-04-10T12:38:13.108Z\",\n    \"swap_quotation\": {\n      \"id\": \"v3w65wfl\",\n      \"from_currency\": \"USDT\",\n      \"to_currency\": \"SOL\",\n      \"quoted_price\": \"0.0059256098933983\",\n      \"quoted_currency\": \"SOL\",\n      \"from_amount\": \"3.254\",\n      \"to_amount\": \"0.019281934593118\",\n      \"confirmed\": true,\n      \"expires_at\": \"2024-04-10T12:38:21.000Z\",\n      \"created_at\": \"2024-04-10T12:38:06.000Z\",\n      \"updated_at\": \"2024-04-10T12:38:12.966Z\",\n      \"user\": {\n        \"id\": \"23azi7bj\",\n        \"sn\": \"QDXXIRPXXKS\",\n        \"email\": \"testuser@gmail.com\",\n        \"reference\": null,\n        \"first_name\": \"Oye\",\n        \"last_name\": \"Olalekan\",\n        \"display_name\": \"appstate\",\n        \"created_at\": \"2021-04-09T09:48:14.000Z\",\n        \"updated_at\": \"2024-03-12T10:34:34.000Z\"\n      }\n    },\n    \"user\": {\n      \"id\": \"23azi7bj\",\n      \"sn\": \"QDXXIRPXXKS\",\n      \"email\": \"testuser@gmail.com\",\n      \"reference\": null,\n      \"first_name\": \"Oye\",\n      \"last_name\": \"Olalekan\",\n      \"display_name\": \"appstate\",\n      \"created_at\": \"2021-04-09T09:48:14.000Z\",\n      \"updated_at\": \"2024-03-12T10:34:34.000Z\"\n    }\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "ib2m2s7i"
+                        },
+                        "from_currency": {
+                          "type": "string",
+                          "example": "USDT"
+                        },
+                        "to_currency": {
+                          "type": "string",
+                          "example": "SOL"
+                        },
+                        "from_amount": {
+                          "type": "string",
+                          "example": "3.254"
+                        },
+                        "received_amount": {
+                          "type": "string",
+                          "example": "0.019281934593118"
+                        },
+                        "execution_price": {
+                          "type": "string",
+                          "example": "0.0059256"
+                        },
+                        "status": {
+                          "type": "string",
+                          "example": "initiated"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "example": "2024-04-10T12:38:13.108Z"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "example": "2024-04-10T12:38:13.108Z"
+                        },
+                        "swap_quotation": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "v3w65wfl"
+                            },
+                            "from_currency": {
+                              "type": "string",
+                              "example": "USDT"
+                            },
+                            "to_currency": {
+                              "type": "string",
+                              "example": "SOL"
+                            },
+                            "quoted_price": {
+                              "type": "string",
+                              "example": "0.0059256098933983"
+                            },
+                            "quoted_currency": {
+                              "type": "string",
+                              "example": "SOL"
+                            },
+                            "from_amount": {
+                              "type": "string",
+                              "example": "3.254"
+                            },
+                            "to_amount": {
+                              "type": "string",
+                              "example": "0.019281934593118"
+                            },
+                            "confirmed": {
+                              "type": "boolean",
+                              "example": true,
+                              "default": true
+                            },
+                            "expires_at": {
+                              "type": "string",
+                              "example": "2024-04-10T12:38:21.000Z"
+                            },
+                            "created_at": {
+                              "type": "string",
+                              "example": "2024-04-10T12:38:06.000Z"
+                            },
+                            "updated_at": {
+                              "type": "string",
+                              "example": "2024-04-10T12:38:12.966Z"
+                            },
+                            "user": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "example": "23azi7bj"
+                                },
+                                "sn": {
+                                  "type": "string",
+                                  "example": "QDXXIRPXXKS"
+                                },
+                                "email": {
+                                  "type": "string",
+                                  "example": "testuser@gmail.com"
+                                },
+                                "reference": {},
+                                "first_name": {
+                                  "type": "string",
+                                  "example": "Oye"
+                                },
+                                "last_name": {
+                                  "type": "string",
+                                  "example": "Olalekan"
+                                },
+                                "display_name": {
+                                  "type": "string",
+                                  "example": "appstate"
+                                },
+                                "created_at": {
+                                  "type": "string",
+                                  "example": "2021-04-09T09:48:14.000Z"
+                                },
+                                "updated_at": {
+                                  "type": "string",
+                                  "example": "2024-03-12T10:34:34.000Z"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "user": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "23azi7bj"
+                            },
+                            "sn": {
+                              "type": "string",
+                              "example": "QDXXIRPXXKS"
+                            },
+                            "email": {
+                              "type": "string",
+                              "example": "testuser@gmail.com"
+                            },
+                            "reference": {},
+                            "first_name": {
+                              "type": "string",
+                              "example": "Oye"
+                            },
+                            "last_name": {
+                              "type": "string",
+                              "example": "Olalekan"
+                            },
+                            "display_name": {
+                              "type": "string",
+                              "example": "appstate"
+                            },
+                            "created_at": {
+                              "type": "string",
+                              "example": "2021-04-09T09:48:14.000Z"
+                            },
+                            "updated_at": {
+                              "type": "string",
+                              "example": "2024-03-12T10:34:34.000Z"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": ""
+                  },
+                  "Invalid quotation id": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"Unable to confirm quotation: Reason: Quotation used or expired\",\n  \"data\": {\n    \"code\": \"E0107\",\n    \"message\": \"Unable to confirm quotation: Reason: Quotation used or expired\"\n  }\n}"
+                  },
+                  "insufficient balance": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"Unable to confirm quotation: Reason: Insufficient balance\",\n  \"data\": {\n    \"code\": \"E0107\",\n    \"message\": \"Unable to confirm quotation: Reason: Insufficient balance\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "oneOf": [
+                    {
+                      "title": "Invalid quotation id",
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "example": "error"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Unable to confirm quotation: Reason: Quotation used or expired"
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "E0107"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Unable to confirm quotation: Reason: Quotation used or expired"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "title": "insufficient balance",
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "example": "error"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Unable to confirm quotation: Reason: Insufficient balance"
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "E0107"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Unable to confirm quotation: Reason: Insufficient balance"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "6981ba5faf9470ee082aeece:6981ba5faf9470ee082aef3f"
+}
+```\n
+````

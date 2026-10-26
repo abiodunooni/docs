@@ -1,4 +1,455 @@
 ---
 title: "Create an order"
-openapi: "/openapi/wallets.json POST /users/{user_id}/orders"
 ---
+
+## ---\\ntitle: "Create an order"\\n---\\n\\n--- agentTools: projectIndex: [https://docs.quidax.io/llms.txt](https://docs.quidax.io/llms.txt)
+
+# Create a sell or buy order
+
+Create a sell or buy order for the authenticated user or a subaccount tethered to authenticated user.
+
+# OpenAPI definition
+
+````json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API 3.0",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "https://openapi.quidax.io/exchange-open-api/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "x-bearer-format": "bearer",
+        "x-default": "api_key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/users/{user_id}/orders": {
+      "post": {
+        "summary": "Create a sell or buy order",
+        "description": "Create a sell or buy order for the authenticated user or a subaccount tethered to authenticated user.",
+        "operationId": "create-a-sell-or-buy-order",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "The User ID. Use 'me' for main authenticated user. Use the user_id of Sub-account linked to the authenticated user for performing activity for subaccount.",
+            "schema": {
+              "type": "string",
+              "default": "me"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "market": {
+                    "type": "string",
+                    "description": "Required. Market in which the order to be placed in. Allowed values: qdxusdt, btcusdt, btcngn, ethngn, qdxngn, xrpngn, dashngn, ltcngn, usdtngn, btcghs, usdtghs, trxngn, dogeusdt, bnbusdt, maticusdt, safemoonusdt, aaveusdt, shibusdt, dotusdt, linkusdt, cakeusdt, xlmusdt, xrpusdt, ltcusdt, ethusdt, trxusdt, axsusdt, wsgusdt, afenusdt, blsusdt, dashusdt.",
+                    "default": "btcngn",
+                    "enum": [
+                      "btcngn",
+                      "usdtngn",
+                      "ethngn",
+                      "xautngn",
+                      "usdcngn",
+                      "trxngn",
+                      "dashngn",
+                      "ltcngn",
+                      "xrpngn",
+                      "solngn",
+                      "qdxngn",
+                      "btcusdt",
+                      "ethusdt",
+                      "xautusdt",
+                      "trxusdt",
+                      "usdcusdt",
+                      "bnbusdt",
+                      "dogeusdt",
+                      "usatusdt",
+                      "ltcusdt",
+                      "linkusdt",
+                      "polusdt",
+                      "xrpusdt",
+                      "dotusdt",
+                      "aaveusdt",
+                      "dashusdt",
+                      "shibusdt",
+                      "xlmusdt",
+                      "cakeusdt",
+                      "adausdt",
+                      "bchusdt",
+                      "slpusdt",
+                      "flokiusdt",
+                      "solusdt",
+                      "cfxusdt",
+                      "pepeusdt",
+                      "bonkusdt",
+                      "algousdt",
+                      "wifusdt",
+                      "tonusdt",
+                      "rndrusdt",
+                      "xyousdt",
+                      "hypeusdt",
+                      "fartcoinusdt",
+                      "cngnngn",
+                      "suiusdt",
+                      "usdtghs",
+                      "lskusdt",
+                      "axcnhusdt",
+                      "axcnhngn",
+                      "usdtcngn",
+                      "qdxusdt",
+                      "usdtxaf",
+                      "usdtxof",
+                      "usdtzar",
+                      "usdtkes",
+                      "axsusdt",
+                      "filusdt",
+                      "babydogeusdt",
+                      "oneusdt",
+                      "xtzusdt",
+                      "sushiusdt",
+                      "zilusdt",
+                      "manausdt",
+                      "sandusdt",
+                      "apeusdt",
+                      "enjusdt",
+                      "lrcusdt",
+                      "wldusdt",
+                      "memeusdt",
+                      "ordiusdt",
+                      "ensusdt",
+                      "arbusdt",
+                      "myrousdt",
+                      "magatrumpusdt",
+                      "jupusdt",
+                      "blurusdt",
+                      "coqusdt",
+                      "fetusdt",
+                      "aiusdt",
+                      "bobusdt",
+                      "bomeusdt",
+                      "stxusdt",
+                      "mogusdt",
+                      "injusdt",
+                      "mntusdt",
+                      "beamusdt",
+                      "mewusdt",
+                      "gnousdt",
+                      "wavesusdt",
+                      "trumpusdt",
+                      "pnutusdt",
+                      "ethghs",
+                      "etcusdt",
+                      "ethbtc",
+                      "ltcbtc",
+                      "bchbtc",
+                      "cngnusdt",
+                      "watsonusdt",
+                      "wlfiusdt",
+                      "usdtusd",
+                      "btcghs",
+                      "nochillusdt",
+                      "katausdt",
+                      "slerfusdt",
+                      "nosusdt",
+                      "nearusdt",
+                      "strkusdt",
+                      "zkusdt",
+                      "susdt"
+                    ]
+                  },
+                  "side": {
+                    "type": "string",
+                    "description": "Required. Allowed values: buy, sell.",
+                    "default": "buy",
+                    "enum": [
+                      "buy",
+                      "sell"
+                    ]
+                  },
+                  "ord_type": {
+                    "type": "string",
+                    "description": "Optional: Allowed values: limit and market, defaults to limit if left empty.",
+                    "default": "limit",
+                    "enum": [
+                      "limit",
+                      "market"
+                    ]
+                  },
+                  "price": {
+                    "type": "string",
+                    "description": "Required if ord_type is limit. It should be left blank for market ord_type.",
+                    "default": "68000"
+                  },
+                  "volume": {
+                    "type": "string",
+                    "description": "Required.",
+                    "default": "0.1"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"success\",\n  \"message\": \"Successful\",\n  \"data\": {\n    \"id\": \"d74c937eda014e72b78c181f95a761c5\",\n    \"reference\": null,\n    \"market\": {\n      \"id\": \"btcusdt\",\n      \"base_unit\": \"BTC\",\n      \"quote_unit\": \"USDT\"\n    },\n    \"side\": \"buy\",\n    \"price\": {\n      \"unit\": \"USDT\",\n      \"amount\": \"61000.0000000000000000\"\n    },\n    \"volume\": {\n      \"unit\": \"BTC\",\n      \"amount\": \"0.0000500000000000\"\n    },\n    \"status\": \"wait\",\n    \"user\": {\n      \"id\": \"24rhpmow\",\n      \"sn\": \"Qw1os7uj7\",\n      \"email\": \"test@gmail.com\",\n      \"reference\": null,\n      \"first_name\": \"test\",\n      \"last_name\": \"tester\",\n      \"display_name\": \"Adigun Efon Exchange\",\n      \"created_at\": \"2026-02-09T13:22:14.000Z\",\n      \"updated_at\": \"2026-02-13T10:45:42.000Z\"\n    },\n    \"trades\": [],\n    \"order_type\": \"limit\",\n    \"avg_price\": {\n      \"unit\": \"USDT\",\n      \"amount\": \"0E-16\"\n    },\n    \"origin_volume\": {\n      \"unit\": \"BTC\",\n      \"amount\": \"0.0000500000000000\"\n    },\n    \"executed_volume\": {\n      \"unit\": \"BTC\",\n      \"amount\": \"0.0000000000000000\"\n    },\n    \"trades_count\": \"0\",\n    \"created_at\": \"2026-02-23T10:47:10.148Z\",\n    \"updated_at\": \"2026-02-23T10:47:10.000Z\",\n    \"done_at\": null\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "d74c937eda014e72b78c181f95a761c5"
+                        },
+                        "reference": {},
+                        "market": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "btcusdt"
+                            },
+                            "base_unit": {
+                              "type": "string",
+                              "example": "BTC"
+                            },
+                            "quote_unit": {
+                              "type": "string",
+                              "example": "USDT"
+                            }
+                          }
+                        },
+                        "side": {
+                          "type": "string",
+                          "example": "buy"
+                        },
+                        "price": {
+                          "type": "object",
+                          "properties": {
+                            "unit": {
+                              "type": "string",
+                              "example": "USDT"
+                            },
+                            "amount": {
+                              "type": "string",
+                              "example": "61000.0000000000000000"
+                            }
+                          }
+                        },
+                        "volume": {
+                          "type": "object",
+                          "properties": {
+                            "unit": {
+                              "type": "string",
+                              "example": "BTC"
+                            },
+                            "amount": {
+                              "type": "string",
+                              "example": "0.0000500000000000"
+                            }
+                          }
+                        },
+                        "status": {
+                          "type": "string",
+                          "example": "wait"
+                        },
+                        "user": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "24rhpmow"
+                            },
+                            "sn": {
+                              "type": "string",
+                              "example": "Qw1os7uj7"
+                            },
+                            "email": {
+                              "type": "string",
+                              "example": "test@gmail.com"
+                            },
+                            "reference": {},
+                            "first_name": {
+                              "type": "string",
+                              "example": "test"
+                            },
+                            "last_name": {
+                              "type": "string",
+                              "example": "tester"
+                            },
+                            "display_name": {
+                              "type": "string",
+                              "example": "Adigun Efon Exchange"
+                            },
+                            "created_at": {
+                              "type": "string",
+                              "example": "2026-02-09T13:22:14.000Z"
+                            },
+                            "updated_at": {
+                              "type": "string",
+                              "example": "2026-02-13T10:45:42.000Z"
+                            }
+                          }
+                        },
+                        "trades": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {}
+                          }
+                        },
+                        "order_type": {
+                          "type": "string",
+                          "example": "limit"
+                        },
+                        "avg_price": {
+                          "type": "object",
+                          "properties": {
+                            "unit": {
+                              "type": "string",
+                              "example": "USDT"
+                            },
+                            "amount": {
+                              "type": "string",
+                              "example": "0E-16"
+                            }
+                          }
+                        },
+                        "origin_volume": {
+                          "type": "object",
+                          "properties": {
+                            "unit": {
+                              "type": "string",
+                              "example": "BTC"
+                            },
+                            "amount": {
+                              "type": "string",
+                              "example": "0.0000500000000000"
+                            }
+                          }
+                        },
+                        "executed_volume": {
+                          "type": "object",
+                          "properties": {
+                            "unit": {
+                              "type": "string",
+                              "example": "BTC"
+                            },
+                            "amount": {
+                              "type": "string",
+                              "example": "0.0000000000000000"
+                            }
+                          }
+                        },
+                        "trades_count": {
+                          "type": "string",
+                          "example": "0"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "example": "2026-02-23T10:47:10.148Z"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "example": "2026-02-23T10:47:10.000Z"
+                        },
+                        "done_at": {}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"Price is below allowed minimum buy price.\",\n  \"data\": {\n    \"code\": \"110112\",\n    \"message\": \"Price is below allowed minimum buy price.\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Price is below allowed minimum buy price."
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "example": "110112"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Price is below allowed minimum buy price."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "6981ba5faf9470ee082aeece:6981ba5faf9470ee082aef0d"
+}
+```\n
+````

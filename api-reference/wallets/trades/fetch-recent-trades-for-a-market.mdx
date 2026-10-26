@@ -1,4 +1,243 @@
 ---
 title: "Fetch recent trades for a market"
-openapi: "/openapi/wallets.json GET /trades/{market_pair}"
 ---
+
+## ---\\ntitle: "Fetch recent trades for a market"\\n---\\n\\n--- agentTools: projectIndex: [https://docs.quidax.io/llms.txt](https://docs.quidax.io/llms.txt)
+
+# Fetch recent trades for a given market pair
+
+# OpenAPI definition
+
+````json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API 3.0",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "https://openapi.quidax.io/exchange-open-api/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "x-bearer-format": "bearer",
+        "x-default": "api_key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/trades/{market_pair}": {
+      "get": {
+        "summary": "Fetch recent trades for a given market pair",
+        "description": "",
+        "operationId": "fetch-recent-trades-for-a-given-market-pair",
+        "parameters": [
+          {
+            "name": "market_pair",
+            "in": "path",
+            "description": "ID of market formed by combining the concatenating the base currency with quote currency, Use the market list or summary API to fetch market information. Allowed Currencies values: qdxusdt, btcusdt, btcngn, ethngn, qdxngn, xrpngn, dashngn, ltcngn, usdtngn, btcghs, usdtghs, trxngn, dogeusdt, bnbusdt, maticusdt, safemoonusdt, aaveusdt, shibusdt, dotusdt, linkusdt, cakeusdt, xlmusdt, xrpusdt, ltcusdt, ethusdt, trxusdt, axsusdt, wsgusdt, afenusdt, blsusdt, dashusdt.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "btcngn",
+                "usdtngn",
+                "ethngn",
+                "xautngn",
+                "usdcngn",
+                "trxngn",
+                "dashngn",
+                "ltcngn",
+                "xrpngn",
+                "solngn",
+                "qdxngn",
+                "btcusdt",
+                "ethusdt",
+                "xautusdt",
+                "trxusdt",
+                "usdcusdt",
+                "bnbusdt",
+                "dogeusdt",
+                "usatusdt",
+                "ltcusdt",
+                "linkusdt",
+                "polusdt",
+                "xrpusdt",
+                "dotusdt",
+                "aaveusdt",
+                "dashusdt",
+                "shibusdt",
+                "xlmusdt",
+                "cakeusdt",
+                "adausdt",
+                "bchusdt",
+                "slpusdt",
+                "flokiusdt",
+                "solusdt",
+                "cfxusdt",
+                "pepeusdt",
+                "bonkusdt",
+                "algousdt",
+                "wifusdt",
+                "tonusdt",
+                "rndrusdt",
+                "xyousdt",
+                "hypeusdt",
+                "fartcoinusdt",
+                "cngnngn",
+                "suiusdt",
+                "usdtghs",
+                "lskusdt",
+                "axcnhusdt",
+                "axcnhngn",
+                "usdtcngn",
+                "qdxusdt",
+                "usdtxaf",
+                "usdtxof",
+                "usdtzar",
+                "usdtkes",
+                "axsusdt",
+                "filusdt",
+                "babydogeusdt",
+                "oneusdt",
+                "xtzusdt",
+                "sushiusdt",
+                "zilusdt",
+                "manausdt",
+                "sandusdt",
+                "apeusdt",
+                "enjusdt",
+                "lrcusdt",
+                "wldusdt",
+                "memeusdt",
+                "ordiusdt",
+                "ensusdt",
+                "arbusdt",
+                "myrousdt",
+                "magatrumpusdt",
+                "jupusdt",
+                "blurusdt",
+                "coqusdt",
+                "fetusdt",
+                "aiusdt",
+                "bobusdt",
+                "bomeusdt",
+                "stxusdt",
+                "mogusdt",
+                "injusdt",
+                "mntusdt",
+                "beamusdt",
+                "mewusdt",
+                "gnousdt",
+                "wavesusdt",
+                "trumpusdt",
+                "pnutusdt",
+                "ethghs",
+                "etcusdt",
+                "ethbtc",
+                "ltcbtc",
+                "bchbtc",
+                "cngnusdt",
+                "watsonusdt",
+                "wlfiusdt",
+                "usdtusd",
+                "btcghs",
+                "nochillusdt",
+                "katausdt",
+                "slerfusdt",
+                "nosusdt",
+                "nearusdt",
+                "strkusdt",
+                "zkusdt",
+                "susdt"
+              ],
+              "default": "btcngn"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"success\",\n  \"message\": \"Successful\",\n  \"data\": [\n    {\n      \"type\": \"BUY\",\n      \"price\": \"0.2803200000000000\",\n      \"timestamp\": 1771227245,\n      \"base_volume\": \"7.1347031900000000\",\n      \"quote_volume\": \"1.99999999822080000000000000000000\",\n      \"trade_id\": 45124120\n    }\n  ]\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successful"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "example": "BUY"
+                          },
+                          "price": {
+                            "type": "string",
+                            "example": "0.2803200000000000"
+                          },
+                          "timestamp": {
+                            "type": "integer",
+                            "example": 1771227245,
+                            "default": 0
+                          },
+                          "base_volume": {
+                            "type": "string",
+                            "example": "7.1347031900000000"
+                          },
+                          "quote_volume": {
+                            "type": "string",
+                            "example": "1.99999999822080000000000000000000"
+                          },
+                          "trade_id": {
+                            "type": "integer",
+                            "example": 45124120,
+                            "default": 0
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "6981ba5faf9470ee082aeece:6981ba5faf9470ee082aef07"
+}
+```\n
+````

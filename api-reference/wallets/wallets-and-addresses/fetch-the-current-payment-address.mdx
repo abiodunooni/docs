@@ -1,4 +1,281 @@
 ---
 title: "Fetch the current payment address"
-openapi: "/openapi/wallets.json GET /users/{user_id}/wallets/{currency}/address"
 ---
+
+## ---\\ntitle: "Fetch the current payment address"\\n---\\n\\n--- agentTools: projectIndex: [https://docs.quidax.io/llms.txt](https://docs.quidax.io/llms.txt)
+
+# Fetch Payment Address
+
+Fetch default payment address for a wallet
+
+# OpenAPI definition
+
+````json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API 3.0",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "https://openapi.quidax.io/exchange-open-api/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "x-bearer-format": "bearer",
+        "x-default": "api_key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/users/{user_id}/wallets/{currency}/address": {
+      "get": {
+        "summary": "Fetch Payment Address",
+        "description": "Fetch default payment address for a wallet",
+        "operationId": "fetch-payment-address",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "The User ID. Use 'me' if fetching wallets of main authenticated user, use the user_id if fetching for Sub-account linked to the authenticated user.",
+            "schema": {
+              "type": "string",
+              "default": "me"
+            },
+            "required": true
+          },
+          {
+            "name": "currency",
+            "in": "path",
+            "description": "The currency you want to get a payment address for. Example: btc, usdt, eth, xrp, ltc, trx, bnb, usdc, sol, or cngn.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "btc",
+                "usdt",
+                "eth",
+                "xaut",
+                "usat",
+                "xrp",
+                "dash",
+                "ltc",
+                "trx",
+                "doge",
+                "bnb",
+                "pol",
+                "usdc",
+                "aave",
+                "shib",
+                "link",
+                "cake",
+                "xlm",
+                "ada",
+                "bch",
+                "floki",
+                "sol",
+                "cfx",
+                "ton",
+                "sui",
+                "zk",
+                "lsk",
+                "axcnh",
+                "qdx",
+                "cngn"
+              ],
+              "default": "btc"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"success\",\n  \"message\": \"Successful\",\n  \"data\": {\n    \"id\": \"b4dddedc637048028f558d276f3015bc\",\n    \"reference\": null,\n    \"currency\": \"BTC\",\n    \"address\": \"bc1qel75acv9tdwqdx86tla6yyxagp2fvq2tntxntp\",\n    \"network\": null,\n    \"user\": {\n      \"id\": \"24rhpmow\",\n      \"sn\": \"Qw1os7uj7\",\n      \"email\": \"test@gmail.com\",\n      \"reference\": null,\n      \"first_name\": \"test\",\n      \"last_name\": \"tester\",\n      \"display_name\": \"Adigun Efon Exchange\",\n      \"created_at\": \"2026-02-09T13:22:14.000Z\",\n      \"updated_at\": \"2026-02-13T10:45:42.000Z\"\n    },\n    \"destination_tag\": null,\n    \"total_payments\": null,\n    \"created_at\": \"2026-02-10T11:33:48.000Z\",\n    \"updated_at\": \"2026-02-10T11:33:48.000Z\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "b4dddedc637048028f558d276f3015bc"
+                        },
+                        "reference": {},
+                        "currency": {
+                          "type": "string",
+                          "example": "BTC"
+                        },
+                        "address": {
+                          "type": "string",
+                          "example": "bc1qel75acv9tdwqdx86tla6yyxagp2fvq2tntxntp"
+                        },
+                        "network": {},
+                        "user": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "24rhpmow"
+                            },
+                            "sn": {
+                              "type": "string",
+                              "example": "Qw1os7uj7"
+                            },
+                            "email": {
+                              "type": "string",
+                              "example": "test@gmail.com"
+                            },
+                            "reference": {},
+                            "first_name": {
+                              "type": "string",
+                              "example": "test"
+                            },
+                            "last_name": {
+                              "type": "string",
+                              "example": "tester"
+                            },
+                            "display_name": {
+                              "type": "string",
+                              "example": "Adigun Efon Exchange"
+                            },
+                            "created_at": {
+                              "type": "string",
+                              "example": "2026-02-09T13:22:14.000Z"
+                            },
+                            "updated_at": {
+                              "type": "string",
+                              "example": "2026-02-13T10:45:42.000Z"
+                            }
+                          }
+                        },
+                        "destination_tag": {},
+                        "total_payments": {},
+                        "created_at": {
+                          "type": "string",
+                          "example": "2026-02-10T11:33:48.000Z"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "example": "2026-02-10T11:33:48.000Z"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "invalid currency": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"Currency with name: btcb doesn't exist\",\n  \"data\": {\n    \"code\": \"E0605\",\n    \"message\": \"Currency with name: btcb doesn't exist\"\n  }\n}"
+                  },
+                  "invalid customer": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"Sub-account with ID: meb doesn't exist\",\n  \"data\": {\n    \"code\": \"E0104\",\n    \"message\": \"Sub-account with ID: meb doesn't exist\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "oneOf": [
+                    {
+                      "title": "invalid currency",
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "example": "error"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Currency with name: btcb doesn't exist"
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "E0605"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Currency with name: btcb doesn't exist"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "title": "invalid customer",
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "example": "error"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Sub-account with ID: meb doesn't exist"
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "example": "E0104"
+                            },
+                            "message": {
+                              "type": "string",
+                              "example": "Sub-account with ID: meb doesn't exist"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "6981ba5faf9470ee082aeece:6981ba5faf9470ee082aeefd"
+}
+```\n
+````

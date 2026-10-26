@@ -1,4 +1,306 @@
 ---
 title: "Cancel an order"
-openapi: "/openapi/wallets.json POST /users/{user_id}/orders/{order_id}/cancel"
 ---
+
+## ---\\ntitle: "Cancel an order"\\n---\\n\\n--- agentTools: projectIndex: [https://docs.quidax.io/llms.txt](https://docs.quidax.io/llms.txt)
+
+# Cancel an order
+
+Cancels an order tethered to the authenticated user or a subaccount tethered to the authenticated user
+
+> 📘 Canceling Orders
+>
+> After making an authenticated request, your order will queued up to be canceled in the background, this process takes less than a second to complete.
+
+# OpenAPI definition
+
+````json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API 3.0",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "https://openapi.quidax.io/exchange-open-api/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "x-bearer-format": "bearer",
+        "x-default": "api_key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/users/{user_id}/orders/{order_id}/cancel": {
+      "post": {
+        "summary": "Cancel an order",
+        "description": "Cancels an order tethered to the authenticated user or a subaccount tethered to the authenticated user",
+        "operationId": "cancel-an-order",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "The User ID. Use 'me' for main authenticated user, use the user_id if fetching for Sub-account linked to the authenticated user.",
+            "schema": {
+              "type": "string",
+              "default": "me"
+            },
+            "required": true
+          },
+          {
+            "name": "order_id",
+            "in": "path",
+            "description": "Order id.",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"success\",\n  \"message\": \"Successful\",\n  \"data\": {\n    \"id\": \"d74c937eda014e72b78c181f95a761c5\",\n    \"reference\": null,\n    \"market\": {\n      \"id\": \"btcusdt\",\n      \"base_unit\": \"BTC\",\n      \"quote_unit\": \"USDT\"\n    },\n    \"side\": \"buy\",\n    \"price\": {\n      \"unit\": \"BTC\",\n      \"amount\": \"61000.0000000000000000\"\n    },\n    \"volume\": {\n      \"unit\": \"USDT\",\n      \"amount\": \"0\"\n    },\n    \"status\": \"cancel\",\n    \"user\": {\n      \"id\": \"24rhpmow\",\n      \"sn\": \"Qw1os7uj7\",\n      \"email\": \"test@gmail.com\",\n      \"reference\": null,\n      \"first_name\": \"test\",\n      \"last_name\": \"tester\",\n      \"display_name\": \"Adigun Efon Exchange\",\n      \"created_at\": \"2026-02-09T13:22:14.000Z\",\n      \"updated_at\": \"2026-02-13T10:45:42.000Z\"\n    },\n    \"trades\": null,\n    \"order_type\": \"limit\",\n    \"avg_price\": {\n      \"unit\": \"BTC\",\n      \"amount\": \"0.0000000000000000\"\n    },\n    \"origin_volume\": {\n      \"unit\": \"USDT\",\n      \"amount\": \"0.0000500000000000\"\n    },\n    \"executed_volume\": {\n      \"unit\": \"USDT\",\n      \"amount\": \"0.0000000000000000\"\n    },\n    \"trades_count\": \"0\",\n    \"created_at\": \"2026-02-23T10:47:10.148Z\",\n    \"updated_at\": \"2026-02-23T10:53:41.000Z\",\n    \"done_at\": null\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "d74c937eda014e72b78c181f95a761c5"
+                        },
+                        "reference": {},
+                        "market": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "btcusdt"
+                            },
+                            "base_unit": {
+                              "type": "string",
+                              "example": "BTC"
+                            },
+                            "quote_unit": {
+                              "type": "string",
+                              "example": "USDT"
+                            }
+                          }
+                        },
+                        "side": {
+                          "type": "string",
+                          "example": "buy"
+                        },
+                        "price": {
+                          "type": "object",
+                          "properties": {
+                            "unit": {
+                              "type": "string",
+                              "example": "BTC"
+                            },
+                            "amount": {
+                              "type": "string",
+                              "example": "61000.0000000000000000"
+                            }
+                          }
+                        },
+                        "volume": {
+                          "type": "object",
+                          "properties": {
+                            "unit": {
+                              "type": "string",
+                              "example": "USDT"
+                            },
+                            "amount": {
+                              "type": "string",
+                              "example": "0"
+                            }
+                          }
+                        },
+                        "status": {
+                          "type": "string",
+                          "example": "cancel"
+                        },
+                        "user": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "24rhpmow"
+                            },
+                            "sn": {
+                              "type": "string",
+                              "example": "Qw1os7uj7"
+                            },
+                            "email": {
+                              "type": "string",
+                              "example": "test@gmail.com"
+                            },
+                            "reference": {},
+                            "first_name": {
+                              "type": "string",
+                              "example": "test"
+                            },
+                            "last_name": {
+                              "type": "string",
+                              "example": "tester"
+                            },
+                            "display_name": {
+                              "type": "string",
+                              "example": "Adigun Efon Exchange"
+                            },
+                            "created_at": {
+                              "type": "string",
+                              "example": "2026-02-09T13:22:14.000Z"
+                            },
+                            "updated_at": {
+                              "type": "string",
+                              "example": "2026-02-13T10:45:42.000Z"
+                            }
+                          }
+                        },
+                        "trades": {},
+                        "order_type": {
+                          "type": "string",
+                          "example": "limit"
+                        },
+                        "avg_price": {
+                          "type": "object",
+                          "properties": {
+                            "unit": {
+                              "type": "string",
+                              "example": "BTC"
+                            },
+                            "amount": {
+                              "type": "string",
+                              "example": "0.0000000000000000"
+                            }
+                          }
+                        },
+                        "origin_volume": {
+                          "type": "object",
+                          "properties": {
+                            "unit": {
+                              "type": "string",
+                              "example": "USDT"
+                            },
+                            "amount": {
+                              "type": "string",
+                              "example": "0.0000500000000000"
+                            }
+                          }
+                        },
+                        "executed_volume": {
+                          "type": "object",
+                          "properties": {
+                            "unit": {
+                              "type": "string",
+                              "example": "USDT"
+                            },
+                            "amount": {
+                              "type": "string",
+                              "example": "0.0000000000000000"
+                            }
+                          }
+                        },
+                        "trades_count": {
+                          "type": "string",
+                          "example": "0"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "example": "2026-02-23T10:47:10.148Z"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "example": "2026-02-23T10:53:41.000Z"
+                        },
+                        "done_at": {}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"Order with ID: 7gvtmw5f does not exist.\",\n  \"data\": {\n    \"code\": \"E0404\",\n    \"message\": \"Order with ID: 7gvtmw5f does not exist.\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Order with ID: 7gvtmw5f does not exist."
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "example": "E0404"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Order with ID: 7gvtmw5f does not exist."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "6981ba5faf9470ee082aeece:6981ba5faf9470ee082aef09"
+}
+```\n
+````

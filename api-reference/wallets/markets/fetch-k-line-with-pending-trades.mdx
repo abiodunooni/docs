@@ -1,4 +1,320 @@
 ---
 title: "Fetch k-line with pending trades"
-openapi: "/openapi/wallets.json GET /markets/{currency}/k_with_pending_trades/{trade_id}"
 ---
+
+## ---\\ntitle: "Fetch k-line with pending trades"\\n---\\n\\n--- agentTools: projectIndex: [https://docs.quidax.io/llms.txt](https://docs.quidax.io/llms.txt)
+
+# Fetch k-line data with pending trades for a market
+
+Returns the k-line (OHLC) data with pending trades, which are the trades not included in K data yet, because there's delay between trade generated and processed by K data generator.
+
+# OpenAPI definition
+
+````json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API 3.0",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "https://openapi.quidax.io/exchange-open-api/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "x-bearer-format": "bearer",
+        "x-default": "api_key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/markets/{currency}/k_with_pending_trades/{trade_id}": {
+      "get": {
+        "summary": "Fetch k-line data with pending trades for a market",
+        "description": "Returns the k-line (OHLC) data with pending trades, which are the trades not included in K data yet, because there's delay between trade generated and processed by K data generator.",
+        "operationId": "fetch-k-line-data-with-pending-trades-for-a-market",
+        "parameters": [
+          {
+            "name": "currency",
+            "in": "path",
+            "description": "Allowed Currencies values: qdxusdt, btcusdt, btcngn, ethngn, qdxngn, xrpngn, dashngn, ltcngn, usdtngn, btcghs, usdtghs, trxngn, dogeusdt, bnbusdt, maticusdt, safemoonusdt, aaveusdt, shibusdt, dotusdt, linkusdt, cakeusdt, xlmusdt, xrpusdt, ltcusdt, ethusdt, trxusdt, axsusdt, wsgusdt, afenusdt, blsusdt, dashusdt.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "btcngn",
+                "usdtngn",
+                "ethngn",
+                "xautngn",
+                "usdcngn",
+                "trxngn",
+                "dashngn",
+                "ltcngn",
+                "xrpngn",
+                "solngn",
+                "qdxngn",
+                "btcusdt",
+                "ethusdt",
+                "xautusdt",
+                "trxusdt",
+                "usdcusdt",
+                "bnbusdt",
+                "dogeusdt",
+                "usatusdt",
+                "ltcusdt",
+                "linkusdt",
+                "polusdt",
+                "xrpusdt",
+                "dotusdt",
+                "aaveusdt",
+                "dashusdt",
+                "shibusdt",
+                "xlmusdt",
+                "cakeusdt",
+                "adausdt",
+                "bchusdt",
+                "slpusdt",
+                "flokiusdt",
+                "solusdt",
+                "cfxusdt",
+                "pepeusdt",
+                "bonkusdt",
+                "algousdt",
+                "wifusdt",
+                "tonusdt",
+                "rndrusdt",
+                "xyousdt",
+                "hypeusdt",
+                "fartcoinusdt",
+                "cngnngn",
+                "suiusdt",
+                "usdtghs",
+                "lskusdt",
+                "axcnhusdt",
+                "axcnhngn",
+                "usdtcngn",
+                "qdxusdt",
+                "usdtxaf",
+                "usdtxof",
+                "usdtzar",
+                "usdtkes",
+                "axsusdt",
+                "filusdt",
+                "babydogeusdt",
+                "oneusdt",
+                "xtzusdt",
+                "sushiusdt",
+                "zilusdt",
+                "manausdt",
+                "sandusdt",
+                "apeusdt",
+                "enjusdt",
+                "lrcusdt",
+                "wldusdt",
+                "memeusdt",
+                "ordiusdt",
+                "ensusdt",
+                "arbusdt",
+                "myrousdt",
+                "magatrumpusdt",
+                "jupusdt",
+                "blurusdt",
+                "coqusdt",
+                "fetusdt",
+                "aiusdt",
+                "bobusdt",
+                "bomeusdt",
+                "stxusdt",
+                "mogusdt",
+                "injusdt",
+                "mntusdt",
+                "beamusdt",
+                "mewusdt",
+                "gnousdt",
+                "wavesusdt",
+                "trumpusdt",
+                "pnutusdt",
+                "ethghs",
+                "etcusdt",
+                "ethbtc",
+                "ltcbtc",
+                "bchbtc",
+                "cngnusdt",
+                "watsonusdt",
+                "wlfiusdt",
+                "usdtusd",
+                "btcghs",
+                "nochillusdt",
+                "katausdt",
+                "slerfusdt",
+                "nosusdt",
+                "nearusdt",
+                "strkusdt",
+                "zkusdt",
+                "susdt"
+              ],
+              "default": "btcngn"
+            },
+            "required": true
+          },
+          {
+            "name": "trade_id",
+            "in": "path",
+            "description": "trade_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit the number of returned data points. Type: Integer. Allowed values: 1..10000. Default is 30",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 30
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "description": "Time period of K line. You can choose between 1, 5, 15, 30, 60, 120, 240, 360, 720, 1440, 4320, 10080. Default to 1.",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 60
+            }
+          },
+          {
+            "name": "timestamp",
+            "in": "query",
+            "description": "An integer represents the seconds elapsed since Unix epoch. If set, only k-line data after that time will be returned. Type: Integer.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "\n{\n  \"status\": \"success\",\n  \"message\": \"Successful\",\n  \"data\": {\n    \"k\": [\n      [\n        1548259200,\n        1302736.74,\n        1302736.74,\n        1299637.85,\n        1299637.85,\n        1.2109\n      ],\n      [\n        1548262800,\n        1299637.85,\n        1299637.85,\n        1299637.85,\n        1299637.85,\n        0\n      ],\n      [\n        1548266400,\n        1299637.85,\n        1299637.85,\n        1297400.02,\n        1297400.02,\n        1.3265\n      ]\n    ],\n    \"trades\": [\n    {\n        \"tid\": 41,\n        \"type\": \"buy\",\n        \"date\": 1533139874,\n        \"price\": \"2672301.0\",\n        \"amount\": \"0.0001\",\n        \"base_volume\": \"0.0001\",\n        \"quote_volume\": \"267.2301\"\n      }]\n  }\n}\n"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "k": {
+                          "type": "array",
+                          "items": {
+                            "type": "array",
+                            "items": {
+                              "type": "number",
+                              "example": 1302736.74,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "trades": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "tid": {
+                                "type": "integer",
+                                "example": 41,
+                                "default": 0
+                              },
+                              "type": {
+                                "type": "string",
+                                "example": "buy"
+                              },
+                              "date": {
+                                "type": "integer",
+                                "example": 1533139874,
+                                "default": 0
+                              },
+                              "price": {
+                                "type": "string",
+                                "example": "2672301.0"
+                              },
+                              "amount": {
+                                "type": "string",
+                                "example": "0.0001"
+                              },
+                              "base_volume": {
+                                "type": "string",
+                                "example": "0.0001"
+                              },
+                              "quote_volume": {
+                                "type": "string",
+                                "example": "267.2301"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false,
+        "security": []
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "6981ba5faf9470ee082aeece:6981ba5faf9470ee082aeef6"
+}
+```\n
+````

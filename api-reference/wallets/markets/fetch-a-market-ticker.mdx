@@ -1,4 +1,304 @@
 ---
 title: "Fetch a market ticker"
-openapi: "/openapi/wallets.json GET /markets/tickers/{market}"
 ---
+
+## ---\\ntitle: "Fetch a market ticker"\\n---\\n\\n--- agentTools: projectIndex: [https://docs.quidax.io/llms.txt](https://docs.quidax.io/llms.txt)
+
+# Fetch a market ticker
+
+Returns the market ticker for a specific market.
+
+# OpenAPI definition
+
+````json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API 3.0",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "https://openapi.quidax.io/exchange-open-api/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "x-bearer-format": "bearer",
+        "x-default": "api_key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/markets/tickers/{market}": {
+      "get": {
+        "summary": "Fetch a market ticker",
+        "description": "Returns the market ticker for a specific market.",
+        "operationId": "fetch-a-market-ticker",
+        "parameters": [
+          {
+            "name": "market",
+            "in": "path",
+            "description": "The market symbol used to fetch the current price.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "btcngn",
+                "usdtngn",
+                "ethngn",
+                "xautngn",
+                "usdcngn",
+                "trxngn",
+                "dashngn",
+                "ltcngn",
+                "xrpngn",
+                "solngn",
+                "qdxngn",
+                "btcusdt",
+                "ethusdt",
+                "xautusdt",
+                "trxusdt",
+                "usdcusdt",
+                "bnbusdt",
+                "dogeusdt",
+                "usatusdt",
+                "ltcusdt",
+                "linkusdt",
+                "polusdt",
+                "xrpusdt",
+                "dotusdt",
+                "aaveusdt",
+                "dashusdt",
+                "shibusdt",
+                "xlmusdt",
+                "cakeusdt",
+                "adausdt",
+                "bchusdt",
+                "slpusdt",
+                "flokiusdt",
+                "solusdt",
+                "cfxusdt",
+                "pepeusdt",
+                "bonkusdt",
+                "algousdt",
+                "wifusdt",
+                "tonusdt",
+                "rndrusdt",
+                "xyousdt",
+                "hypeusdt",
+                "fartcoinusdt",
+                "cngnngn",
+                "suiusdt",
+                "usdtghs",
+                "lskusdt",
+                "axcnhusdt",
+                "axcnhngn",
+                "usdtcngn",
+                "qdxusdt",
+                "usdtxaf",
+                "usdtxof",
+                "usdtzar",
+                "usdtkes",
+                "axsusdt",
+                "filusdt",
+                "babydogeusdt",
+                "oneusdt",
+                "xtzusdt",
+                "sushiusdt",
+                "zilusdt",
+                "manausdt",
+                "sandusdt",
+                "apeusdt",
+                "enjusdt",
+                "lrcusdt",
+                "wldusdt",
+                "memeusdt",
+                "ordiusdt",
+                "ensusdt",
+                "arbusdt",
+                "myrousdt",
+                "magatrumpusdt",
+                "jupusdt",
+                "blurusdt",
+                "coqusdt",
+                "fetusdt",
+                "aiusdt",
+                "bobusdt",
+                "bomeusdt",
+                "stxusdt",
+                "mogusdt",
+                "injusdt",
+                "mntusdt",
+                "beamusdt",
+                "mewusdt",
+                "gnousdt",
+                "wavesusdt",
+                "trumpusdt",
+                "pnutusdt",
+                "ethghs",
+                "etcusdt",
+                "ethbtc",
+                "ltcbtc",
+                "bchbtc",
+                "cngnusdt",
+                "watsonusdt",
+                "wlfiusdt",
+                "usdtusd",
+                "btcghs",
+                "nochillusdt",
+                "katausdt",
+                "slerfusdt",
+                "nosusdt",
+                "nearusdt",
+                "strkusdt",
+                "zkusdt",
+                "susdt"
+              ],
+              "default": "btcngn"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n\t\"status\": \"success\",\n\t\"message\": \"Successful\",\n\t\"data\": {\n\t\t\"btcngn\": {\n\t\t\t\"ticker\": {\n\t\t\t\t\"high\": \"10000000\",\n\t\t\t\t\"vol\": \"874.31737149\",\n\t\t\t\t\"last\": 10000000.0000000000000000,\n\t\t\t\t\"low\": \"10000000\",\n\t\t\t\t\"buy\": 90419109,\n\t\t\t\t\"sell\": 90600129,\n\t\t\t\t\"open\": \"10000000\"\n\t\t\t},\n\t\t\t\"at\": 1784998695000\n\t\t}\n\t}\n}"
+                  },
+                  "invalid market": {
+                    "value": "{\n  \"status\": \"success\",\n  \"message\": \"Successful\",\n  \"data\": {}\n}"
+                  }
+                },
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "example": "success"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Successful"
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "btcngn": {
+                              "type": "object",
+                              "properties": {
+                                "ticker": {
+                                  "type": "object",
+                                  "properties": {
+                                    "high": {
+                                      "type": "string",
+                                      "example": "10000000"
+                                    },
+                                    "vol": {
+                                      "type": "string",
+                                      "example": "874.31737149"
+                                    },
+                                    "last": {
+                                      "type": "integer",
+                                      "example": 10000000,
+                                      "default": 0
+                                    },
+                                    "low": {
+                                      "type": "string",
+                                      "example": "10000000"
+                                    },
+                                    "buy": {
+                                      "type": "integer",
+                                      "example": 90419109,
+                                      "default": 0
+                                    },
+                                    "sell": {
+                                      "type": "integer",
+                                      "example": 90600129,
+                                      "default": 0
+                                    },
+                                    "open": {
+                                      "type": "string",
+                                      "example": "10000000"
+                                    }
+                                  }
+                                },
+                                "at": {
+                                  "type": "integer",
+                                  "example": 1784998695000,
+                                  "default": 0
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "title": "invalid market",
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "example": "success"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Successful"
+                        },
+                        "data": {
+                          "type": "object",
+                          "properties": {}
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false,
+        "security": []
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "6981ba5faf9470ee082aeece:6981ba5faf9470ee082aeef4"
+}
+```\n
+````

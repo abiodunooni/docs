@@ -1,4 +1,291 @@
 ---
 title: "Fetch depth data for a market"
-openapi: "/openapi/wallets.json GET /markets/{currency}/depth"
 ---
+
+## ---\\ntitle: "Fetch depth data for a market"\\n---\\n\\n--- agentTools: projectIndex: [https://docs.quidax.io/llms.txt](https://docs.quidax.io/llms.txt)
+
+# Fetch depth data for a market
+
+Get depth or specified market. Both asks and bids are sorted from highest price to lowest.
+
+# OpenAPI definition
+
+````json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API 3.0",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "https://openapi.quidax.io/exchange-open-api/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "x-bearer-format": "bearer",
+        "x-default": "api_key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/markets/{currency}/depth?limit={limit}": {
+      "get": {
+        "summary": "Fetch depth data for a market",
+        "description": "Get depth or specified market. Both asks and bids are sorted from highest price to lowest.",
+        "operationId": "fetch-depth-data-for-a-market",
+        "parameters": [
+          {
+            "name": "currency",
+            "in": "path",
+            "description": "Allowed Currencies values: qdxusdt, btcusdt, btcngn, ethngn, qdxngn, xrpngn, dashngn, ltcngn, usdtngn, btcghs, usdtghs, trxngn, dogeusdt, bnbusdt, maticusdt, safemoonusdt, aaveusdt, shibusdt, dotusdt, linkusdt, cakeusdt, xlmusdt, xrpusdt, ltcusdt, ethusdt, trxusdt, axsusdt, wsgusdt, afenusdt, blsusdt, dashusdt.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "btcngn",
+                "usdtngn",
+                "ethngn",
+                "xautngn",
+                "usdcngn",
+                "trxngn",
+                "dashngn",
+                "ltcngn",
+                "xrpngn",
+                "solngn",
+                "qdxngn",
+                "btcusdt",
+                "ethusdt",
+                "xautusdt",
+                "trxusdt",
+                "usdcusdt",
+                "bnbusdt",
+                "dogeusdt",
+                "usatusdt",
+                "ltcusdt",
+                "linkusdt",
+                "polusdt",
+                "xrpusdt",
+                "dotusdt",
+                "aaveusdt",
+                "dashusdt",
+                "shibusdt",
+                "xlmusdt",
+                "cakeusdt",
+                "adausdt",
+                "bchusdt",
+                "slpusdt",
+                "flokiusdt",
+                "solusdt",
+                "cfxusdt",
+                "pepeusdt",
+                "bonkusdt",
+                "algousdt",
+                "wifusdt",
+                "tonusdt",
+                "rndrusdt",
+                "xyousdt",
+                "hypeusdt",
+                "fartcoinusdt",
+                "cngnngn",
+                "suiusdt",
+                "usdtghs",
+                "lskusdt",
+                "axcnhusdt",
+                "axcnhngn",
+                "usdtcngn",
+                "qdxusdt",
+                "usdtxaf",
+                "usdtxof",
+                "usdtzar",
+                "usdtkes",
+                "axsusdt",
+                "filusdt",
+                "babydogeusdt",
+                "oneusdt",
+                "xtzusdt",
+                "sushiusdt",
+                "zilusdt",
+                "manausdt",
+                "sandusdt",
+                "apeusdt",
+                "enjusdt",
+                "lrcusdt",
+                "wldusdt",
+                "memeusdt",
+                "ordiusdt",
+                "ensusdt",
+                "arbusdt",
+                "myrousdt",
+                "magatrumpusdt",
+                "jupusdt",
+                "blurusdt",
+                "coqusdt",
+                "fetusdt",
+                "aiusdt",
+                "bobusdt",
+                "bomeusdt",
+                "stxusdt",
+                "mogusdt",
+                "injusdt",
+                "mntusdt",
+                "beamusdt",
+                "mewusdt",
+                "gnousdt",
+                "wavesusdt",
+                "trumpusdt",
+                "pnutusdt",
+                "ethghs",
+                "etcusdt",
+                "ethbtc",
+                "ltcbtc",
+                "bchbtc",
+                "cngnusdt",
+                "watsonusdt",
+                "wlfiusdt",
+                "usdtusd",
+                "btcghs",
+                "nochillusdt",
+                "katausdt",
+                "slerfusdt",
+                "nosusdt",
+                "nearusdt",
+                "strkusdt",
+                "zkusdt",
+                "susdt"
+              ],
+              "default": "btcngn"
+            },
+            "required": true
+          },
+          {
+            "name": "limit",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "default": "10"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n    \"status\": \"success\",\n    \"message\": \"Successful\",\n    \"data\": {\n        \"asks\": [\n            [\n                92032089,\n                0.61102603\n            ],\n            [\n                92036143,\n                0.49320159\n            ],\n            [\n                92040197,\n                0.6266092\n            ],\n            [\n                92044252,\n                0.05392214\n            ],\n            [\n                92048306,\n                0.04486807\n            ],\n            [\n                92052360,\n                0.15982503\n            ],\n            [\n                92056414,\n                0.58472037\n            ],\n            [\n                92057285,\n                0.93082183\n            ],\n            [\n                92060468,\n                0.74669461\n            ],\n            [\n                92061340,\n                0.91844518\n            ]\n        ],\n        \"bids\": [\n            [\n                91505767,\n                0.24908664\n            ],\n            [\n                91500360,\n                0.91763351\n            ],\n            [\n                91494953,\n                0.1482939\n            ],\n            [\n                91489546,\n                0.2845928\n            ],\n            [\n                91484139,\n                0.6983035\n            ],\n            [\n                91478732,\n                0.04203352\n            ],\n            [\n                91473325,\n                0.81385347\n            ],\n            [\n                91467918,\n                0.76322111\n            ],\n            [\n                91462511,\n                0.82364755\n            ],\n            [\n                91457104,\n                0.55378148\n            ]\n        ],\n        \"timestamp\": 1772187854000\n    }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "asks": {
+                          "type": "array",
+                          "items": {
+                            "type": "array",
+                            "items": {
+                              "type": "number",
+                              "example": 0.61102603,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "bids": {
+                          "type": "array",
+                          "items": {
+                            "type": "array",
+                            "items": {
+                              "type": "number",
+                              "example": 0.24908664,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "timestamp": {
+                          "type": "integer",
+                          "example": 1772187854000,
+                          "default": 0
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n    \"status\": \"error\",\n    \"message\": \"Validation failed: must be greater than or equal to 1\",\n    \"data\": {\n        \"code\": \"E0107\",\n        \"message\": \"Validation failed: must be greater than or equal to 1\"\n    }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Validation failed: must be greater than or equal to 1"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "example": "E0107"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Validation failed: must be greater than or equal to 1"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false,
+        "security": []
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "6981ba5faf9470ee082aeece:6981ba5faf9470ee082aeef8"
+}
+```\n
+````

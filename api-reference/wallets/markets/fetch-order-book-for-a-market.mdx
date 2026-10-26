@@ -1,4 +1,397 @@
 ---
 title: "Fetch order book for a market"
-openapi: "/openapi/wallets.json GET /markets/{currency}/order_book"
 ---
+
+## ---\\ntitle: "Fetch order book for a market"\\n---\\n\\n--- agentTools: projectIndex: [https://docs.quidax.io/llms.txt](https://docs.quidax.io/llms.txt)
+
+# Fetch order-book items for a market
+
+Gets the volume of trades that are currently being processed by the order book.
+
+# OpenAPI definition
+
+````json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API 3.0",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "https://openapi.quidax.io/exchange-open-api/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "x-bearer-format": "bearer",
+        "x-default": "api_key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/markets/{currency}/order_book": {
+      "get": {
+        "summary": "Fetch order-book items for a market",
+        "description": "Gets the volume of trades that are currently being processed by the order book.",
+        "operationId": "fetch-order-book-items-for-a-market",
+        "parameters": [
+          {
+            "name": "currency",
+            "in": "path",
+            "description": "Allowed Currencies values: qdxusdt, btcusdt, btcngn, ethngn, qdxngn, xrpngn, dashngn, ltcngn, usdtngn, btcghs, usdtghs, trxngn, dogeusdt, bnbusdt, maticusdt, safemoonusdt, aaveusdt, shibusdt, dotusdt, linkusdt, cakeusdt, xlmusdt, xrpusdt, ltcusdt, ethusdt, trxusdt, axsusdt, wsgusdt, afenusdt, blsusdt, dashusdt.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "btcngn",
+                "usdtngn",
+                "ethngn",
+                "xautngn",
+                "usdcngn",
+                "trxngn",
+                "dashngn",
+                "ltcngn",
+                "xrpngn",
+                "solngn",
+                "qdxngn",
+                "btcusdt",
+                "ethusdt",
+                "xautusdt",
+                "trxusdt",
+                "usdcusdt",
+                "bnbusdt",
+                "dogeusdt",
+                "usatusdt",
+                "ltcusdt",
+                "linkusdt",
+                "polusdt",
+                "xrpusdt",
+                "dotusdt",
+                "aaveusdt",
+                "dashusdt",
+                "shibusdt",
+                "xlmusdt",
+                "cakeusdt",
+                "adausdt",
+                "bchusdt",
+                "slpusdt",
+                "flokiusdt",
+                "solusdt",
+                "cfxusdt",
+                "pepeusdt",
+                "bonkusdt",
+                "algousdt",
+                "wifusdt",
+                "tonusdt",
+                "rndrusdt",
+                "xyousdt",
+                "hypeusdt",
+                "fartcoinusdt",
+                "cngnngn",
+                "suiusdt",
+                "usdtghs",
+                "lskusdt",
+                "axcnhusdt",
+                "axcnhngn",
+                "usdtcngn",
+                "qdxusdt",
+                "usdtxaf",
+                "usdtxof",
+                "usdtzar",
+                "usdtkes",
+                "axsusdt",
+                "filusdt",
+                "babydogeusdt",
+                "oneusdt",
+                "xtzusdt",
+                "sushiusdt",
+                "zilusdt",
+                "manausdt",
+                "sandusdt",
+                "apeusdt",
+                "enjusdt",
+                "lrcusdt",
+                "wldusdt",
+                "memeusdt",
+                "ordiusdt",
+                "ensusdt",
+                "arbusdt",
+                "myrousdt",
+                "magatrumpusdt",
+                "jupusdt",
+                "blurusdt",
+                "coqusdt",
+                "fetusdt",
+                "aiusdt",
+                "bobusdt",
+                "bomeusdt",
+                "stxusdt",
+                "mogusdt",
+                "injusdt",
+                "mntusdt",
+                "beamusdt",
+                "mewusdt",
+                "gnousdt",
+                "wavesusdt",
+                "trumpusdt",
+                "pnutusdt",
+                "ethghs",
+                "etcusdt",
+                "ethbtc",
+                "ltcbtc",
+                "bchbtc",
+                "cngnusdt",
+                "watsonusdt",
+                "wlfiusdt",
+                "usdtusd",
+                "btcghs",
+                "nochillusdt",
+                "katausdt",
+                "slerfusdt",
+                "nosusdt",
+                "nearusdt",
+                "strkusdt",
+                "zkusdt",
+                "susdt"
+              ],
+              "default": "btcngn"
+            },
+            "required": true
+          },
+          {
+            "name": "ask_limit",
+            "in": "query",
+            "description": "Limit the number of returned sell orders. Type: Integer, Allowed values: 1..200. Default to 20.",
+            "schema": {
+              "type": "string",
+              "default": "20"
+            }
+          },
+          {
+            "name": "bids_limit",
+            "in": "query",
+            "description": "Limit the number of returned buy orders. Type: Integer, Allowed values: 1..200. Default to 20.",
+            "schema": {
+              "type": "string",
+              "default": "20"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"success\",\n  \"message\": \"Successful\",\n  \"data\": {\n    \"bids\": [\n      {\n        \"id\": 3115264299823557600,\n        \"side\": \"buy\",\n        \"price\": \"88200000.0000000000000000\",\n        \"state\": \"NEW_\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0005045500000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"0.0000000000000000\",\n        \"origin_volume\": \"0.0005045500000000\",\n        \"executed_volume\": \"0.0000000000000000\",\n        \"trades_count\": 0,\n        \"created_at\": \"2026-02-20T08:01:17.000Z\",\n        \"updated_at\": \"2026-02-20T08:01:17.000Z\"\n      },\n      {\n        \"id\": 3115281445333054500,\n        \"side\": \"buy\",\n        \"price\": \"90104371.0000000000000000\",\n        \"state\": \"NEW_\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0009771600000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"0.0000000000000000\",\n        \"origin_volume\": \"0.0009771600000000\",\n        \"executed_volume\": \"0.0000000000000000\",\n        \"trades_count\": 0,\n        \"created_at\": \"2026-02-20T08:44:29.000Z\",\n        \"updated_at\": \"2026-02-20T08:44:29.000Z\"\n      },\n      {\n        \"id\": 3115281599951877600,\n        \"side\": \"buy\",\n        \"price\": \"90104381.0000000000000000\",\n        \"state\": \"NEW_\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000500000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"0.0000000000000000\",\n        \"origin_volume\": \"0.0000500000000000\",\n        \"executed_volume\": \"0.0000000000000000\",\n        \"trades_count\": 0,\n        \"created_at\": \"2026-02-20T08:47:19.000Z\",\n        \"updated_at\": \"2026-02-20T08:47:19.000Z\"\n      },\n      {\n        \"id\": 3115285413882863600,\n        \"side\": \"buy\",\n        \"price\": \"90104378.0000000000000000\",\n        \"state\": \"NEW_\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0009759000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"0.0000000000000000\",\n        \"origin_volume\": \"0.0009759000000000\",\n        \"executed_volume\": \"0.0000000000000000\",\n        \"trades_count\": 0,\n        \"created_at\": \"2026-02-20T08:46:41.000Z\",\n        \"updated_at\": \"2026-02-20T08:46:41.000Z\"\n      },\n      {\n        \"id\": 3115286547754164000,\n        \"side\": \"buy\",\n        \"price\": \"90104379.0000000000000000\",\n        \"state\": \"NEW_\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0011525500000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"0.0000000000000000\",\n        \"origin_volume\": \"0.0011525500000000\",\n        \"executed_volume\": \"0.0000000000000000\",\n        \"trades_count\": 0,\n        \"created_at\": \"2026-02-20T08:46:53.000Z\",\n        \"updated_at\": \"2026-02-20T08:46:53.000Z\"\n      },\n      {\n        \"id\": 62,\n        \"side\": \"buy\",\n        \"price\": \"2600000.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2600000.0000000000000000\",\n        \"origin_volume\": \"0.0001000000000000\",\n        \"executed_volume\": \"0.0001000000000000\",\n        \"trades_count\": 1,\n        \"created_at\": \"2018-08-01T08:57:40.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 63,\n        \"side\": \"buy\",\n        \"price\": \"2610000.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2610000.0000000000000000\",\n        \"origin_volume\": \"0.0001000000000000\",\n        \"executed_volume\": \"0.0001000000000000\",\n        \"trades_count\": 1,\n        \"created_at\": \"2018-08-01T08:58:03.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 64,\n        \"side\": \"buy\",\n        \"price\": \"2615000.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2615000.0000000000000000\",\n        \"origin_volume\": \"0.0001000000000000\",\n        \"executed_volume\": \"0.0001000000000000\",\n        \"trades_count\": 1,\n        \"created_at\": \"2018-08-01T08:58:25.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 66,\n        \"side\": \"buy\",\n        \"price\": \"2630000.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2630000.0000000000000000\",\n        \"origin_volume\": \"0.0003000000000000\",\n        \"executed_volume\": \"0.0003000000000000\",\n        \"trades_count\": 1,\n        \"created_at\": \"2018-08-01T08:58:45.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 67,\n        \"side\": \"buy\",\n        \"price\": \"2630001.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2630001.0000000000000000\",\n        \"origin_volume\": \"0.0003000000000000\",\n        \"executed_volume\": \"0.0003000000000000\",\n        \"trades_count\": 1,\n        \"created_at\": \"2018-08-01T08:59:13.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 69,\n        \"side\": \"buy\",\n        \"price\": \"2630011.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2630011.0000000000000000\",\n        \"origin_volume\": \"0.0001000000000000\",\n        \"executed_volume\": \"0.0001000000000000\",\n        \"trades_count\": 1,\n        \"created_at\": \"2018-08-01T09:00:05.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 70,\n        \"side\": \"buy\",\n        \"price\": \"2630411.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2630411.0000000000000000\",\n        \"origin_volume\": \"0.0004000000000000\",\n        \"executed_volume\": \"0.0004000000000000\",\n        \"trades_count\": 1,\n        \"created_at\": \"2018-08-01T09:00:17.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 73,\n        \"side\": \"buy\",\n        \"price\": \"2600000.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2600000.0000000000000000\",\n        \"origin_volume\": \"0.0003000000000000\",\n        \"executed_volume\": \"0.0003000000000000\",\n        \"trades_count\": 1,\n        \"created_at\": \"2018-08-01T09:01:23.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 74,\n        \"side\": \"buy\",\n        \"price\": \"2600001.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2600001.0000000000000000\",\n        \"origin_volume\": \"0.0003000000000000\",\n        \"executed_volume\": \"0.0003000000000000\",\n        \"trades_count\": 1,\n        \"created_at\": \"2018-08-01T09:01:35.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 77,\n        \"side\": \"buy\",\n        \"price\": \"2600101.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2600101.0000000000000000\",\n        \"origin_volume\": \"0.0004000000000000\",\n        \"executed_volume\": \"0.0004000000000000\",\n        \"trades_count\": 1,\n        \"created_at\": \"2018-08-01T09:01:50.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 78,\n        \"side\": \"buy\",\n        \"price\": \"2600301.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2600301.0000000000000000\",\n        \"origin_volume\": \"0.0004000000000000\",\n        \"executed_volume\": \"0.0004000000000000\",\n        \"trades_count\": 1,\n        \"created_at\": \"2018-08-01T09:02:06.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 79,\n        \"side\": \"buy\",\n        \"price\": \"2601301.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2601301.0000000000000000\",\n        \"origin_volume\": \"0.0004000000000000\",\n        \"executed_volume\": \"0.0004000000000000\",\n        \"trades_count\": 1,\n        \"created_at\": \"2018-08-01T09:02:15.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 81,\n        \"side\": \"buy\",\n        \"price\": \"2611301.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2611301.0000000000000000\",\n        \"origin_volume\": \"0.0004000000000000\",\n        \"executed_volume\": \"0.0004000000000000\",\n        \"trades_count\": 2,\n        \"created_at\": \"2018-08-01T09:02:31.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 83,\n        \"side\": \"buy\",\n        \"price\": \"2611301.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2611301.0000000000000000\",\n        \"origin_volume\": \"0.0002000000000000\",\n        \"executed_volume\": \"0.0002000000000000\",\n        \"trades_count\": 0,\n        \"created_at\": \"2018-08-01T09:11:43.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 84,\n        \"side\": \"buy\",\n        \"price\": \"2671000.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2655250.0000000000000000\",\n        \"origin_volume\": \"0.0004000000000000\",\n        \"executed_volume\": \"0.0004000000000000\",\n        \"trades_count\": 2,\n        \"created_at\": \"2018-08-01T09:15:50.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      }\n    ],\n    \"asks\": [\n      {\n        \"id\": 3115096435321958400,\n        \"side\": \"sell\",\n        \"price\": \"96935759.0000000000000000\",\n        \"state\": \"NEW_\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0009248800000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"0.0000000000000000\",\n        \"origin_volume\": \"0.0009248800000000\",\n        \"executed_volume\": \"0.0000000000000000\",\n        \"trades_count\": 0,\n        \"created_at\": \"2026-02-18T06:57:43.000Z\",\n        \"updated_at\": \"2026-02-18T06:57:42.000Z\"\n      },\n      {\n        \"id\": 3115114903681283600,\n        \"side\": \"sell\",\n        \"price\": \"95935759.0000000000000000\",\n        \"state\": \"NEW_\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0009379900000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"0.0000000000000000\",\n        \"origin_volume\": \"0.0009379900000000\",\n        \"executed_volume\": \"0.0000000000000000\",\n        \"trades_count\": 0,\n        \"created_at\": \"2026-02-18T07:01:55.000Z\",\n        \"updated_at\": \"2026-02-18T07:01:55.000Z\"\n      },\n      {\n        \"id\": 3115115487796720600,\n        \"side\": \"sell\",\n        \"price\": \"96373519.0000000000000000\",\n        \"state\": \"NEW_\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0009288200000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"0.0000000000000000\",\n        \"origin_volume\": \"0.0009288200000000\",\n        \"executed_volume\": \"0.0000000000000000\",\n        \"trades_count\": 0,\n        \"created_at\": \"2026-02-18T06:56:35.000Z\",\n        \"updated_at\": \"2026-02-18T06:56:35.000Z\"\n      },\n      {\n        \"id\": 3115275947774972000,\n        \"side\": \"sell\",\n        \"price\": \"91020679.0000000000000000\",\n        \"state\": \"NEW_\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0002000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"0.0000000000000000\",\n        \"origin_volume\": \"0.0002000000000000\",\n        \"executed_volume\": \"0.0000000000000000\",\n        \"trades_count\": 0,\n        \"created_at\": \"2026-02-20T07:52:40.000Z\",\n        \"updated_at\": \"2026-02-20T07:52:47.000Z\"\n      },\n      {\n        \"id\": 3115299518555362000,\n        \"side\": \"sell\",\n        \"price\": \"91025371.0000000000000000\",\n        \"state\": \"NEW_\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0002000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"0.0000000000000000\",\n        \"origin_volume\": \"0.0002000000000000\",\n        \"executed_volume\": \"0.0000000000000000\",\n        \"trades_count\": 0,\n        \"created_at\": \"2026-02-20T08:47:13.000Z\",\n        \"updated_at\": \"2026-02-20T08:47:13.000Z\"\n      },\n      {\n        \"id\": 68,\n        \"side\": \"sell\",\n        \"price\": \"2650000.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2650000.0000000000000000\",\n        \"origin_volume\": \"0.0003000000000000\",\n        \"executed_volume\": \"0.0003000000000000\",\n        \"trades_count\": 1,\n        \"created_at\": \"2018-08-01T08:59:38.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 71,\n        \"side\": \"sell\",\n        \"price\": \"2600000.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2625475.5714285714285714\",\n        \"origin_volume\": \"0.0014000000000000\",\n        \"executed_volume\": \"0.0014000000000000\",\n        \"trades_count\": 7,\n        \"created_at\": \"2018-08-01T09:00:39.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 72,\n        \"side\": \"sell\",\n        \"price\": \"2671000.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2671000.0000000000000000\",\n        \"origin_volume\": \"0.0004000000000000\",\n        \"executed_volume\": \"0.0004000000000000\",\n        \"trades_count\": 3,\n        \"created_at\": \"2018-08-01T09:00:46.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 75,\n        \"side\": \"sell\",\n        \"price\": \"2600000.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2600001.0000000000000000\",\n        \"origin_volume\": \"0.0003000000000000\",\n        \"executed_volume\": \"0.0003000000000000\",\n        \"trades_count\": 1,\n        \"created_at\": \"2018-08-01T09:01:38.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 76,\n        \"side\": \"sell\",\n        \"price\": \"2600000.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2600000.0000000000000000\",\n        \"origin_volume\": \"0.0003000000000000\",\n        \"executed_volume\": \"0.0003000000000000\",\n        \"trades_count\": 1,\n        \"created_at\": \"2018-08-01T09:01:45.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 80,\n        \"side\": \"sell\",\n        \"price\": \"2600101.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2600567.6666666666666667\",\n        \"origin_volume\": \"0.0012000000000000\",\n        \"executed_volume\": \"0.0012000000000000\",\n        \"trades_count\": 3,\n        \"created_at\": \"2018-08-01T09:02:31.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 82,\n        \"side\": \"sell\",\n        \"price\": \"2611301.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2611301.0000000000000000\",\n        \"origin_volume\": \"0.0001000000000000\",\n        \"executed_volume\": \"0.0001000000000000\",\n        \"trades_count\": 1,\n        \"created_at\": \"2018-08-01T09:10:08.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 85,\n        \"side\": \"sell\",\n        \"price\": \"2658000.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2658000.0000000000000000\",\n        \"origin_volume\": \"0.0001000000000000\",\n        \"executed_volume\": \"0.0001000000000000\",\n        \"trades_count\": 0,\n        \"created_at\": \"2018-08-01T09:16:52.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 86,\n        \"side\": \"sell\",\n        \"price\": \"2672301.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2672301.0000000000000000\",\n        \"origin_volume\": \"0.0005000000000000\",\n        \"executed_volume\": \"0.0005000000000000\",\n        \"trades_count\": 0,\n        \"created_at\": \"2018-08-01T09:18:06.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 88,\n        \"side\": \"sell\",\n        \"price\": \"2611301.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2611301.0000000000000000\",\n        \"origin_volume\": \"0.0010000000000000\",\n        \"executed_volume\": \"0.0010000000000000\",\n        \"trades_count\": 1,\n        \"created_at\": \"2018-08-01T09:19:44.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 89,\n        \"side\": \"sell\",\n        \"price\": \"2611400.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2611400.0000000000000000\",\n        \"origin_volume\": \"0.0002000000000000\",\n        \"executed_volume\": \"0.0002000000000000\",\n        \"trades_count\": 0,\n        \"created_at\": \"2018-08-01T09:20:29.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 90,\n        \"side\": \"sell\",\n        \"price\": \"2611500.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2611500.0000000000000000\",\n        \"origin_volume\": \"0.0002000000000000\",\n        \"executed_volume\": \"0.0002000000000000\",\n        \"trades_count\": 0,\n        \"created_at\": \"2018-08-01T09:49:46.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 91,\n        \"side\": \"sell\",\n        \"price\": \"2611700.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2611700.0000000000000000\",\n        \"origin_volume\": \"0.0002000000000000\",\n        \"executed_volume\": \"0.0002000000000000\",\n        \"trades_count\": 0,\n        \"created_at\": \"2018-08-01T09:50:28.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:18.000Z\"\n      },\n      {\n        \"id\": 145,\n        \"side\": \"sell\",\n        \"price\": \"268888.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2656800.0000000000000000\",\n        \"origin_volume\": \"0.0005000000000000\",\n        \"executed_volume\": \"0.0005000000000000\",\n        \"trades_count\": 0,\n        \"created_at\": \"2018-08-01T10:18:13.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:19.000Z\"\n      },\n      {\n        \"id\": 146,\n        \"side\": \"sell\",\n        \"price\": \"2674401.0000000000000000\",\n        \"state\": \"FILLED\",\n        \"currency\": \"btcngn\",\n        \"volume\": \"0.0000000000000000\",\n        \"ord_type\": \"LIMIT\",\n        \"avg_price\": \"2674401.0000000000000000\",\n        \"origin_volume\": \"0.0005000000000000\",\n        \"executed_volume\": \"0.0005000000000000\",\n        \"trades_count\": 0,\n        \"created_at\": \"2018-08-01T10:19:01.000Z\",\n        \"updated_at\": \"2018-12-11T05:10:19.000Z\"\n      }\n    ]\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "bids": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "integer",
+                                "example": 3115264299823557600,
+                                "default": 0
+                              },
+                              "side": {
+                                "type": "string",
+                                "example": "buy"
+                              },
+                              "price": {
+                                "type": "string",
+                                "example": "88200000.0000000000000000"
+                              },
+                              "state": {
+                                "type": "string",
+                                "example": "NEW_"
+                              },
+                              "currency": {
+                                "type": "string",
+                                "example": "btcngn"
+                              },
+                              "volume": {
+                                "type": "string",
+                                "example": "0.0005045500000000"
+                              },
+                              "ord_type": {
+                                "type": "string",
+                                "example": "LIMIT"
+                              },
+                              "avg_price": {
+                                "type": "string",
+                                "example": "0.0000000000000000"
+                              },
+                              "origin_volume": {
+                                "type": "string",
+                                "example": "0.0005045500000000"
+                              },
+                              "executed_volume": {
+                                "type": "string",
+                                "example": "0.0000000000000000"
+                              },
+                              "trades_count": {
+                                "type": "integer",
+                                "example": 0,
+                                "default": 0
+                              },
+                              "created_at": {
+                                "type": "string",
+                                "example": "2026-02-20T08:01:17.000Z"
+                              },
+                              "updated_at": {
+                                "type": "string",
+                                "example": "2026-02-20T08:01:17.000Z"
+                              }
+                            }
+                          }
+                        },
+                        "asks": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "integer",
+                                "example": 3115096435321958400,
+                                "default": 0
+                              },
+                              "side": {
+                                "type": "string",
+                                "example": "sell"
+                              },
+                              "price": {
+                                "type": "string",
+                                "example": "96935759.0000000000000000"
+                              },
+                              "state": {
+                                "type": "string",
+                                "example": "NEW_"
+                              },
+                              "currency": {
+                                "type": "string",
+                                "example": "btcngn"
+                              },
+                              "volume": {
+                                "type": "string",
+                                "example": "0.0009248800000000"
+                              },
+                              "ord_type": {
+                                "type": "string",
+                                "example": "LIMIT"
+                              },
+                              "avg_price": {
+                                "type": "string",
+                                "example": "0.0000000000000000"
+                              },
+                              "origin_volume": {
+                                "type": "string",
+                                "example": "0.0009248800000000"
+                              },
+                              "executed_volume": {
+                                "type": "string",
+                                "example": "0.0000000000000000"
+                              },
+                              "trades_count": {
+                                "type": "integer",
+                                "example": 0,
+                                "default": 0
+                              },
+                              "created_at": {
+                                "type": "string",
+                                "example": "2026-02-18T06:57:43.000Z"
+                              },
+                              "updated_at": {
+                                "type": "string",
+                                "example": "2026-02-18T06:57:42.000Z"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"asks_limit does not have a valid value\",\n  \"data\": {\n    \"code\": \"E0000\",\n    \"message\": \"asks_limit does not have a valid value\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "asks_limit does not have a valid value"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "example": "E0000"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "asks_limit does not have a valid value"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false,
+        "security": []
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "6981ba5faf9470ee082aeece:6981ba5faf9470ee082aeef7"
+}
+```\n
+````

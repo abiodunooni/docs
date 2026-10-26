@@ -1,4 +1,339 @@
 ---
 title: "Fetch all payment addresses"
-openapi: "/openapi/wallets.json GET /users/{user_id}/wallets/{currency}/addresses"
 ---
+
+## ---\\ntitle: "Fetch all payment addresses"\\n---\\n\\n--- agentTools: projectIndex: [https://docs.quidax.io/llms.txt](https://docs.quidax.io/llms.txt)
+
+# Fetch Payment Addresses
+
+Get the deposits addresses assigned to a wallet. crypto deposits made to any of the wallet's addresses would immediately be reflected on the balance.
+
+# OpenAPI definition
+
+````json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API 3.0",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "https://openapi.quidax.io/exchange-open-api/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "x-bearer-format": "bearer",
+        "x-default": "api_key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/users/{user_id}/wallets/{currency}/addresses": {
+      "get": {
+        "summary": "Fetch Payment Addresses",
+        "description": "Get the deposits addresses assigned to a wallet. crypto deposits made to any of the wallet's addresses would immediately be reflected on the balance.",
+        "operationId": "fetch-payment-addresses",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "The User ID. Use 'me' if fetching wallets of main authenticated user, use the user_id if fetching for Sub-account linked to the authenticated user.",
+            "schema": {
+              "type": "string",
+              "default": "me"
+            },
+            "required": true
+          },
+          {
+            "name": "currency",
+            "in": "path",
+            "description": "Allowed Currencies values: usd, btc, ltc, eth, xrp, usdt, dash, trx, doge, xrp, bnb, matic, shib, axs, safemoon, cake, xlm, aave, link.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "btc",
+                "usdt",
+                "eth",
+                "xaut",
+                "usat",
+                "xrp",
+                "dash",
+                "ltc",
+                "trx",
+                "doge",
+                "bnb",
+                "pol",
+                "usdc",
+                "aave",
+                "shib",
+                "link",
+                "cake",
+                "xlm",
+                "ada",
+                "bch",
+                "floki",
+                "sol",
+                "cfx",
+                "ton",
+                "sui",
+                "zk",
+                "lsk",
+                "axcnh",
+                "qdx",
+                "cngn"
+              ],
+              "default": "btc"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"success\",\n  \"message\": \"Successful\",\n  \"data\": [\n    {\n      \"id\": \"b4dddedc637048028f558d276f3015bc\",\n      \"reference\": null,\n      \"currency\": \"btc\",\n      \"address\": \"bc1qel75acv9tdwqdx86tla6yyxagp2fvq2tntxntp\",\n      \"network\": \"Bitcoin Network\",\n      \"user\": {\n        \"id\": \"24rhpmow\",\n        \"sn\": \"Qw1os7uj7\",\n        \"email\": \"test@gmail.com\",\n        \"reference\": null,\n        \"first_name\": \"test\",\n        \"last_name\": \"tester\",\n        \"display_name\": \"Adigun Efon Exchange\",\n        \"created_at\": \"2026-02-09T13:22:14.000Z\",\n        \"updated_at\": \"2026-02-13T10:45:42.000Z\"\n      },\n      \"destination_tag\": null,\n      \"total_payments\": null,\n      \"created_at\": \"2026-02-10T11:33:48.000Z\",\n      \"updated_at\": \"2026-02-10T11:33:48.000Z\"\n    },\n    {\n      \"id\": \"5aa8fa21383743a1b9a0bdb3b00ad8cd\",\n      \"reference\": null,\n      \"currency\": \"btc\",\n      \"address\": \"0xf145464EB467582b4dE10B20edAff9F164F42d06\",\n      \"network\": \"BEP20\",\n      \"user\": {\n        \"id\": \"24rhpmow\",\n        \"sn\": \"Qw1os7uj7\",\n        \"email\": \"test@gmail.com\",\n        \"reference\": null,\n        \"first_name\": \"test\",\n        \"last_name\": \"tester\",\n        \"display_name\": \"Adigun Efon Exchange\",\n        \"created_at\": \"2026-02-09T13:22:14.000Z\",\n        \"updated_at\": \"2026-02-13T10:45:42.000Z\"\n      },\n      \"destination_tag\": null,\n      \"total_payments\": null,\n      \"created_at\": \"2026-02-10T11:35:12.000Z\",\n      \"updated_at\": \"2026-02-10T11:35:12.000Z\"\n    }\n  ]\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successful"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "b4dddedc637048028f558d276f3015bc"
+                          },
+                          "reference": {},
+                          "currency": {
+                            "type": "string",
+                            "example": "btc"
+                          },
+                          "address": {
+                            "type": "string",
+                            "example": "bc1qel75acv9tdwqdx86tla6yyxagp2fvq2tntxntp"
+                          },
+                          "network": {
+                            "type": "string",
+                            "example": "Bitcoin Network"
+                          },
+                          "user": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "example": "24rhpmow"
+                              },
+                              "sn": {
+                                "type": "string",
+                                "example": "Qw1os7uj7"
+                              },
+                              "email": {
+                                "type": "string",
+                                "example": "test@gmail.com"
+                              },
+                              "reference": {},
+                              "first_name": {
+                                "type": "string",
+                                "example": "test"
+                              },
+                              "last_name": {
+                                "type": "string",
+                                "example": "tester"
+                              },
+                              "display_name": {
+                                "type": "string",
+                                "example": "Adigun Efon Exchange"
+                              },
+                              "created_at": {
+                                "type": "string",
+                                "example": "2026-02-09T13:22:14.000Z"
+                              },
+                              "updated_at": {
+                                "type": "string",
+                                "example": "2026-02-13T10:45:42.000Z"
+                              }
+                            }
+                          },
+                          "destination_tag": {},
+                          "total_payments": {},
+                          "created_at": {
+                            "type": "string",
+                            "example": "2026-02-10T11:33:48.000Z"
+                          },
+                          "updated_at": {
+                            "type": "string",
+                            "example": "2026-02-10T11:33:48.000Z"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"Currency with Name: 'mmm' doesn't exist.\",\n  \"data\": {\n    \"code\": \"E0604\",\n    \"message\": \"Currency with Name: 'mmm' doesn't exist.\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Currency with Name: 'mmm' doesn't exist."
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "example": "E0604"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Currency with Name: 'mmm' doesn't exist."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false,
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {},
+              "examples": {
+                "Request Example": {
+                  "value": {
+                    "status": "success",
+                    "message": "Successful",
+                    "data": [
+                      {
+                        "id": "fp4gzgx5",
+                        "reference": null,
+                        "currency": "btc",
+                        "address": "38KA5TtxbsFYscyZDGHpHbos1AMLNUgKGJ",
+                        "destination_tag": null,
+                        "total_payments": "0.0",
+                        "created_at": "2021-04-09T10:49:55.000+01:00",
+                        "updated_at": "2021-04-09T10:49:56.000+01:00"
+                      },
+                      {
+                        "id": "j33bhlmp",
+                        "reference": null,
+                        "currency": "btc",
+                        "address": "3B3u4VdqaHoDXNrVjBabdpHvB7Q1fcsrr1",
+                        "destination_tag": null,
+                        "total_payments": "0.0",
+                        "created_at": "2021-04-09T23:39:34.000+01:00",
+                        "updated_at": "2021-04-09T23:39:34.000+01:00"
+                      },
+                      {
+                        "id": "xttmiv5k",
+                        "reference": null,
+                        "currency": "btc",
+                        "address": "34peN7oqSVc5zdYs4sw5x5qEZyk1EDQDzU",
+                        "destination_tag": null,
+                        "total_payments": "0.0",
+                        "created_at": "2021-04-12T07:20:17.000+01:00",
+                        "updated_at": "2021-04-12T07:20:17.000+01:00"
+                      },
+                      {
+                        "id": "446qevcu",
+                        "reference": null,
+                        "currency": "btc",
+                        "address": "18w3v4FzAoNstXWoRmsFLFVjEpouzm37BA",
+                        "destination_tag": null,
+                        "total_payments": "0.0",
+                        "created_at": "2021-07-27T00:34:09.000+01:00",
+                        "updated_at": "2021-07-27T00:34:10.000+01:00"
+                      },
+                      {
+                        "id": "3ep646wn",
+                        "reference": null,
+                        "currency": "btc",
+                        "address": "1Phgerwvz6yJmzKKewGBEqJSLuENtJUYdt",
+                        "destination_tag": null,
+                        "total_payments": "0.0",
+                        "created_at": "2021-07-27T00:34:46.000+01:00",
+                        "updated_at": "2021-07-27T00:34:46.000+01:00"
+                      },
+                      {
+                        "id": "yibl77mc",
+                        "reference": null,
+                        "currency": "btc",
+                        "address": "16qFEAdgWRgHSDGS3a8tkXxmVENkvHC7yC",
+                        "destination_tag": null,
+                        "total_payments": "0.0",
+                        "created_at": "2021-10-30T14:30:30.000+01:00",
+                        "updated_at": "2021-10-30T14:31:03.000+01:00"
+                      },
+                      {
+                        "id": "4ogybn3w",
+                        "reference": null,
+                        "currency": "btc",
+                        "address": "18mgR4rQ2TPi3KzAkNhTNYB2RmQaD5qZES",
+                        "destination_tag": null,
+                        "total_payments": "0.0",
+                        "created_at": "2021-10-30T14:30:33.000+01:00",
+                        "updated_at": "2021-10-30T14:31:24.000+01:00"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "6981ba5faf9470ee082aeece:6981ba5faf9470ee082aeefb"
+}
+```\n
+````

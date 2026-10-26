@@ -1,4 +1,214 @@
 ---
 title: "Get withdrawal fees"
-openapi: "/openapi/wallets.json GET /users/me/fee_rule"
 ---
+
+## ---\\ntitle: "Get withdrawal fees"\\n---\\n\\n--- agentTools: projectIndex: [https://docs.quidax.io/llms.txt](https://docs.quidax.io/llms.txt)
+
+# Get crypto withdrawal fees
+
+Get a withdrawal fee for a specific currency.
+
+# OpenAPI definition
+
+````json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API 3.0",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "https://openapi.quidax.io/exchange-open-api/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "x-bearer-format": "bearer",
+        "x-default": "api_key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/users/me/fee_rule?currency={currency}&amount={amount}&network={network}": {
+      "get": {
+        "summary": "Get crypto withdrawal fees",
+        "description": "Get a withdrawal fee for a specific currency.",
+        "operationId": "get-crypto-withdrawal-fees",
+        "parameters": [
+          {
+            "name": "currency",
+            "in": "path",
+            "description": "Allowed Currencies values: usdc, busd, btc, ltc, eth, xrp, usdt, dash, trx, doge, xrp, bnb, matic, shib, axs, safemoon, cake, xlm, aave, link.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "btc",
+                "usdt",
+                "eth",
+                "xaut",
+                "usat",
+                "xrp",
+                "dash",
+                "ltc",
+                "trx",
+                "doge",
+                "bnb",
+                "pol",
+                "usdc",
+                "aave",
+                "shib",
+                "dot",
+                "link",
+                "cake",
+                "xlm",
+                "axs",
+                "fil",
+                "babydoge",
+                "ada",
+                "one",
+                "bch",
+                "xtz",
+                "sushi",
+                "zil",
+                "floki",
+                "sol",
+                "mana",
+                "sand",
+                "enj",
+                "lrc",
+                "cfx",
+                "ape",
+                "wld",
+                "meme",
+                "ens",
+                "arb",
+                "myro",
+                "magatrump",
+                "jup",
+                "blur",
+                "coq",
+                "fet",
+                "ai",
+                "bob",
+                "bome",
+                "ton",
+                "mog",
+                "inj",
+                "mnt",
+                "beam",
+                "mew",
+                "gno",
+                "waves",
+                "trump",
+                "pnut",
+                "wlfi",
+                "zk",
+                "lsk",
+                "axcnh",
+                "qdx",
+                "cngn"
+              ],
+              "default": "btc"
+            },
+            "required": true
+          },
+          {
+            "name": "network",
+            "in": "path",
+            "description": "Allowed Network: trc20, erc20, and bep20.",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "amount",
+            "in": "path",
+            "description": "Amount to be withdrawn",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"success\",\n  \"message\": \"Successful\",\n  \"data\": {\n    \"fee\": 0.0001,\n    \"type\": \"flat\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "fee": {
+                          "type": "number",
+                          "example": 0.0001,
+                          "default": 0
+                        },
+                        "type": {
+                          "type": "string",
+                          "example": "flat"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "6981ba5faf9470ee082aeece:6981ba5faf9470ee082aef27"
+}
+```\n
+````
