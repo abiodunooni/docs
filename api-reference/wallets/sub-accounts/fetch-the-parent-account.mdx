@@ -1,4 +1,163 @@
 ---
 title: "Fetch the parent account"
-openapi: "/openapi/wallets.json GET /users/me"
 ---
+
+## ---\\ntitle: "Fetch the parent account"\\n---\\n\\n--- agentTools: projectIndex: [https://docs.quidax.io/llms.txt](https://docs.quidax.io/llms.txt)
+
+# Fetch parent account.
+
+This is endpoints is used fetch user detail for parent account, this account are master account tethered for you to user.
+
+# OpenAPI definition
+
+````json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API 3.0",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "https://openapi.quidax.io/exchange-open-api/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "x-bearer-format": "bearer",
+        "x-default": "api_key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/users/me": {
+      "get": {
+        "summary": "Fetch parent account.",
+        "description": "This is endpoints is used fetch user detail for parent account, this account are master account tethered for you to user.",
+        "operationId": "fetch-parent-account",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"success\",\n  \"message\": \"Successful\",\n  \"data\": {\n    \"id\": \"23azi7bj\",\n    \"sn\": \"QDXXIRPXXKS\",\n    \"email\": \"test@gmail.com\",\n    \"reference\": null,\n    \"first_name\": \"test\",\n    \"last_name\": \"user\",\n    \"display_name\": \"testapp\",\n    \"created_at\": \"2021-04-09T10:48:14.000+01:00\",\n    \"updated_at\": \"2021-04-09T11:54:32.000+01:00\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "23azi7bj"
+                        },
+                        "sn": {
+                          "type": "string",
+                          "example": "QDXXIRPXXKS"
+                        },
+                        "email": {
+                          "type": "string",
+                          "example": "test@gmail.com"
+                        },
+                        "reference": {},
+                        "first_name": {
+                          "type": "string",
+                          "example": "test"
+                        },
+                        "last_name": {
+                          "type": "string",
+                          "example": "user"
+                        },
+                        "display_name": {
+                          "type": "string",
+                          "example": "testapp"
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "example": "2021-04-09T10:48:14.000+01:00"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "example": "2021-04-09T11:54:32.000+01:00"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "401",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"Invalid api key\",\n  \"data\": {\n    \"code\": \"E0107\",\n    \"message\": \"Invalid api key\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid api key"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "example": "E0107"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Invalid api key"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "6981ba5faf9470ee082aeece:6981ba5faf9470ee082aeeeb"
+}
+```\n
+````

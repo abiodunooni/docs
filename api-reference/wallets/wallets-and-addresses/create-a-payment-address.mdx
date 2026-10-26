@@ -1,4 +1,295 @@
 ---
 title: "Create a payment address"
-openapi: "/openapi/wallets.json POST /users/{user_id}/wallets/{currency}/addresses"
 ---
+
+## ---\\ntitle: "Create a payment address"\\n---\\n\\n--- agentTools: projectIndex: [https://docs.quidax.io/llms.txt](https://docs.quidax.io/llms.txt)
+
+# Create Payment Address for a cryptocurrency
+
+Create a payment address for a wallet.  The address is generated immediately and returned in the API response.  Specify the network when creating the address. To see the networks available for each currency, use the [Fetch User Wallet](https://docs.quidax.io/reference/fetch-user-wallet)  endpoint.
+
+# OpenAPI definition
+
+````json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API 3.0",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "https://openapi.quidax.io/exchange-open-api/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "x-bearer-format": "bearer",
+        "x-default": "api_key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/users/{user_id}/wallets/{currency}/addresses?": {
+      "post": {
+        "summary": "Create Payment Address for a cryptocurrency",
+        "description": "Create a payment address for a wallet.  The address is generated immediately and returned in the API response.  Specify the network when creating the address. To see the networks available for each currency, use the [Fetch User Wallet](https://docs.quidax.io/reference/fetch-user-wallet)  endpoint.",
+        "operationId": "create-payment-address-for-a-cryptocurrency",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "The User ID. Use 'me' if fetching wallets of main authenticated user, use the user_id if fetching for Sub-account linked to the authenticated user.",
+            "schema": {
+              "type": "string",
+              "default": "me"
+            },
+            "required": true
+          },
+          {
+            "name": "currency",
+            "in": "path",
+            "description": "Currency. Allowed valued: Required. Allowed values: Currencies - qdx, usd, ngn, ghs, btc, usdt, busd, cfx, usdc, cnhc, eth, bnb, xrp, ltc, wkd, bch, doge, dash, trx, one, link, cake, xlm, axs, shib, afen, bls, fil, ada, dot, babydoge, xtz, matic, sfm, aave, wsg, ckt, floki, sol, mana, ftm, sand, slp, enj, lrc, ape, sushi, zil.  trx",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "btc",
+                "usdt",
+                "eth",
+                "xaut",
+                "usat",
+                "xrp",
+                "dash",
+                "ltc",
+                "trx",
+                "doge",
+                "bnb",
+                "pol",
+                "usdc",
+                "aave",
+                "shib",
+                "link",
+                "cake",
+                "xlm",
+                "ada",
+                "bch",
+                "floki",
+                "sol",
+                "cfx",
+                "ton",
+                "sui",
+                "zk",
+                "lsk",
+                "axcnh",
+                "qdx",
+                "cngn"
+              ],
+              "default": "btc"
+            },
+            "required": true
+          },
+          {
+            "name": "network",
+            "in": "query",
+            "description": "example: bep20, erc20, trc20.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"success\",\n  \"message\": \"Successful\",\n  \"data\": {\n    \"id\": \"8aa1fd67-2b03-4059-909d-5b325c0bb317\",\n    \"reference\": null,\n    \"currency\": \"usdt\",\n    \"address\": \"0x20A5EDe8eCa1BACb63C9C77A5C4ecbD9d089d5d2\",\n    \"network\": \"BEP20\",\n    \"user\": {\n      \"id\": \"dmdn34n4-2b03-4059-900d-444mff\",\n      \"sn\": \"QDXXIRPXXKS\",\n      \"email\": \"test@gmail.com\",\n      \"reference\": null,\n      \"first_name\": \"Oye\",\n      \"last_name\": \"Olalekan\",\n      \"display_name\": \"appstate\",\n      \"created_at\": \"2021-04-09T10:48:14.000+01:00\",\n      \"updated_at\": \"2024-03-12T11:34:34.000+01:00\"\n    },\n    \"destination_tag\": null,\n    \"total_payments\": null,\n    \"created_at\": \"2024-08-28T16:41:23.818+01:00\",\n    \"updated_at\": \"2024-08-28T16:41:23.818+01:00\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "8aa1fd67-2b03-4059-909d-5b325c0bb317"
+                        },
+                        "reference": {},
+                        "currency": {
+                          "type": "string",
+                          "example": "usdt"
+                        },
+                        "address": {
+                          "type": "string",
+                          "example": "0x20A5EDe8eCa1BACb63C9C77A5C4ecbD9d089d5d2"
+                        },
+                        "network": {
+                          "type": "string",
+                          "example": "BEP20"
+                        },
+                        "user": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "dmdn34n4-2b03-4059-900d-444mff"
+                            },
+                            "sn": {
+                              "type": "string",
+                              "example": "QDXXIRPXXKS"
+                            },
+                            "email": {
+                              "type": "string",
+                              "example": "test@gmail.com"
+                            },
+                            "reference": {},
+                            "first_name": {
+                              "type": "string",
+                              "example": "Oye"
+                            },
+                            "last_name": {
+                              "type": "string",
+                              "example": "Olalekan"
+                            },
+                            "display_name": {
+                              "type": "string",
+                              "example": "appstate"
+                            },
+                            "created_at": {
+                              "type": "string",
+                              "example": "2021-04-09T10:48:14.000+01:00"
+                            },
+                            "updated_at": {
+                              "type": "string",
+                              "example": "2024-03-12T11:34:34.000+01:00"
+                            }
+                          }
+                        },
+                        "destination_tag": {},
+                        "total_payments": {},
+                        "created_at": {
+                          "type": "string",
+                          "example": "2024-08-28T16:41:23.818+01:00"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "example": "2024-08-28T16:41:23.818+01:00"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "401",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"Generating a new address for currency eth is not permitted.\",\n  \"data\": {\n    \"code\": \"E0609\",\n    \"message\": \"Generating a new address for currency eth is not permitted.\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Generating a new address for currency eth is not permitted."
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "example": "E0609"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Generating a new address for currency eth is not permitted."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"Sub-account with ID: 'mebb' doesn't exist.\",\n  \"data\": {\n    \"code\": \"E0104\",\n    \"message\": \"Sub-account with ID: 'mebb' doesn't exist.\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Sub-account with ID: 'mebb' doesn't exist."
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "example": "E0104"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Sub-account with ID: 'mebb' doesn't exist."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "6981ba5faf9470ee082aeece:6981ba5faf9470ee082aeefc"
+}
+```\n
+````

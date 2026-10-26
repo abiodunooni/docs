@@ -1,4 +1,172 @@
 ---
 title: "Fetch a sub-account"
-openapi: "/openapi/wallets.json GET /users/{user_id}"
 ---
+
+## ---\\ntitle: "Fetch a sub-account"\\n---\\n\\n--- agentTools: projectIndex: [https://docs.quidax.io/llms.txt](https://docs.quidax.io/llms.txt)
+
+# Fetch Details of Subaccount
+
+Get details of a subaccount.
+
+# OpenAPI definition
+
+````json
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API 3.0",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "https://openapi.quidax.io/exchange-open-api/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "x-bearer-format": "bearer",
+        "x-default": "api_key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/users/{user_id}": {
+      "get": {
+        "summary": "Fetch Details of Subaccount",
+        "description": "Get details of a subaccount.",
+        "operationId": "fetch-details-of-subaccount",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "The User ID. Use 'me' if fetching wallets of main authenticated user, use the user_id if fetching for Sub-account linked to the authenticated user.",
+            "schema": {
+              "type": "string",
+              "default": "me"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"success\",\n  \"message\": \"Successful\",\n  \"data\": {\n    \"id\": \"7y5pmgbo\",\n    \"sn\": \"QDX7WO4TOTY\",\n    \"email\": \"test@gmail.com\",\n    \"reference\": null,\n    \"first_name\": \"test\",\n    \"last_name\": \"user\",\n    \"display_name\": null,\n    \"created_at\": \"2021-04-09T11:06:42.000+01:00\",\n    \"updated_at\": \"2021-10-21T13:12:00.000+01:00\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "7y5pmgbo"
+                        },
+                        "sn": {
+                          "type": "string",
+                          "example": "QDX7WO4TOTY"
+                        },
+                        "email": {
+                          "type": "string",
+                          "example": "test@gmail.com"
+                        },
+                        "reference": {},
+                        "first_name": {
+                          "type": "string",
+                          "example": "test"
+                        },
+                        "last_name": {
+                          "type": "string",
+                          "example": "user"
+                        },
+                        "display_name": {},
+                        "created_at": {
+                          "type": "string",
+                          "example": "2021-04-09T11:06:42.000+01:00"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "example": "2021-10-21T13:12:00.000+01:00"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "sub account does not exist": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"Sub-account with ID: men doesn't exist\",\n  \"data\": {\n    \"code\": \"E0104\",\n    \"message\": \"Sub-account with ID: test doesn't exist\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Sub-account with ID: men doesn't exist"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "example": "E0104"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Sub-account with ID: test doesn't exist"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true,
+  "_id": "6981ba5faf9470ee082aeece:6981ba5faf9470ee082aeef0"
+}
+```\n
+````
