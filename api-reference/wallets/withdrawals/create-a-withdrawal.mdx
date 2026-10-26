@@ -1,4 +1,13 @@
 ---
 title: "Create a withdrawal"
-openapi: "/openapi/wallets.json POST /users/{user_id}/withdraws"
 ---
+
+This endpoint initiates a cryptocurrency withdrawal for the authenticated account or a linked sub-account.
+
+## Endpoint
+
+`POST /users/{user_id}/withdraws`
+
+Supply the destination address, currency, amount, and a unique `reference`. Use the reference to make retries safe and to look up the withdrawal if the request times out.
+
+See [Fetch a withdrawal by reference](/api-reference/wallets/withdrawals/fetch-a-withdrawal-by-reference) for reconciliation.

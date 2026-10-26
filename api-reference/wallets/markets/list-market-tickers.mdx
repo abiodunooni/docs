@@ -2,7 +2,7 @@
 title: "List market tickers"
 ---
 
----\\ntitle: "List market tickers"\\n---\\n\\nWarning: truncated output (original token count: 58471) Total output lines: 4793
+Warning: truncated output (original token count: 58471) Total output lines: 4793
 
 ---
 
@@ -14,7 +14,7 @@ Returns the list of tickers(a cryptocurrency buy, sell, volume information) for 
 
 # OpenAPI definition
 
-````json
+```json
 {
   "openapi": "3.1.0",
   "info": {
@@ -746,7 +746,933 @@ Returns the list of tickers(a cryptocurrency buy, sell, volume information) for 
                                 "buy": {
                                   "type": "integer",
                                   "example": 0,
-                          …28471 tokens truncated…: "integer",
+                                  "default": 0
+                                },
+                                "sell": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "open": {
+                                  "type": "string",
+                                  "example": "0.673"
+                                }
+                              }
+                            },
+                            "at": {
+                              "type": "integer",
+                              "example": 1771845815000,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "slpusdt": {
+                          "type": "object",
+                          "properties": {
+                            "ticker": {
+                              "type": "object",
+                              "properties": {
+                                "high": {
+                                  "type": "string",
+                                  "example": "0.002384"
+                                },
+                                "vol": {
+                                  "type": "string",
+                                  "example": "0"
+                                },
+                                "last": {
+                                  "type": "number",
+                                  "example": 0.002384,
+                                  "default": 0
+                                },
+                                "low": {
+                                  "type": "string",
+                                  "example": "0.002384"
+                                },
+                                "buy": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "sell": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "open": {
+                                  "type": "string",
+                                  "example": "0.002384"
+                                }
+                              }
+                            },
+                            "at": {
+                              "type": "integer",
+                              "example": 1772715501000,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "sushiusdt": {
+                          "type": "object",
+                          "properties": {
+                            "ticker": {
+                              "type": "object",
+                              "properties": {
+                                "high": {
+                                  "type": "string",
+                                  "example": "0.701"
+                                },
+                                "vol": {
+                                  "type": "string",
+                                  "example": "0"
+                                },
+                                "last": {
+                                  "type": "number",
+                                  "example": 0.701,
+                                  "default": 0
+                                },
+                                "low": {
+                                  "type": "string",
+                                  "example": "0.701"
+                                },
+                                "buy": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "sell": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "open": {
+                                  "type": "string",
+                                  "example": "0.701"
+                                }
+                              }
+                            },
+                            "at": {
+                              "type": "integer",
+                              "example": 1771845815000,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "zilusdt": {
+                          "type": "object",
+                          "properties": {
+                            "ticker": {
+                              "type": "object",
+                              "properties": {
+                                "high": {
+                                  "type": "string",
+                                  "example": "0.01284"
+                                },
+                                "vol": {
+                                  "type": "string",
+                                  "example": "0"
+                                },
+                                "last": {
+                                  "type": "number",
+                                  "example": 0.01284,
+                                  "default": 0
+                                },
+                                "low": {
+                                  "type": "string",
+                                  "example": "0.01284"
+                                },
+                                "buy": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "sell": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "open": {
+                                  "type": "string",
+                                  "example": "0.01284"
+                                }
+                              }
+                            },
+                            "at": {
+                              "type": "integer",
+                              "example": 1771845815000,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "flokiusdt": {
+                          "type": "object",
+                          "properties": {
+                            "ticker": {
+                              "type": "object",
+                              "properties": {
+                                "high": {
+                                  "type": "string",
+                                  "example": "0.0001421"
+                                },
+                                "vol": {
+                                  "type": "string",
+                                  "example": "0"
+                                },
+                                "last": {
+                                  "type": "number",
+                                  "example": 0.0001421,
+                                  "default": 0
+                                },
+                                "low": {
+                                  "type": "string",
+                                  "example": "0.0001421"
+                                },
+                                "buy": {
+                                  "type": "number",
+                                  "example": 0.000123,
+                                  "default": 0
+                                },
+                                "sell": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "open": {
+                                  "type": "string",
+                                  "example": "0.0001421"
+                                }
+                              }
+                            },
+                            "at": {
+                              "type": "integer",
+                              "example": 1771845815000,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "manausdt": {
+                          "type": "object",
+                          "properties": {
+                            "ticker": {
+                              "type": "object",
+                              "properties": {
+                                "high": {
+                                  "type": "string",
+                                  "example": "0.2577"
+                                },
+                                "vol": {
+                                  "type": "string",
+                                  "example": "0"
+                                },
+                                "last": {
+                                  "type": "number",
+                                  "example": 0.2577,
+                                  "default": 0
+                                },
+                                "low": {
+                                  "type": "string",
+                                  "example": "0.2577"
+                                },
+                                "buy": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "sell": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "open": {
+                                  "type": "string",
+                                  "example": "0.2577"
+                                }
+                              }
+                            },
+                            "at": {
+                              "type": "integer",
+                              "example": 1771845815000,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "ftmusdt": {
+                          "type": "object",
+                          "properties": {
+                            "ticker": {
+                              "type": "object",
+                              "properties": {
+                                "high": {
+                                  "type": "string",
+                                  "example": "0.66"
+                                },
+                                "vol": {
+                                  "type": "string",
+                                  "example": "0"
+                                },
+                                "last": {
+                                  "type": "number",
+                                  "example": 0.66,
+                                  "default": 0
+                                },
+                                "low": {
+                                  "type": "string",
+                                  "example": "0.66"
+                                },
+                                "buy": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "sell": {
+                                  "type": "number",
+                                  "example": 0.66,
+                                  "default": 0
+                                },
+                                "open": {
+                                  "type": "string",
+                                  "example": "0.66"
+                                }
+                              }
+                            },
+                            "at": {
+                              "type": "integer",
+                              "example": 1754833525000,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "sandusdt": {
+                          "type": "object",
+                          "properties": {
+                            "ticker": {
+                              "type": "object",
+                              "properties": {
+                                "high": {
+                                  "type": "string",
+                                  "example": "0.1664"
+                                },
+                                "vol": {
+                                  "type": "string",
+                                  "example": "0"
+                                },
+                                "last": {
+                                  "type": "number",
+                                  "example": 0.1664,
+                                  "default": 0
+                                },
+                                "low": {
+                                  "type": "string",
+                                  "example": "0.1664"
+                                },
+                                "buy": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "sell": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "open": {
+                                  "type": "string",
+                                  "example": "0.1664"
+                                }
+                              }
+                            },
+                            "at": {
+                              "type": "integer",
+                              "example": 1784998830000,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "apeusdt": {
+                          "type": "object",
+                          "properties": {
+                            "ticker": {
+                              "type": "object",
+                              "properties": {
+                                "high": {
+                                  "type": "string",
+                                  "example": "0.399"
+                                },
+                                "vol": {
+                                  "type": "string",
+                                  "example": "0"
+                                },
+                                "last": {
+                                  "type": "number",
+                                  "example": 0.399,
+                                  "default": 0
+                                },
+                                "low": {
+                                  "type": "string",
+                                  "example": "0.399"
+                                },
+                                "buy": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "sell": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "open": {
+                                  "type": "string",
+                                  "example": "0.399"
+                                }
+                              }
+                            },
+                            "at": {
+                              "type": "integer",
+                              "example": 1784998830000,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "enjusdt": {
+                          "type": "object",
+                          "properties": {
+                            "ticker": {
+                              "type": "object",
+                              "properties": {
+                                "high": {
+                                  "type": "string",
+                                  "example": "0.9"
+                                },
+                                "vol": {
+                                  "type": "string",
+                                  "example": "0"
+                                },
+                                "last": {
+                                  "type": "number",
+                                  "example": 0.9,
+                                  "default": 0
+                                },
+                                "low": {
+                                  "type": "string",
+                                  "example": "0.9"
+                                },
+                                "buy": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "sell": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "open": {
+                                  "type": "string",
+                                  "example": "0.9"
+                                }
+                              }
+                            },
+                            "at": {
+                              "type": "integer",
+                              "example": 1771845815000,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "lrcusdt": {
+                          "type": "object",
+                          "properties": {
+                            "ticker": {
+                              "type": "object",
+                              "properties": {
+                                "high": {
+                                  "type": "string",
+                                  "example": "0.0887"
+                                },
+                                "vol": {
+                                  "type": "string",
+                                  "example": "0"
+                                },
+                                "last": {
+                                  "type": "number",
+                                  "example": 0.0887,
+                                  "default": 0
+                                },
+                                "low": {
+                                  "type": "string",
+                                  "example": "0.0887"
+                                },
+                                "buy": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                         …18471 tokens truncated…             "type": "string",
+                                  "example": "0.0044"
+                                }
+                              }
+                            },
+                            "at": {
+                              "type": "integer",
+                              "example": 1771845815000,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "beamusdt": {
+                          "type": "object",
+                          "properties": {
+                            "ticker": {
+                              "type": "object",
+                              "properties": {
+                                "high": {
+                                  "type": "string",
+                                  "example": "0.01201"
+                                },
+                                "vol": {
+                                  "type": "string",
+                                  "example": "0"
+                                },
+                                "last": {
+                                  "type": "number",
+                                  "example": 0.01201,
+                                  "default": 0
+                                },
+                                "low": {
+                                  "type": "string",
+                                  "example": "0.01201"
+                                },
+                                "buy": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "sell": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "open": {
+                                  "type": "string",
+                                  "example": "0.01201"
+                                }
+                              }
+                            },
+                            "at": {
+                              "type": "integer",
+                              "example": 1771845815000,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "reachusdt": {
+                          "type": "object",
+                          "properties": {
+                            "ticker": {
+                              "type": "object",
+                              "properties": {
+                                "last": {
+                                  "type": "number",
+                                  "example": 0.02104,
+                                  "default": 0
+                                },
+                                "buy": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "sell": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                }
+                              }
+                            },
+                            "at": {
+                              "type": "integer",
+                              "example": 0,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "wavesusdt": {
+                          "type": "object",
+                          "properties": {
+                            "ticker": {
+                              "type": "object",
+                              "properties": {
+                                "high": {
+                                  "type": "string",
+                                  "example": "1.08"
+                                },
+                                "vol": {
+                                  "type": "string",
+                                  "example": "0"
+                                },
+                                "last": {
+                                  "type": "number",
+                                  "example": 1.08,
+                                  "default": 0
+                                },
+                                "low": {
+                                  "type": "string",
+                                  "example": "1.08"
+                                },
+                                "buy": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "sell": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "open": {
+                                  "type": "string",
+                                  "example": "1.08"
+                                }
+                              }
+                            },
+                            "at": {
+                              "type": "integer",
+                              "example": 1784998830000,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "gnousdt": {
+                          "type": "object",
+                          "properties": {
+                            "ticker": {
+                              "type": "object",
+                              "properties": {
+                                "high": {
+                                  "type": "string",
+                                  "example": "151.1"
+                                },
+                                "vol": {
+                                  "type": "string",
+                                  "example": "0"
+                                },
+                                "last": {
+                                  "type": "number",
+                                  "example": 151.1,
+                                  "default": 0
+                                },
+                                "low": {
+                                  "type": "string",
+                                  "example": "151.1"
+                                },
+                                "buy": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "sell": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "open": {
+                                  "type": "string",
+                                  "example": "151.1"
+                                }
+                              }
+                            },
+                            "at": {
+                              "type": "integer",
+                              "example": 1784998830000,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "mntusdt": {
+                          "type": "object",
+                          "properties": {
+                            "ticker": {
+                              "type": "object",
+                              "properties": {
+                                "high": {
+                                  "type": "string",
+                                  "example": "0.8029"
+                                },
+                                "vol": {
+                                  "type": "string",
+                                  "example": "0"
+                                },
+                                "last": {
+                                  "type": "number",
+                                  "example": 0.8029,
+                                  "default": 0
+                                },
+                                "low": {
+                                  "type": "string",
+                                  "example": "0.8029"
+                                },
+                                "buy": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "sell": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "open": {
+                                  "type": "string",
+                                  "example": "0.8029"
+                                }
+                              }
+                            },
+                            "at": {
+                              "type": "integer",
+                              "example": 1784998830000,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "xyousdt": {
+                          "type": "object",
+                          "properties": {
+                            "ticker": {
+                              "type": "object",
+                              "properties": {
+                                "high": {
+                                  "type": "string",
+                                  "example": "0.00421"
+                                },
+                                "vol": {
+                                  "type": "string",
+                                  "example": "0"
+                                },
+                                "last": {
+                                  "type": "number",
+                                  "example": 0.00421,
+                                  "default": 0
+                                },
+                                "low": {
+                                  "type": "string",
+                                  "example": "0.00421"
+                                },
+                                "buy": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "sell": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "open": {
+                                  "type": "string",
+                                  "example": "0.00421"
+                                }
+                              }
+                            },
+                            "at": {
+                              "type": "integer",
+                              "example": 1784998830000,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "coqusdt": {
+                          "type": "object",
+                          "properties": {
+                            "ticker": {
+                              "type": "object",
+                              "properties": {
+                                "high": {
+                                  "type": "string",
+                                  "example": "0.00000138"
+                                },
+                                "vol": {
+                                  "type": "string",
+                                  "example": "0"
+                                },
+                                "last": {
+                                  "type": "number",
+                                  "example": 0.00000138,
+                                  "default": 0
+                                },
+                                "low": {
+                                  "type": "string",
+                                  "example": "0.00000138"
+                                },
+                                "buy": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "sell": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "open": {
+                                  "type": "string",
+                                  "example": "0.00000138"
+                                }
+                              }
+                            },
+                            "at": {
+                              "type": "integer",
+                              "example": 1784998830000,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "magatrumpusdt": {
+                          "type": "object",
+                          "properties": {
+                            "ticker": {
+                              "type": "object",
+                              "properties": {
+                                "high": {
+                                  "type": "string",
+                                  "example": "0.1575"
+                                },
+                                "vol": {
+                                  "type": "string",
+                                  "example": "0"
+                                },
+                                "last": {
+                                  "type": "number",
+                                  "example": 0.1575,
+                                  "default": 0
+                                },
+                                "low": {
+                                  "type": "string",
+                                  "example": "0.1575"
+                                },
+                                "buy": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "sell": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "open": {
+                                  "type": "string",
+                                  "example": "0.1575"
+                                }
+                              }
+                            },
+                            "at": {
+                              "type": "integer",
+                              "example": 1784998830000,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "katangn": {
+                          "type": "object",
+                          "properties": {
+                            "ticker": {
+                              "type": "object",
+                              "properties": {
+                                "buy": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "sell": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                }
+                              }
+                            },
+                            "at": {
+                              "type": "integer",
+                              "example": 0,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "myrongn": {
+                          "type": "object",
+                          "properties": {
+                            "ticker": {
+                              "type": "object",
+                              "properties": {
+                                "high": {
+                                  "type": "string",
+                                  "example": "1000"
+                                },
+                                "vol": {
+                                  "type": "string",
+                                  "example": "0"
+                                },
+                                "last": {
+                                  "type": "integer",
+                                  "example": 1000,
+                                  "default": 0
+                                },
+                                "low": {
+                                  "type": "string",
+                                  "example": "1000"
+                                },
+                                "buy": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "sell": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "open": {
+                                  "type": "string",
+                                  "example": "1000"
+                                }
+                              }
+                            },
+                            "at": {
+                              "type": "integer",
+                              "example": 1784998830000,
+                              "default": 0
+                            }
+                          }
+                        },
+                        "jupngn": {
+                          "type": "object",
+                          "properties": {
+                            "ticker": {
+                              "type": "object",
+                              "properties": {
+                                "high": {
+                                  "type": "string",
+                                  "example": "800"
+                                },
+                                "vol": {
+                                  "type": "string",
+                                  "example": "0"
+                                },
+                                "last": {
+                                  "type": "integer",
+                                  "example": 800,
+                                  "default": 0
+                                },
+                                "low": {
+                                  "type": "string",
+                                  "example": "800"
+                                },
+                                "buy": {
+                                  "type": "integer",
+                                  "example": 0,
+                                  "default": 0
+                                },
+                                "sell": {
+                                  "type": "integer",
                                   "example": 0,
                                   "default": 0
                                 },
@@ -2158,5 +3084,4 @@ Returns the list of tickers(a cryptocurrency buy, sell, volume information) for 
   "x-readme-fauxas": true,
   "_id": "6981ba5faf9470ee082aeece:6981ba5faf9470ee082aeef3"
 }
-```\n
-````
+```
