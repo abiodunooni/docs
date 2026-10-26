@@ -4,80 +4,218 @@ title: "Create a sub-account"
 
 Create a sub account tethered to the authenticated user
 
-## POST /users
-
-### Authorization
-
-`Authorization`
-
-`api_key`
-
-### email
-
-`string`
-
-The email of your sub user, the user email must be unique and it can't be changed.
-
-`test@gmail.com`
-
-### first_name
-
-`string`
-
-The first name of your sub user, this field can be edited.
-
-`test`
-
-### last_name
-
-`string`
-
-The last name of your sub user, this field can be edited.
-
-`user`
-
-## 200
+# OpenAPI definition
 
 ```json
 {
-  "status": "success",
-  "message": "Successful",
-  "data": {
-    "id": "fxxwu3kc",
-    "sn": "QDXR3E7XPRQ",
-    "email": "teste@gmail.com",
-    "reference": null,
-    "first_name": "test",
-    "last_name": "user",
-    "display_name": null,
-    "created_at": "2021-11-15T19:33:03.725+01:00",
-    "updated_at": "2021-11-15T19:33:05.753+01:00"
-  }
-}
-```
-
-## 401
-
-```json
-{
-  "status": "error",
-  "message": "Invalid api key",
-  "data": {
-    "code": "E0107",
-    "message": "Invalid api key"
-  }
-}
-```
-
-## 409
-
-```json
-{
-  "status": "error",
-  "message": "A sub account with this email already exists",
-  "data": {
-    "code": "E0101",
-    "message": "A sub account with this email already exists"
-  }
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API 3.0",
+    "version": "3.0"
+  },
+  "servers": [
+    {
+      "url": "https://openapi.quidax.io/exchange-open-api/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sec0": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "x-bearer-format": "bearer",
+        "x-default": "api_key"
+      }
+    }
+  },
+  "security": [
+    {
+      "sec0": []
+    }
+  ],
+  "paths": {
+    "/users": {
+      "post": {
+        "summary": "Create a Sub-account",
+        "description": "Create a sub account tethered to the authenticated user",
+        "operationId": "create-a-sub-account",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "The email of your sub user, the user email must be unique and it can't be changed.",
+                    "default": "test@gmail.com"
+                  },
+                  "first_name": {
+                    "type": "string",
+                    "description": "The first name of your sub user, this field can be edited.",
+                    "default": "test"
+                  },
+                  "last_name": {
+                    "type": "string",
+                    "description": "The last name of your sub user, this field can be edited.",
+                    "default": "user"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"success\",\n  \"message\": \"Successful\",\n  \"data\": {\n    \"id\": \"fxxwu3kc\",\n    \"sn\": \"QDXR3E7XPRQ\",\n    \"email\": \"teste@gmail.com\",\n    \"reference\": null,\n    \"first_name\": \"test\",\n    \"last_name\": \"user\",\n    \"display_name\": null,\n    \"created_at\": \"2021-11-15T19:33:03.725+01:00\",\n    \"updated_at\": \"2021-11-15T19:33:05.753+01:00\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "fxxwu3kc"
+                        },
+                        "sn": {
+                          "type": "string",
+                          "example": "QDXR3E7XPRQ"
+                        },
+                        "email": {
+                          "type": "string",
+                          "example": "teste@gmail.com"
+                        },
+                        "reference": {},
+                        "first_name": {
+                          "type": "string",
+                          "example": "test"
+                        },
+                        "last_name": {
+                          "type": "string",
+                          "example": "user"
+                        },
+                        "display_name": {},
+                        "created_at": {
+                          "type": "string",
+                          "example": "2021-11-15T19:33:03.725+01:00"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "example": "2021-11-15T19:33:05.753+01:00"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "401",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Invalid secret key": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"Invalid api key\",\n  \"data\": {\n    \"code\": \"E0107\",\n    \"message\": \"Invalid api key\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid api key"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "example": "E0107"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Invalid api key"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "409",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Result": {
+                    "value": "{\n  \"status\": \"error\",\n  \"message\": \"A sub account with this email already exists\",\n  \"data\": {\n    \"code\": \"E0101\",\n    \"message\": \"A sub account with this email already exists\"\n  }\n}"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "A sub account with this email already exists"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "example": "E0101"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "A sub account with this email already exists"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "x-readme": {
+    "headers": [],
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  },
+  "x-readme-fauxas": true
 }
 ```
